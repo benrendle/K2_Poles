@@ -97,7 +97,7 @@ def C3_cat():
     # C3_2 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/C3_All_EPICS2.txt')
     # print( C3_2)
     C3 = pd.concat([C3_1,C3_2],ignore_index=True)
-    # C3.to_csv('/home/bmr135/Downloads/C3',index=False)
+    C3.to_csv('/home/bmr135/Downloads/C3',index=False)
 
     return C3
 
@@ -112,6 +112,7 @@ def C6_cat():
     # C6_3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/C6_epic_search3.txt')
     # C6_4 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/C6_epic_search4.txt')
     C6 = pd.concat([C6_1,C6_2,C6_3,C6_4])
+    C6.to_csv('/home/bmr135/Downloads/C6',index=False)
 
     return C6
 
@@ -129,9 +130,15 @@ def K2_GAP():
     GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
     GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     GAP3['sig_Teff'] = (abs(GAP3['ep_teff'])+abs(GAP3['em_teff']))/2
+    for i in range(len(GAP3['sig_Teff'])):
+        if GAP3['sig_Teff'][i] < 100:
+            GAP3['sig_Teff'][i] = 100
     GAP3['sig_logg'] = (abs(GAP3['ep_logg'])+abs(GAP3['em_logg']))/2
     GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2
     GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
+    for i in range(len(GAP6['sig_Teff'])):
+        if GAP6['sig_Teff'][i] < 100:
+            GAP6['sig_Teff'][i] = 100
     GAP6['sig_logg'] = (abs(GAP6['ep_logg'])+abs(GAP6['em_logg']))/2
     GAP6['sig_feh'] = (abs(GAP6['ep_[Fe/H]'])+abs(GAP6['em_[Fe/H]']))/2
 
@@ -159,7 +166,8 @@ def Yvonne():
     # Yvonne_C3 = Yvonne_C3[Yvonne_C3.rej1 < 1]
     # Yvonne_C3 = Yvonne_C3[Yvonne_C3.rej2 < 1]
 
-    Yvonne_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-ben-all-results.txt',delimiter=r'\s+')
+    Yvonne_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/c3-YE-results.txt')
+    # Yvonne_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-ben-all-results.txt',delimiter=r'\s+')
     # Yvonne_C3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-ben-all-results.txt',delimiter=r'\s+')
 
     # Yvonne_C6_numax = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/C6-A-nu_max.txt',delim_whitespace=True)
@@ -169,7 +177,8 @@ def Yvonne():
     # Yvonne_C6 = Yvonne_C6[Yvonne_C6.rej1 < 1]
     # Yvonne_C6 = Yvonne_C6[Yvonne_C6.rej2 < 1]
 
-    Yvonne_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C6-ben-all-results.txt',delimiter=r'\s+')
+    Yvonne_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/c6-YE-results.txt')
+    # Yvonne_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C6-ben-all-results.txt',delimiter=r'\s+')
     # Yvonne_C6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/Yvonne/YE-C6-ben-all-results.txt',delimiter=r'\s+')
     # print( type(Yvonne_C6['YDnu'][5]))
     # j=0
@@ -330,24 +339,24 @@ def APO_merge(K2,APO,name):
 
 def LAMOST():
     ''' Read in a format LAMOST data '''
-    C3 = pd.read_csv('/home/bmr135/GA/K2Poles/LAMOST/C3_LAMOST_output.csv',comment='#')
+    C3 = pd.read_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/C3_LAMOST_output.csv',comment='#')
     # C3 = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/C3_LAMOST_output.csv',comment='#')
     C3 = C3.convert_objects(convert_numeric=True)
     C3 = C3.drop_duplicates(subset='input_id',keep='first')
     C3 = C3.dropna()
     C3 = C3.reset_index(drop=True)
-    C3_list = pd.read_csv('/home/bmr135/GA/K2Poles/LAMOST/C3_LAMOST.csv')
+    C3_list = pd.read_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/C3_LAMOST.csv')
     # C3_list = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/C3_LAMOST.csv')
     c3_comp = pd.merge(C3,C3_list,how='inner',on=['RA'])
     c3_comp = c3_comp.reset_index(drop=True)
 
-    C6 = pd.read_csv('/home/bmr135/GA/K2Poles/LAMOST/C6_LAMOST_output.csv',comment='#')
+    C6 = pd.read_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/C6_LAMOST_output.csv',comment='#')
     # C6 = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/C6_LAMOST_output.csv',comment='#')
     C6 = C6.convert_objects(convert_numeric=True)
     C6 = C6.dropna()
     C6 = C6.drop_duplicates(subset='input_id',keep='first')
     C6 = C6.reset_index(drop=True)
-    C6_list = pd.read_csv('/home/bmr135/GA/K2Poles/LAMOST/C6_LAMOST.csv')
+    C6_list = pd.read_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/C6_LAMOST.csv')
     # C6_list = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/C6_LAMOST.csv')
     c6_comp = pd.merge(C6,C6_list,how='inner',on=['RA'])
     c6_comp = c6_comp.reset_index(drop=True)
