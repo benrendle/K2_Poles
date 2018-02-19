@@ -1520,7 +1520,7 @@ plt.title(r'Multi det - Benoit (C3)',fontsize=20)
 plt.tick_params(labelsize=15)
 
 plt.tight_layout()
-#
+
 # a = np.sum(hist2)
 # b = np.sum(hist1)
 # c = np.float(b/a)*100
