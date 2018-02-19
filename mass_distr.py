@@ -319,7 +319,7 @@ if __name__ == '__main__':
             TRI = TRI.sample(n=len(K2))
             TRI = TRI.reset_index(drop=True)
         sim = copy.deepcopy(TRI)
-        obs = copy.deepcopy(K2) #####################################################################################
+        obs = copy.deepcopy(K2)
         alt_sim = mdf.sim_pert(obs,sim)
         # print(alt_sim.columns.values)
         thin_alt = alt_sim[alt_sim['#Gc'] == 1]
