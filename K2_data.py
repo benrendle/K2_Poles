@@ -85,7 +85,7 @@ def BESANCON():
 def C3_cat():
     # EPIC C3 Catalogue
     C3_1 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/C3_All_EPICS1.txt')
-    C3_2 = pd.read_csv(ext_DB'Dropbox/K2Poles/Data0405/C3_All_EPICS2.txt')
+    C3_2 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/C3_All_EPICS2.txt')
     C3 = pd.concat([C3_1,C3_2],ignore_index=True)
     # C3.to_csv('/home/bmr135/Downloads/C3',index=False)
 

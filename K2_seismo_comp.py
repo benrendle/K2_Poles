@@ -25,6 +25,7 @@ import K2_constants as const
 import K2_data as dat
 from numbers import Number
 import seaborn as sns
+import time
 
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
@@ -252,19 +253,6 @@ TRI6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_old_stars',index=False)
 print('Trilegal saved out')
 
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
-
-Y6_dnu = pd.DataFrame()
-Y6_dnu = YC6[YC6['dnu'] != np.nan]
-Y6_dnu.reset_index(drop=True)
-print(len(Y6_dnu), len(YC6))
-
-plt.figure()
-hist, bins, patches = plt.hist(YC6['Radius'],histtype='step',bins=50,label=r'All Data')#,normed=True)
-plt.hist(Y6_dnu['Radius'],bins=bins,histtype='step',label=r'With $\Delta\nu$')#,normed=True)
-plt.xlabel(r'Radius [R$_{\odot}$]')
-plt.legend()
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-
 
 ''' Add detection flags to data/save out values for comparisons '''
 # YC3,BC3,SC3 = prop.individ(YC3,BC3,SC3,'K2P2_C3')
@@ -502,7 +490,7 @@ camp3 = prop.single_seismo(camp3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp3 = prop.single_seismo(camp3,['BDnu','dnu','SDnu'],'DNU')
 camp3 = prop.single_seismo(camp3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp3 = prop.met_filter(camp3)
-camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_070218.csv',index=False)
+camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
 
 camp6 = pd.concat([YB_C6,YS_C6,BS_C6],ignore_index=True)
 camp6 = camp6.drop_duplicates(subset=['EPIC'])
@@ -514,7 +502,7 @@ camp6 = prop.single_seismo(camp6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp6 = prop.single_seismo(camp6,['BDnu','dnu','SDnu'],'DNU')
 camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp6 = prop.met_filter(camp6)
-camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_070218.csv',index=False)
+camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
 
 print(len(camp3),len(camp6))
 
@@ -529,52 +517,52 @@ GAP_camp3 = pd.merge(GAP3_v2,camp3,how='inner',on=['EPIC'])
 GAP_camp6 = pd.merge(GAP6_v2,camp6,how='inner',on=['EPIC'])
 print(len(GAP_camp3),len(GAP_camp6))
 
-fig,ax = plt.subplots(2)
-ax[0].hist(GAP3_v2['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'GAP')
-ax[0].hist(camp3['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'Seismic')
-ax[0].hist(GAP_camp3['Hmag_x'],bins=np.linspace(7,12,50),histtype='step',label=r'Combined')
-ax[0].legend()
-ax[0].set_xlabel(r'H')
-ax[1].hist(GAP6_v2['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'GAP')
-ax[1].hist(camp6['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'Seismic')
-ax[1].hist(GAP_camp6['Vcut_x'],bins=np.linspace(9,15,50),histtype='step',label=r'Combined')
-ax[1].set_xlabel(r'V')
-plt.tight_layout()
+# fig,ax = plt.subplots(2)
+# ax[0].hist(GAP3_v2['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'GAP')
+# ax[0].hist(camp3['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'Seismic')
+# ax[0].hist(GAP_camp3['Hmag_x'],bins=np.linspace(7,12,50),histtype='step',label=r'Combined')
+# ax[0].legend()
+# ax[0].set_xlabel(r'H')
+# ax[1].hist(GAP6_v2['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'GAP')
+# ax[1].hist(camp6['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'Seismic')
+# ax[1].hist(GAP_camp6['Vcut_x'],bins=np.linspace(9,15,50),histtype='step',label=r'Combined')
+# ax[1].set_xlabel(r'V')
+# plt.tight_layout()
 
 cols_to_use = camp3.columns.difference(RAVE3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC3 = pd.merge(RAVE3,camp3[cols_to_use],how='inner',on=['EPIC'])
-RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_070218.csv',index=False,na_rep='Inf')
+RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 cols_to_use = camp6.columns.difference(RAVE6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
-RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_070218.csv',index=False,na_rep='Inf')
+RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_070218.csv',index=False,na_rep='Inf')
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Merging of LAMOST data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(LAMOST3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L3 = pd.merge(LAMOST3,camp3[cols_to_use],how='inner',on=['EPIC'])
-L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_070218.csv',index=False,na_rep='Inf')
+L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "LAMOST3 saved out ", len(LAMOST3))
 cols_to_use = camp6.columns.difference(LAMOST6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L6 = pd.merge(LAMOST6,camp6[cols_to_use],how='inner',on=['EPIC'])
-L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_070218.csv',index=False,na_rep='Inf')
+L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "LAMOST6 saved out ", len(LAMOST6))
 
 ''' Merging of APOGEE data with multiple asteroseismic dets '''
 cols_to_use = camp6.columns.difference(APO6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 APO = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
-APO.to_csv(ext_GA+'GA/K2Poles/APOGEE_070218.csv',index=False,na_rep='Inf')
+APO.to_csv(ext_GA+'GA/K2Poles/APOGEE_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "APOGEE saved out", len(APO))
 
 print(len(pd.merge(L3,GES,how='inner',on=['EPIC'])))
@@ -585,7 +573,7 @@ print(len(L6),len(RC6))
 cols_to_use = RC6.columns.difference(L6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 LR6 = pd.merge(L6,RC6[cols_to_use],how='inner',on=['EPIC'])
-LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6.csv',index=False,na_rep='Inf')
+LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print('LAMOST/RAVE C6 saved out')
 
 E3 = pd.concat([EE_C3,SE_C3,YSE_C3],ignore_index=True)
