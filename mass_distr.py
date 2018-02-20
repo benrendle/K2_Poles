@@ -59,10 +59,16 @@ if __name__ == '__main__':
     tar = tt.TAR(ext,'APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me', r'\s+')
     APK2 = pd.DataFrame()
     APK2 = tar()
-    print(APK2)
+
+    targ = tt.TAR(ext,'GES.tar.gz', 'GES/', 'GES.in.me', r'\s+')
+    GES = pd.DataFrame()
+    GES = targ()
+
+    targ_v2 = tt.TAR(ext,'GES_v2.tar.gz', 'GES_v2/', 'GES.in.me', r'\s+')
+    GES_v2 = pd.DataFrame()
+    GES_v2 = targ_v2()
     sys.exit()
-    GES = pd.read_csv(ext+'GES/GES.in.me',delimiter=r'\s+')
-    GES_v2 = pd.read_csv(ext+'GES_v2/GES.in.me',delimiter=r'\s+')
+
     GES_ns = pd.read_csv(ext+'GES_ns/GES.in.me',delimiter=r'\s+')
     GES_A40 = pd.read_csv(ext+'GES_A40/GES.in.me',delimiter=r'\s+')
     APO = pd.read_csv(ext+'APO6/APOGEE.in.me',delimiter=r'\s+')
