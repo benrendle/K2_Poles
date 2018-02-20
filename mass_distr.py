@@ -104,26 +104,26 @@ if __name__ == '__main__':
     # (Kep_Sim['Vcut'] > 9) & (Kep_Sim['Vcut'] < 15) & (Kep_Sim['JK'] > 0.5)]
 
     ''' Additional PARAM inputs that aren't output values '''
-    C3 = mdf.p_in('C3',C3,'C3')
-    C3_True = mdf.p_in('C3',C3_True,'C3')
-    C3_ns = mdf.p_in('C3',C3_ns,'C3')
-    C3_A40 = mdf.p_in('C3',C3_A40,'C3')
-    C3_40_06FeH = mdf.p_in('C3_40_06FeH',C3_40_06FeH,'C3_40_06FeH')
-    GES = mdf.p_in('GES',GES,'C3')
-    GES_v2 = mdf.p_in('GES',GES_v2,'C3')
-    GES_ns = mdf.p_in('GES',GES_ns,'C3')
-    GES_A40 = mdf.p_in('GES',GES_A40,'C3')
-    RC3 = mdf.p_in('RC3',RC3,'C3')
-    RC3_ns = mdf.p_in('RC3',RC3_ns,'C3')
-    RC3_A40 = mdf.p_in('RC3',RC3_A40,'C3')
-    C6 = mdf.p_in('C6',C6,'C6')
-    C6_True = mdf.p_in('C6',C6_True,'C6')
-    C6_A40 = mdf.p_in('C6',C6_A40,'C6')
-    C6_40_06FeH = mdf.p_in('C6_40_06FeH',C6_40_06FeH,'C6_40_06FeH')
-    APO = mdf.p_in('APOGEE',APO,'C6')
-    APO_ns = mdf.p_in('APOGEE',APO_ns,'C6')
-    RC6 = mdf.p_in('RC6',RC6,'C6')
-    RC6_A40 = mdf.p_in('RC6',RC6_A40,'C6')
+    C3 = mdf.p_in('Pre_02_2018/C3',C3,'C3')
+    C3_True = mdf.p_in('Pre_02_2018/C3',C3_True,'C3')
+    C3_ns = mdf.p_in('Pre_02_2018/C3',C3_ns,'C3')
+    C3_A40 = mdf.p_in('Pre_02_2018/C3',C3_A40,'C3')
+    C3_40_06FeH = mdf.p_in('Pre_02_2018/C3_40_06FeH',C3_40_06FeH,'C3_40_06FeH')
+    GES = mdf.p_in('Pre_02_2018/GES',GES,'C3')
+    GES_v2 = mdf.p_in('Pre_02_2018/GES',GES_v2,'C3')
+    GES_ns = mdf.p_in('Pre_02_2018/GES',GES_ns,'C3')
+    GES_A40 = mdf.p_in('Pre_02_2018/GES',GES_A40,'C3')
+    RC3 = mdf.p_in('Pre_02_2018/RC3',RC3,'C3')
+    RC3_ns = mdf.p_in('Pre_02_2018/RC3',RC3_ns,'C3')
+    RC3_A40 = mdf.p_in('Pre_02_2018/RC3',RC3_A40,'C3')
+    C6 = mdf.p_in('Pre_02_2018/C6',C6,'C6')
+    C6_True = mdf.p_in('Pre_02_2018/C6',C6_True,'C6')
+    C6_A40 = mdf.p_in('Pre_02_2018/C6',C6_A40,'C6')
+    C6_40_06FeH = mdf.p_in('Pre_02_2018/C6_40_06FeH',C6_40_06FeH,'C6_40_06FeH')
+    APO = mdf.p_in('Pre_02_2018/APOGEE',APO,'C6')
+    APO_ns = mdf.p_in('Pre_02_2018/APOGEE',APO_ns,'C6')
+    RC6 = mdf.p_in('Pre_02_2018/RC6',RC6,'C6')
+    RC6_A40 = mdf.p_in('Pre_02_2018/RC6',RC6_A40,'C6')
 
     # RC6_ns = p_in('RC6',RC6_ns,'C6')
     TRI3['age'] = (10**TRI3['logAge'])/1e9
@@ -186,13 +186,9 @@ if __name__ == '__main__':
     param = ['mass','rad','age']
     x = [['mass',0.0],['rad',0.0],['age',0.0]]
     err1 = mdf.uncerts(c3_ns,param,x)
-    # print(err1)
     err2 = mdf.uncerts(ges_ns,param,x)
-    # print(err2)
     err3 = mdf.uncerts(ges,param,x)
-    # print(err3)
     err4 = mdf.uncerts(c3,param,x)
-    # print(err4)
 
     ''' Combine all spectroscopic data for each campaign '''
     c_three = pd.concat([ges_40,rc3_40],ignore_index=True)
@@ -243,67 +239,32 @@ if __name__ == '__main__':
     K2_dnu = K2[K2['dnu'] > 0]
     K2_dnu.reset_index(drop=True)
 
-    ''' Plotting '''
-    # mdf.MZ_DistDiff(APO,APO_ns)
-    # mdf.MZ(RC3,ges_v2,C3,APK)
-    # mdf.MZ(APO,APO_ns,C6,APK)
-    # mdf.MZ(RC6,ges,C6,APK)
-    # mdf.MZ(C6,C3,C6,APK)
 
     ''' [Fe/H] vs [alpha/Fe] '''
     # mdf.met_comp([RC3,RC6,GES,APO],[r'RC3',r'RC6',r'GES',r'APOGEE'],'feh','alpha',['r','g','b','m'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([RC3],[r'RC3'],'feh','alpha',['r'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([RC6],[r'RC6'],'feh','alpha',['g'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([GES],[r'GES'],'feh','alpha',['b'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([APO],[r'APOGEE'],'feh','alpha',['m'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([c_three],[r'C3 Spectro'],'feh','alpha',['y'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-    # met_comp([c_six],[r'C6 Spectro'],'feh','alpha',['orange'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
-
-    # mdf.pop_dist([APK,C3,C6],['grey','b','r'],[r'APOKASC',r'C3',r'C6'],1)
+    # plt.show()
+    # mdf.met_comp([RC3],[r'RC3'],'feh','alpha',['r'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # mdf.plt.show()
+    # mdf.met_comp([RC6],[r'RC6'],'feh','alpha',['g'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # plt.show()
+    # mdf.met_comp([APO],[r'APOGEE'],'feh','alpha',['m'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # plt.show()
+    # mdf.met_comp([c_three],[r'C3 Spectro'],'feh','alpha',['y'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # plt.show()
+    # mdf.met_comp([GES],[r'GES'],'feh','alpha',['b'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # plt.show()
+    # mdf.met_comp([c_six],[r'C6 Spectro'],'feh','alpha',['orange'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
+    # plt.show()
 
     ''' Mulitple C3/C6 plots '''
     # param = ['feh','alpha','age']
     # label = [r'[Fe/H]',r'[$\alpha$/Fe]',r'Age [Gyr]']
     # for i in range (0,len(param),1):
     #     mdf.c3_6_param(AS,param[i],label[i])
+    # plt.show()
+
     #     plt.savefig('/home/bmr135/Dropbox/ALL_spectro_'+param[i])
 
-    ''' Age/number denisty distribtion histograms '''
-    # plt.figure()
-    # mdf.histo(c_three,'age',np.linspace(0,15,30),r'Age [Gyr]')
-    # mdf.histo(TRI3,'logAge',np.logspace(-0.4,0.12,60),r'log(Age)',0,r'Tri Solo')
-    # plt.figure()
-    # mdf.histo(c_six,'age',np.linspace(0,15,30),r'Age [Gyr]')
-    # mdf.histo(TRI6,'age',np.linspace(0,15,30),r'Age [Gyr]')
-    # plt.figure()
-    # C3['Z'] = C3['dist']*np.sin(C3['Glat']*np.pi/180)*1e-3
-    # mdf.histo(C3,'Z',np.linspace(-8,0,80),r'Z [kpc]')
-    # plt.figure()
-    # C6['Z'] = C6['dist']*np.sin(RC6['Glat']*np.pi/180)*1e-3
-    # mdf.histo(C6,'Z',np.linspace(0,8,80),r'Z [kpc]')
-    #
-    # x = np.range(XXX)
-    # m = 2.03e-3
-    # c1 = -7.42
-    # c2 = -7.32
-    # y = m*x + c1
-    # TC3['art_g'] = m*TC3['Teff'] + c1
-    # # TC3 = TC3[TC3['logg'] > TC3['art_g']]
-    # K2['art_g'] = m*K2['Teff'] + c1
-    # # K2 = K2[K2['logg'] > K2['art_g']]
-    # K2['Clump_Rat'] = (K2['nmx']**0.75)/K2['dnu']
-    #
-    # ''' f = b + sqrt(r**2 + (d - a)**2) '''
-    # d = np.linspace(min(XXX['deltanu']),max(XXX['deltanu']),100)
-    # g = np.linspace(min(XXX['Clump_Rat']),4.5,100)
-    # D, G = np.meshgrid(d,g)
-    # a = 6
-    # r = 6
-    # b = 0
-    # f1 = 9.5*(g-3.37)**2 + 4.35
-    # f2 = 5.75*(g-3.37)**2 + 2.8
-    #
-    #
 
     ''' Clump removal function '''
     if clump == 1:
@@ -337,6 +298,8 @@ if __name__ == '__main__':
             plt.legend(prop={'size':15},loc=2)
             if clump == 1:
                 plt.title(r'R $< 9$')
+    plt.show()
+
     # plt.title(r'$\forall$ R',fontsize=20)
     # plt.tight_layout()
     # plt.savefig(ext_fig+'K2_age_100_itr'+sys.argv[1]+'.png')
@@ -372,6 +335,7 @@ if __name__ == '__main__':
             if clump == 1:
                 plt.title(r'R $< 9$')
     # plt.savefig(ext_fig+'Kepler_APOKASC_age_100_itr'+sys.argv[1]+'.png')
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Kepler_APOKASC_age_Z.png')
     # plt.show()
@@ -387,20 +351,23 @@ if __name__ == '__main__':
     plt.title(r'$\forall$ R')
     # plt.title(r'R $< 9$')
     plt.legend(prop={'size':15},loc=2)
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'K2_stacked_age.png')
 
 
-    ''' Parameter Distributions '''
+    ''' PARAM vs Simulated vs Scaling Relation Mass '''
     plt.figure()
     bins = np.linspace(0.5,2.5,20)
     mdf.histo(K2,'mass',bins,r'Mass [M$_{\odot}$]',0,r'K2 PARAM')
     mdf.histo(alt_sim,'Mass',bins,r'Mass [M$_{\odot}$]',0,r'TRILEGAL')
     mdf.histo(K2,'m_seismo',bins,r'Mass [M$_{\odot}$]',0,r'K2 S-R')
     plt.legend(prop={'size':15})
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Mass_comp_param_sim_SR.png')
 
+    ''' Parameter distribution plots '''
     K2_RGB = pd.DataFrame()
     APK2 = APK2[APK2['radius'] > 0.0]
     K2_RGB = K2_AS[K2_AS['rad'] < 9.0]
@@ -427,6 +394,7 @@ if __name__ == '__main__':
     ax5.axis('off')
     # fig.subplots_adjust(top=3.0)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
@@ -440,175 +408,173 @@ if __name__ == '__main__':
     plt.xlim([0.5,max(AS['mass'])+0.1])
     plt.ylabel(r'$\%$ Difference between PARAM and Scaling-Relations')
     plt.savefig(ext_fig+'Mass_percent_diff_spectro')
+    plt.show()
 
     ''' Teff/Met comparisons '''
-    # ds = mdf.least_squares(c3,ges)
-    # dsT = mdf.least_squares2(c3,ges)
-    # ds1 = mdf.least_squares(c3_R,rc3)
-    # ds1T = mdf.least_squares2(c3_R,rc3)
-    # ds2 = mdf.least_squares(c6_R,rc6)
-    # ds2T = mdf.least_squares2(c6_R,rc6)
-    # ds3 = mdf.least_squares(c6,apo)
-    # ds3T = mdf.least_squares2(c6,apo)
-    # df = mdf.least_squares2(GR3,RG3)
-    # df1 = mdf.least_squares2(AR6,RA6)
-    # df2 = mdf.least_squares(GR3,RG3)
-    # df3 = mdf.least_squares(AR6,RA6)
-    # print(ds)
-    # print(ds1)
-    # print(ds2)
-    # print(ds3)
-    # print(df)
-    # print(df1)
-    # print(df2)
-    # print(df3)
-    #
-    # x = np.linspace(4100,5500,100)
-    #
-    # plt.figure()
-    # plt.scatter(c3['Teff'],ges['Teff'],label=r'GES C3')
-    # plt.scatter(c3_R['Teff'],rc3['Teff'],label=r'RAVE C3',color='g')
-    # plt.scatter(c6_R['Teff'],rc6['Teff'],label=r'RAVE C6',color='r')
-    # plt.scatter(c6['Teff'],apo['Teff'],label=r'APOGEE C6',color='m')
-    # plt.xlabel(r'MAST T$_{\rm{eff}}$')
-    # plt.ylabel(r'Spectroscopic T$_{\rm{eff}}$')
-    # plt.plot([4100,5500],[4100,5500],c='k')
-    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # plt.xlim(4100,5500)
-    # plt.ylim(4100,5500)
-    # plt.legend(loc=4)
-    #
-    # plt.figure()
-    # plt.subplot(2,2,1)
-    # plt.scatter(c3['feh'],ges['feh'],label=r'GES C3')
-    # plt.scatter(c3_R['feh'],rc3['feh'],label=r'RAVE C3',color='g')
-    # plt.scatter(c6_R['feh'],rc6['feh'],label=r'RAVE C6',color='r')
-    # plt.scatter(c6['feh'],apo['feh'],label=r'APOGEE C6',color='m')
-    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # plt.xlim(-3.0,1.0)
-    # plt.ylim(-3.0,1.0)
-    # plt.tick_params(labelsize=15)
-    # plt.title(r'All Pipelines',fontsize=20)
-    #
-    # plt.subplot(2,2,2)
-    # plt.scatter(c3['feh'],ges['feh'],label=r'C3')
-    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # plt.xlim(-3.0,1.0)
-    # plt.ylim(-3.0,1.0)
-    # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds[0][0],ds[1][0]), ha='center', va='center',fontsize=15)
-    # plt.tick_params(labelsize=15)
-    # plt.title(r'Gaia-ESO',fontsize=20)
-    #
-    # plt.subplot(2,2,3)
-    # plt.scatter(c3_R['feh'],rc3['feh'],label=r'C3',color='g')
-    # plt.scatter(c6_R['feh'],rc6['feh'],label=r'C6',color='r')
-    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # plt.xlim(-3.0,1.0)
-    # plt.ylim(-3.0,1.0)
-    # plt.text(-.1, -2.5,r'Fit RC3: %.6sx $+$ %.6s' %(ds1[0][0],ds1[1][0]), ha='center', va='center',fontsize=15)
-    # plt.text(-.1, -2.75,r'Fit RC6: %.6sx $+$ %.6s' %(ds2[0][0],ds2[1][0]), ha='center', va='center',fontsize=15)
-    # plt.tick_params(labelsize=15)
-    # plt.title(r'RAVE',fontsize=20)
-    # plt.legend()
-    #
-    # plt.subplot(2,2,4)
-    # plt.scatter(c6['feh'],apo['feh'],label=r'C6',color='m')
-    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # plt.xlim(-3.0,1.0)
-    # plt.ylim(-3.0,1.0)
-    # plt.tick_params(labelsize=15)
-    # plt.title(r'APOGEE',fontsize=20)
-    # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds3[0][0],ds3[1][0]), ha='center', va='center',fontsize=15)
-    #
-    # plt.tight_layout()
-    #
-    # plt.figure()
-    # plt.subplot(2,1,1)
-    # plt.scatter(GR3['Teff'],RG3['Teff'])
-    # plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
-    # plt.ylabel(r'RAVE T$_{\rm{eff}}$')
-    # plt.plot([4100,5500],[4100,5500],c='k')
-    # # plt.plot(x,(x*df2[0])+df2[1],linewidth=2)
-    # plt.xlim(4100,5500)
-    # plt.title(r'C3')
-    # plt.subplot(2,1,2)
-    # plt.scatter(AR6['Teff'],RA6['Teff'])
-    # plt.xlabel(r'APOGEE T$_{\rm{eff}}$')
-    # plt.ylabel(r'RAVE T$_{\rm{eff}}$')
-    # plt.plot([4100,5500],[4100,5500],c='k')
-    # # plt.plot(x,(x*df3[0])+df3[1],linewidth=2)
-    # plt.xlim(4100,5500)
-    # plt.title(r'C6')
-    #
-    # plt.tight_layout()
+    ds = mdf.least_squares(c3,ges)
+    dsT = mdf.least_squares2(c3,ges)
+    ds1 = mdf.least_squares(c3_R,rc3)
+    ds1T = mdf.least_squares2(c3_R,rc3)
+    ds2 = mdf.least_squares(c6_R,rc6)
+    ds2T = mdf.least_squares2(c6_R,rc6)
+    ds3 = mdf.least_squares(c6,apo)
+    ds3T = mdf.least_squares2(c6,apo)
+    df = mdf.least_squares2(GR3,RG3)
+    df1 = mdf.least_squares2(AR6,RA6)
+    df2 = mdf.least_squares(GR3,RG3)
+    df3 = mdf.least_squares(AR6,RA6)
+
+
+    x = np.linspace(4100,5500,100)
+
+    plt.figure()
+    plt.scatter(c3['Teff'],ges['Teff'],label=r'GES C3')
+    plt.scatter(c3_R['Teff'],rc3['Teff'],label=r'RAVE C3',color='g')
+    plt.scatter(c6_R['Teff'],rc6['Teff'],label=r'RAVE C6',color='r')
+    plt.scatter(c6['Teff'],apo['Teff'],label=r'APOGEE C6',color='m')
+    plt.xlabel(r'MAST T$_{\rm{eff}}$')
+    plt.ylabel(r'Spectroscopic T$_{\rm{eff}}$')
+    plt.plot([4100,5500],[4100,5500],c='k')
+    plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    plt.xlim(4100,5500)
+    plt.ylim(4100,5500)
+    plt.legend(loc=4)
+    plt.show()
+
+    plt.figure()
+    plt.subplot(2,2,1)
+    plt.scatter(c3['feh'],ges['feh'],label=r'GES C3')
+    plt.scatter(c3_R['feh'],rc3['feh'],label=r'RAVE C3',color='g')
+    plt.scatter(c6_R['feh'],rc6['feh'],label=r'RAVE C6',color='r')
+    plt.scatter(c6['feh'],apo['feh'],label=r'APOGEE C6',color='m')
+    plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    plt.xlim(-3.0,1.0)
+    plt.ylim(-3.0,1.0)
+    plt.tick_params(labelsize=15)
+    plt.title(r'All Pipelines',fontsize=20)
+
+    plt.subplot(2,2,2)
+    plt.scatter(c3['feh'],ges['feh'],label=r'C3')
+    plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    plt.xlim(-3.0,1.0)
+    plt.ylim(-3.0,1.0)
+    plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds[0][0],ds[1][0]), ha='center', va='center',fontsize=15)
+    plt.tick_params(labelsize=15)
+    plt.title(r'Gaia-ESO',fontsize=20)
+
+    plt.subplot(2,2,3)
+    plt.scatter(c3_R['feh'],rc3['feh'],label=r'C3',color='g')
+    plt.scatter(c6_R['feh'],rc6['feh'],label=r'C6',color='r')
+    plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    plt.xlim(-3.0,1.0)
+    plt.ylim(-3.0,1.0)
+    plt.text(-.1, -2.5,r'Fit RC3: %.6sx $+$ %.6s' %(ds1[0][0],ds1[1][0]), ha='center', va='center',fontsize=15)
+    plt.text(-.1, -2.75,r'Fit RC6: %.6sx $+$ %.6s' %(ds2[0][0],ds2[1][0]), ha='center', va='center',fontsize=15)
+    plt.tick_params(labelsize=15)
+    plt.title(r'RAVE',fontsize=20)
+    plt.legend()
+
+    plt.subplot(2,2,4)
+    plt.scatter(c6['feh'],apo['feh'],label=r'C6',color='m')
+    plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    plt.xlim(-3.0,1.0)
+    plt.ylim(-3.0,1.0)
+    plt.tick_params(labelsize=15)
+    plt.title(r'APOGEE',fontsize=20)
+    plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds3[0][0],ds3[1][0]), ha='center', va='center',fontsize=15)
+
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(GR3['Teff'],RG3['Teff'])
+    plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
+    plt.ylabel(r'RAVE T$_{\rm{eff}}$')
+    plt.plot([4100,5500],[4100,5500],c='k')
+    # plt.plot(x,(x*df2[0])+df2[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C3')
+    plt.subplot(2,1,2)
+    plt.scatter(AR6['Teff'],RA6['Teff'])
+    plt.xlabel(r'APOGEE T$_{\rm{eff}}$')
+    plt.ylabel(r'RAVE T$_{\rm{eff}}$')
+    plt.plot([4100,5500],[4100,5500],c='k')
+    # plt.plot(x,(x*df3[0])+df3[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C6')
+
+    plt.tight_layout()
+    plt.show()
 
     ''' Spectroscopic and Photometric Parameter Comparison Plots - FeH/Teff '''
-    # plt.figure()
-    # plt.subplot(2,1,1)
-    # plt.scatter(ges['Teff'],ges['Teff']-c3['Teff'])
-    # plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
-    # plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (Gaia-ESO - Photom)')
-    # plt.plot([4100,5500],[0,0],c='k')
-    # plt.plot(x,(x*dsT[0])+dsT[1],linewidth=2)
-    # plt.xlim(4100,5500)
-    # plt.title(r'C3')
-    # plt.text(5300, 400,r'Offset: %.4sK' %(dsT[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(2,1,2)
-    # plt.scatter(rc3['Teff'],rc3['Teff']-c3_R['Teff'])
-    # plt.xlabel(r'RAVE T$_{\rm{eff}}$')
-    # plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - Photom)')
-    # plt.plot([4100,5500],[0,0],c='k')
-    # plt.plot(x,(x*ds1T[0])+ds1T[1],linewidth=2)
-    # plt.xlim(4100,5500)
-    # plt.title(r'C3')
-    # plt.text(5300, 175,r'Offset: %.4sK' %(ds1T[1][0]), ha='center', va='center')
-    #
-    # plt.tight_layout()
-    #
-    # x = np.linspace(-1.5,.5,100)
-    #
-    # plt.figure()
-    # plt.subplot(2,1,1)
-    # plt.scatter(ges['feh'],ges['feh']-c3['feh'])
-    # plt.xlabel(r'Gaia-ESO [Fe/H]')
-    # plt.ylabel(r'$\Delta$[Fe/H] (Gaia-ESO - Photom)')
-    # plt.plot([-1.5,0.5],[0,0],c='k')
-    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2)
-    # plt.xlim(-1.5,0.5)
-    # plt.title(r'C3')
-    # plt.text(-1.25, 1.25,r'Offset: %.4sdex' %(ds[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(2,1,2)
-    # plt.scatter(rc3['feh'],rc3['feh']-c3_R['feh'])
-    # plt.xlabel(r'RAVE [Fe/H]')
-    # plt.ylabel(r'$\Delta$[Fe/H] (RAVE - Photom)')
-    # plt.plot([-1.5,0.5],[0,0],c='k')
-    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2)
-    # plt.xlim(-1.5,0.5)
-    # plt.title(r'C3')
-    # plt.text(-1.25, 0.8,r'Offset: %.5sdex' %(ds1[1][0]), ha='center', va='center')
-    #
-    # plt.tight_layout()
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(ges['Teff'],ges['Teff']-c3['Teff'])
+    plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
+    plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (Gaia-ESO - Photom)')
+    plt.plot([4100,5500],[0,0],c='k')
+    plt.plot(x,(x*dsT[0])+dsT[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C3')
+    plt.text(5300, 400,r'Offset: %.4sK' %(dsT[1][0]), ha='center', va='center')
+
+    plt.subplot(2,1,2)
+    plt.scatter(rc3['Teff'],rc3['Teff']-c3_R['Teff'])
+    plt.xlabel(r'RAVE T$_{\rm{eff}}$')
+    plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - Photom)')
+    plt.plot([4100,5500],[0,0],c='k')
+    plt.plot(x,(x*ds1T[0])+ds1T[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C3')
+    plt.text(5300, 175,r'Offset: %.4sK' %(ds1T[1][0]), ha='center', va='center')
+
+    plt.tight_layout()
+    plt.show()
+
+    x = np.linspace(-1.5,.5,100)
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(ges['feh'],ges['feh']-c3['feh'])
+    plt.xlabel(r'Gaia-ESO [Fe/H]')
+    plt.ylabel(r'$\Delta$[Fe/H] (Gaia-ESO - Photom)')
+    plt.plot([-1.5,0.5],[0,0],c='k')
+    plt.plot(x,(x*ds[0])+ds[1],linewidth=2)
+    plt.xlim(-1.5,0.5)
+    plt.title(r'C3')
+    plt.text(-1.25, 1.25,r'Offset: %.4sdex' %(ds[1][0]), ha='center', va='center')
+
+    plt.subplot(2,1,2)
+    plt.scatter(rc3['feh'],rc3['feh']-c3_R['feh'])
+    plt.xlabel(r'RAVE [Fe/H]')
+    plt.ylabel(r'$\Delta$[Fe/H] (RAVE - Photom)')
+    plt.plot([-1.5,0.5],[0,0],c='k')
+    plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2)
+    plt.xlim(-1.5,0.5)
+    plt.title(r'C3')
+    plt.text(-1.25, 0.8,r'Offset: %.5sdex' %(ds1[1][0]), ha='center', va='center')
+
+    plt.tight_layout()
+    plt.show()
 
     ''' Specroscopic and Photometric Mass and Age Comparisons: C3 & C6 '''
     data = [c_three,c3]
@@ -628,34 +594,30 @@ if __name__ == '__main__':
             k+=1
         if save_out == 1:
             plt.savefig(ext_fig+'Spectro_photom_distr_dir_comp_'+field[0]+'.png')
+    plt.show()
 
 
     ''' Mass/Age Distributions at Different Z Values '''
     zm = [0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8]
     za = [0.0,0.4,0.8,1.2,1.6,2.0,2.4,2.8,3.2]
     mdf.Z_subplots(K2,TRI,'mass',np.linspace(0.5,2.5,20),r'Mass [M$_{\odot}$]',zm)
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Mass_as_funct_Z_K2.png')
     mdf.Z_subplots(K2,TRI,'logAge',np.linspace(8.5,10.5,70),r'log$_{10}$(Age)',za)
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Age_as_funct_Z_K2.png')
 
-
-    ''' numax Distributions '''
-    plt.figure()
-    mdf.histo(K2,'nmx',np.linspace(0,280,280),r'$\nu_{\rm{max}}$ [$\mu$Hz]',0,r'K2')
-    mdf.histo(TRI,'numax',np.linspace(0,280,280),r'$\nu_{\rm{max}}$ [$\mu$Hz]',0,r'TRILEGAL')
-    plt.legend(prop={'size':15})
-    if save_out == 1:
-        plt.savefig(ext_fig+folder_loc+'K2_sim_numax.png')
 
     ''' Radius Distributions '''
     plt.figure()
     mdf.histo(K2_AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
     mdf.histo(AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'TRILEGAL')
     plt.legend(prop={'size':15})
+    plt.show()
     # if save_out == 1:
-    plt.savefig(ext_fig+'K2_sim_radius_spectro.png')
+    # plt.savefig(ext_fig+'K2_sim_radius_spectro.png')
 
     ''' KEPLER vs K2 simulations '''
     plt.figure()
@@ -668,6 +630,7 @@ if __name__ == '__main__':
     plt.xlabel(r'log$_{10}$(Age)')
     # plt.title(r'$\forall$ R')
     plt.title(r'R $< 9$')
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Kep_multi_samp_K2_age_distr.png')
 
@@ -683,53 +646,27 @@ if __name__ == '__main__':
     ax1.hist([thick_kep['logAge'],thin_kep['logAge']],bins=ranges[0],stacked=True,label=[r'Kepler Sim Thick',r'Kepler Sim Thin'])
     plt.xlabel(r'log$_{10}$(Age)')
     ax1.legend(prop={'size':15},loc=2)
+    plt.show()
     if save_out == 1:
         plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
     # print(len(Kep_Sim),len(TRI))
 
     ''' Moving average for age-metallicity/alpha trends '''
-    # plt.figure()
-    # c_three = c_three.sort_values(['age'])
-    # c_three = c_three[c_three['feh'] > -5]
-    # c_three = c_three[c_three['alpha'] > -5]
-    # c_six = c_six.sort_values(['age'])
-    # c_six = c_six[c_six['feh'] > -5]
-    # c_six = c_six[c_six['alpha'] > -5]
-    #
-    # plt.scatter(c_three['age'],c_three['feh'])
-    # y_av = mdf.movingaverage(c_three['feh'],50)
-    # plt.plot(c_three['age'], y_av,'r')
-    # plt.xlabel(r'Age [Gyr]')
-    # plt.ylabel(r'[Fe/H]')
+    plt.figure()
+    c_three = c_three.sort_values(['age'])
+    c_three = c_three[c_three['feh'] > -5]
+    c_three = c_three[c_three['alpha'] > -5]
+    c_six = c_six.sort_values(['age'])
+    c_six = c_six[c_six['feh'] > -5]
+    c_six = c_six[c_six['alpha'] > -5]
 
-    ''' Comparisons with Benoit's data and C3/C6 '''
-    # B3 = pd.read_csv('/home/bmr135/GA/K2Poles/param_outputs/BC3_GAP.in.me',delimiter=r'\s+')
-    # B6 = pd.read_csv('/home/bmr135/GA/K2Poles/param_outputs/BC6_GAP.in.me',delimiter=r'\s+')
-    # B3['logAge'] = np.log10(B3['age']*10**9)
-    # B6['logAge'] = np.log10(B6['age']*10**9)
-    #
-    # B3 = B3[B3['rad'] < 9.0]
-    # B6 = B6[B6['rad'] < 9.0]
-    # C3_R9 = C3_A40[C3_A40['rad'] < 9.0]
-    # C6_R9 = C6_A40[C6_A40['rad'] < 9.0]
-    #
-    # bins = np.linspace(8,11,60)
-    # plt.figure()
-    # plt.hist(C3_A40['logAge'][np.isfinite(C3_A40['logAge'])],bins=bins,histtype='step',label=r'Multi-Det C3')
-    # plt.hist(C3_R9['logAge'][np.isfinite(C3_R9['logAge'])],bins=bins,histtype='step',label=r'Multi-Det C3, R $< 9$')
-    # # plt.hist(B3['logAge'][np.isfinite(B3['logAge'])],bins=bins,histtype='step',label=r'Benoit C3')
-    # plt.xlabel(r'Age')
-    # # plt.title(r'R $< 9$')
-    # plt.legend(prop={'size':15},loc=2)
-    #
-    # plt.figure()
-    # plt.hist(C6_A40['logAge'][np.isfinite(C6_A40['logAge'])],bins=bins,histtype='step',label=r'Multi-Det C6')
-    # plt.hist(C6_R9['logAge'][np.isfinite(C6_R9['logAge'])],bins=bins,histtype='step',label=r'Multi-Det C6, R $< 9$')
-    # # plt.hist(B6['logAge'][np.isfinite(B6['logAge'])],bins=bins,histtype='step',label=r'Benoit C6')
-    # plt.xlabel(r'Age')
-    # # plt.title(r'R $< 9$')
-    # plt.legend(prop={'size':15},loc=2)
+    plt.scatter(c_three['age'],c_three['feh'])
+    y_av = mdf.movingaverage(c_three['feh'],50)
+    plt.plot(c_three['age'], y_av,'r')
+    plt.xlabel(r'Age [Gyr]')
+    plt.ylabel(r'[Fe/H]')
+    plt.show()
 
     ''' Kiel Diagram '''
     plt.figure()
@@ -743,6 +680,7 @@ if __name__ == '__main__':
     plt.xlabel(r'T$_{\rm{eff}}$ [K]', fontsize=15)
     plt.ylabel(r'log$_{10}$(g)', fontsize=15)
     plt.tight_layout()
+    plt.show()
     # plt.savefig(ext_fig+'Teff_logg.png')
 
     ''' Age vs Teff '''
@@ -753,7 +691,8 @@ if __name__ == '__main__':
     plt.xlabel(r'T$_{\rm{eff}}$ [K]', fontsize=15)
     plt.ylabel(r'Age [Gyr]', fontsize=15)
     plt.tight_layout()
-    plt.savefig(ext_fig+'Teff_Age_spectro.png')
+    plt.show()
+    # plt.savefig(ext_fig+'Teff_Age_spectro.png')
 
     ''' Radius vs Scaling Radius '''
     C3_True['Rs'] = (C3_True['nmx']/3090) * (C3_True['dnu']/135.1)**-2 * (C3_True['Teff']/5777)**0.5
@@ -768,14 +707,16 @@ if __name__ == '__main__':
     plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
     plt.ylabel(r'R - R$_{sr}$', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
-    # plt.figure()
-    # hist, bins, patches = plt.hist(C3_True['rad'],bins=50,histtype='step',label=r'PARAM R',normed=True,linewidth=2)
-    # plt.hist(C3_True['Rs'],bins=bins,histtype='step',label=r'Scaling R',normed=True,linewidth=2)
-    # # plt.hist(alt_sim['radius'],bins=bins,histtype='step',label=r'TRI R',normed=True,linewidth=2,alpha=0.5)
-    # plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
-    # plt.legend()
-    # plt.tight_layout()
+    plt.figure()
+    hist, bins, patches = plt.hist(C3_True['rad'],bins=50,histtype='step',label=r'PARAM R',normed=True,linewidth=2)
+    plt.hist(C3_True['Rs'],bins=bins,histtype='step',label=r'Scaling R',normed=True,linewidth=2)
+    # plt.hist(alt_sim['radius'],bins=bins,histtype='step',label=r'TRI R',normed=True,linewidth=2,alpha=0.5)
+    plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
     plt.figure()
     hist, bins, patches = plt.hist(C6_True['rad'],bins=50,histtype='step',label=r'PARAM R',normed=True,linewidth=2)
@@ -784,28 +725,32 @@ if __name__ == '__main__':
     plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
     plt.tight_layout()
     plt.legend()
+    plt.show()
 
-    # plt.figure()
-    # hist, bins, patches = plt.hist(K2_AS['Rs'],bins=50,histtype='step',label=r'Photometry',normed=True,linewidth=2)
-    # plt.hist(AS['Rs'],bins=bins,histtype='step',label=r'Spectroscopy',normed=True,linewidth=2)
-    # # plt.xlabel(r'Scaling Relation Radius [R$_{\odot}$]', fontsize=15)
-    # plt.legend()
-    # plt.tight_layout()
-    #
-    # plt.figure()
-    # hist, bins, patches = plt.hist(K2_AS['Teff'],bins=50,histtype='step',label=r'Photometry',normed=True,linewidth=2)
-    # plt.hist(AS['Teff'],bins=bins,histtype='step',label=r'Spectroscopy',normed=True,linewidth=2)
-    # plt.xlabel(r'Teff [K]', fontsize=15)
-    # plt.legend()
-    # plt.tight_layout()
-    #
-    # plt.figure()
-    # plt.scatter(AS['logAge'],AS['rad'],c=AS['Teff'],cmap=colormaps.parula)
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'T$_{\rm{eff}}$ [K]', rotation=270, fontsize=15, labelpad=25)
-    # plt.xlabel(r'log Age', fontsize=15)
-    # plt.ylabel(r'Radius [R$_{\odot}$]', fontsize=15)
-    # plt.tight_layout()
+    plt.figure()
+    hist, bins, patches = plt.hist(K2_AS['Rs'],bins=50,histtype='step',label=r'Photometry',normed=True,linewidth=2)
+    plt.hist(AS['Rs'],bins=bins,histtype='step',label=r'Spectroscopy',normed=True,linewidth=2)
+    # plt.xlabel(r'Scaling Relation Radius [R$_{\odot}$]', fontsize=15)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure()
+    hist, bins, patches = plt.hist(K2_AS['Teff'],bins=50,histtype='step',label=r'Photometry',normed=True,linewidth=2)
+    plt.hist(AS['Teff'],bins=bins,histtype='step',label=r'Spectroscopy',normed=True,linewidth=2)
+    plt.xlabel(r'Teff [K]', fontsize=15)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure()
+    plt.scatter(AS['logAge'],AS['rad'],c=AS['Teff'],cmap=colormaps.parula)
+    cbar = plt.colorbar()
+    cbar.set_label(r'T$_{\rm{eff}}$ [K]', rotation=270, fontsize=15, labelpad=25)
+    plt.xlabel(r'log Age', fontsize=15)
+    plt.ylabel(r'Radius [R$_{\odot}$]', fontsize=15)
+    plt.tight_layout()
+    plt.show()
 
 
     ''' Mass vs Radius ([Fe/H] colourbar) '''
@@ -816,17 +761,10 @@ if __name__ == '__main__':
     plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     plt.ylabel(r'Radius [R$_{\odot}$]', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
     ''' Mass vs Age (scaling mass colourbar) '''
     K2['Ms'] = (K2['nmx']/3090)**3 * (K2['dnu']/135.1)**-4 * (K2['Teff']/5777)**1.5
-    plt.figure()
-    plt.scatter(K2['mass'],K2['logAge'],c=K2['Ms'],cmap=colormaps.magma)
-    cbar = plt.colorbar()
-    cbar.set_label(r'Mass - Scaling Relation', rotation=270, fontsize=15, labelpad=25)
-    plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
-    plt.ylabel(r'log$_{10}$(Age)', fontsize=15)
-    plt.tight_layout()
-
     plt.figure()
     plt.scatter(K2['mass'],K2['logAge'],c=K2['Ms'],cmap=colormaps.parula)
     cbar = plt.colorbar()
@@ -834,6 +772,7 @@ if __name__ == '__main__':
     plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     plt.ylabel(r'log$_{10}$(Age)', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
     ''' Space Density plots '''
     mdf.space_density2(C6_True)
@@ -841,7 +780,7 @@ if __name__ == '__main__':
     plt.show()
     # sys.exit()
 
-    ''' Mass vs Z scatter plots '''
+    ''' Mass vs Z scatter plots with trend lines '''
     K2['mass_err'] = np.sqrt(((K2['mass_68U']-K2['mass'])**2 + (K2['mass']-K2['mass_68L'])**2)/4)
     K2['Z_err'] = ((abs(K2['dist_68U'])-abs(K2['dist'])) + (abs(K2['dist'])-abs(K2['dist_68L'])))/2
     K2['rad_err'] = 0.5*(K2['rad_68U']-K2['rad_68L'])
@@ -868,6 +807,7 @@ if __name__ == '__main__':
     plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     plt.ylabel(r'Z [kpc]', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
     ''' [Fe/H] vs [Alpha/Fe] '''
     AS = AS[AS['alpha'] > -4]
@@ -878,8 +818,9 @@ if __name__ == '__main__':
     plt.xlabel(r'[Fe/H]', fontsize=15)
     plt.ylabel(r'[$\alpha$/Fe]', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
-    ''' Mag vs Z '''
+    ''' Mag vs Z with trend lines '''
     bins = np.linspace(-8,0,16)
     bins6 = np.linspace(0,8,16)
     Kp_Z, edges, number = scipy.stats.binned_statistic(C3_40_06FeH['Z'],C3_40_06FeH['Kepler'],statistic='median',bins=bins)
@@ -893,10 +834,7 @@ if __name__ == '__main__':
     plt.xlabel(r'Z [kpc]', fontsize=15)
     plt.ylabel(r'Kp', fontsize=15)
     plt.tight_layout()
+    plt.show()
 
     Kp_Z, edges, number = scipy.stats.binned_statistic(C3_40_06FeH['Z'],C3_40_06FeH['Kepler'],statistic='count',bins=bins)
     Kp_Z6, edges6, number6 = scipy.stats.binned_statistic(C6_40_06FeH['Z'],C6_40_06FeH['Kepler'],statistic='count',bins=bins6)
-    # print(Kp_Z)
-    # print(Kp_Z6)
-
-    plt.show()
