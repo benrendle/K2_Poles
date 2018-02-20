@@ -23,9 +23,6 @@ def TRILEGAL():
     TRILEGAL_C3['L'] = 10**(TRILEGAL_C3['logL'])
     TRILEGAL_C3['radius'] = np.sqrt(TRILEGAL_C3['Mass'] / (TRILEGAL_C3['g']/const.solar_g))
     TRILEGAL_C3['JK'] = TRILEGAL_C3['Jmag'] - TRILEGAL_C3['Kmag']
-
-    # TRILEGAL_C3['numax'] = TRILEGAL_C3['Mact'] * TRILEGAL_C3['Radius']**-2 * (TRILEGAL_C3['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
-    # TRILEGAL_C3['dnu'] = TRILEGAL_C3['Mact']**0.5 * TRILEGAL_C3['Radius']**-1.5 * const.solar_Dnu
     TRILEGAL_C3 = TRILEGAL_C3.dropna(axis=0)
 
     TRILEGAL_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/k1.6_K16_c6.all.out.txt',delimiter=r'\s+')
@@ -36,10 +33,7 @@ def TRILEGAL():
     TRILEGAL_C6['radius'] = np.sqrt(TRILEGAL_C6['Mass'] / (TRILEGAL_C6['g']/const.solar_g))
     TRILEGAL_C6['JK'] = TRILEGAL_C6['Jmag'] - TRILEGAL_C6['Kmag']
     TRILEGAL_C6['Vcut'] = TRILEGAL_C6['Kmag'] + 2*(TRILEGAL_C6['JK']+0.14) + 0.382*np.exp(2*(TRILEGAL_C6['JK']-0.2))
-    # TRILEGAL_C6['numax'] = TRILEGAL_C6['Mact'] * TRILEGAL_C6['Radius']**-2 * (TRILEGAL_C6['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
-    # TRILEGAL_C6['dnu'] = TRILEGAL_C6['Mact']**0.5 * TRILEGAL_C6['Radius']**-1.5 * const.solar_Dnu
     TRILEGAL_C6 = TRILEGAL_C6.dropna(axis=0)
-
 
     return TRILEGAL_C3, TRILEGAL_C6
 
@@ -47,7 +41,6 @@ def BESANCON():
     ''' Return BESANCON C3/C6 fields (Data from Celine Reyle) '''
     c3 = pd.read_csv('/home/bmr135/GA/K2Poles/K2c3.sim1705',delim_whitespace=True)
     # c3 = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/K2c3.sim1705',delim_whitespace=True)
-    # c3 = galactic_coords(c3)
     c3 = prop.galactic_coords2(c3)
     c3['logTe'] = np.log10(c3['Teff'])
     c3['numax'] = c3['IniMass'] * c3['Radius']**-2 * (c3['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
@@ -67,9 +60,6 @@ def BESANCON():
     c6['imag'] = np.nan
     c6['Kmag'] = c6['Vmag'] - c6['V-J'] - c6['JK']
     c6['Vcut'] = c6['Kmag'] + 2*(c6['JK']+0.14) + 0.382*np.exp(2*(c6['JK']-0.2))
-
-    # c3['KepMag'] = c3['Vmag']-0.35 # from Stello K2 C6 proposal
-    # c6['KepMag'] = c6['Vcut']-0.35 # from Stello K2 C6 proposal
 
     ''' Kepler magnitude calculation: Eq. 4, Huber et al., 2016 '''
     c3['KepMag'] = 0.314377 + 3.85667*c3['JK'] + 3.176111*c3['JK']**2 - \
@@ -92,10 +82,8 @@ def C3_cat():
     # EPIC C3 Catalogue
     C3_1 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/C3_All_EPICS1.txt')
     # C3_1 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/C3_All_EPICS1.txt')
-    # print( C3_1)
     C3_2 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/C3_All_EPICS2.txt')
     # C3_2 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/C3_All_EPICS2.txt')
-    # print( C3_2)
     C3 = pd.concat([C3_1,C3_2],ignore_index=True)
     C3.to_csv('/home/bmr135/Downloads/C3',index=False)
 
@@ -159,33 +147,14 @@ def KASOC_LC_in():
 
 def Yvonne():
     ''' Yvonne Seismo C3 and C6 '''
-    # Yvonne_C3_numax = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/C3-A-nu_max.txt',delim_whitespace=True)
-    # Yvonne_C3_dnu = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/C3-B-mean_large_separation.txt',delim_whitespace=True)
-    # Yvonne_C3 = pd.merge(Yvonne_C3_dnu,Yvonne_C3_numax,how='inner',on=['star'])
-    # Yvonne_C3.columns = ['EPIC','YDnu','e_YDnu','rej1','Ynumax','e_Ynumax','rej2']
-    # Yvonne_C3 = Yvonne_C3[Yvonne_C3.rej1 < 1]
-    # Yvonne_C3 = Yvonne_C3[Yvonne_C3.rej2 < 1]
 
     Yvonne_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/c3-YE-results.txt')
     # Yvonne_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-ben-all-results.txt',delimiter=r'\s+')
     # Yvonne_C3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-ben-all-results.txt',delimiter=r'\s+')
 
-    # Yvonne_C6_numax = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/C6-A-nu_max.txt',delim_whitespace=True)
-    # Yvonne_C6_dnu = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/C6-B-mean_large_separation.txt',delim_whitespace=True)
-    # Yvonne_C6 = pd.merge(Yvonne_C6_dnu,Yvonne_C6_numax,how='inner',on=['star'])
-    # Yvonne_C6.columns = ['EPIC','YDnu','e_YDnu','rej1','Ynumax','e_Ynumax','rej2']
-    # Yvonne_C6 = Yvonne_C6[Yvonne_C6.rej1 < 1]
-    # Yvonne_C6 = Yvonne_C6[Yvonne_C6.rej2 < 1]
-
     Yvonne_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/c6-YE-results.txt')
     # Yvonne_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C6-ben-all-results.txt',delimiter=r'\s+')
     # Yvonne_C6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/Yvonne/YE-C6-ben-all-results.txt',delimiter=r'\s+')
-    # print( type(Yvonne_C6['YDnu'][5]))
-    # j=0
-    # Yvonne_C6 = Yvonne_C6[Yvonne_C6['YDnu'] != float("NaN")]
-    # Yvonne_C6 = Yvonne_C6[np.isnan(Yvonne_C6['YDnu']) != True]
-    # Yvonne_C3 = Yvonne_C3[np.isnan(Yvonne_C3['YDnu']) != True]
-    # print( len(Yvonne_C6))
 
     ''' Everest Light Curves '''
     Yvonne_EC3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Yvonne/YE-C3-Everest-results.txt')
@@ -233,8 +202,6 @@ def Benoit():
     # Benoit_C3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/Benoit/K2_fin_C3_E.txt',skiprows=3, \
     #                     names=['EPIC','Bnumax','e_Bnumax','BDnu','e_BDnu','A','errA'],delim_whitespace=True)
 
-    # Benoit_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Benoit/K2_fin_C6_E.txt',skiprows=3, \
-    #                         names=['EPIC','Bnumax','e_Bnumax','BDnu','e_BDnu','A','errA'],delim_whitespace=True)
     Benoit_C6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Benoit/K2_fin_C06_01_E.txt',skiprows=3, \
                             names=['EPIC','Bnumax','e_Bnumax','BDnu','e_BDnu','A','errA'],delim_whitespace=True)
     Everest_C3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/Benoit/K2_fin_C_3_E.txt',skiprows=3, \
@@ -253,16 +220,11 @@ def Benoit():
 
 def RAVE():
     ''' RAVE C3/C6 Catalogues (Data from Marica) '''
-    # Test = Table.read('/home/bmr135/Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
     RAVE3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
     # RAVE3 = pd.read_csv('/home/ben/Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
-    # print( Test)
-    # RAVE3 = Test.to_pandas()
     RAVE3.rename(columns={'EPIC_ID':'EPIC'},inplace=True)
-    # RTest = Table.read('/home/bmr135/Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
     RAVE6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/RAVE/RAVE-K2C6_TGPfinal.csv')
     # RAVE6 = pd.read_csv('/home/ben/Dropbox/K2Poles/RAVE/RAVE-K2C6_TGPfinal.csv')
-    # RAVE6 = RTest.to_pandas()
     RAVE6.rename(columns={'EPIC ID':'EPIC'},inplace=True)
     RAVE3.to_csv('/home/bmr135/GA/K2Poles/RAVE3.csv',index=False)
     RAVE6.to_csv('/home/bmr135/GA/K2Poles/RAVE6.csv',index=False)
@@ -291,13 +253,9 @@ def Gaia_ESO():
         # Gaia_ESO_C3 = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Diane_Feuillet/epinarbo_ite2_new.txt')
         # Gaia_ESO_C3 = pd.read_csv('/home/ben/Dropbox/GES-K2/Diane_Feuillet/epinarbo_ite2_new.txt')
         # Gaia_ESO_C3 = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Alvin_Gavel/lumba_ite1_uves_new.txt')
-        # print( Gaia_ESO_C3['epic'])
-        # Gaia_ESO_C3.rename(columns={'epic':'EPIC'},inplace=True)
         Gaia_ESO_C3.rename(columns={'OBJECT':'EPIC'},inplace=True)
-        # print( Gaia_ESO_C3['EPIC'])
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].map(lambda x: x.split('_')[-1])
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].convert_objects(convert_numeric=True)
-        # print( Gaia_ESO_C3['EPIC'])
         return Gaia_ESO_C3
 
 def GES_merge(K2,GES,name):
@@ -324,7 +282,6 @@ def APOGEE():
 
 def APO_merge(K2,APO,name):
     ''' Merge K2 data with APOGEE and save out file'''
-    # print( K2[0])
     for i in range(0,len(K2),1):
         b = K2[i]
         cols_to_use = b.columns.difference(APO.columns)
@@ -371,7 +328,6 @@ def LAMOST_merge(K2,LAMOST,name):
         cols_to_use = cols_to_use.union(['EPIC'])
         c = pd.merge(b[cols_to_use],LAMOST,how='inner',on=['EPIC'])
         c = c.reset_index(drop=True)
-        print(c)
         K2[i] = c
         c.to_csv('/home/bmr135/GA/K2Poles/'+name[i]+'_LAMOST_match.csv',index=False,na_rep='Inf')
         # c.to_csv('/media/ben/SAMSUNG/GA/K2Poles/'+name[i]+'_LAMOST_match.csv',index=False,na_rep='Inf')
