@@ -10,7 +10,7 @@ import pandas as pd
 
 class TAR():
 
-    def __init__(self, _tar, _subfolder, _data, _delim):
+    def __init__(self, _ext, _tar, _subfolder, _data, _delim):
         ''' Open tar file and look for a specific user defined file within a folder.
         This file is then extracted, stored as a panda array and then the file is
         removed.
@@ -31,7 +31,7 @@ class TAR():
                 If another extraction format is preferred, please edit the code
                 to suit your requirements
         '''
-
+        self.ext = _ext
         self.filename = _tar
         self.sf = _subfolder
         self.data = _data
@@ -44,9 +44,9 @@ class TAR():
 
     def extract(self):
         ''' Extract file from tar.gz '''
-        tdir = tarfile.open(self.filename,'r') # open tar file
+        tdir = tarfile.open(self.ext+self.filename,'r') # open tar file
         tdir.extractall(members=self.members(tdir)) # extract required file
-        x = pd.read_csv('/home/bmr135/GA/K2Poles/'+self.data,delimiter=self.delim) # convert file to DataFrame
+        x = pd.read_csv(self.data,delimiter=self.delim) # convert file to DataFrame
         os.remove(self.data) # remove extracted file from user area
         tdir.close() # close tar file
         return x

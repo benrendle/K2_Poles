@@ -26,6 +26,7 @@ import sim_pert as sp
 import copy
 import mass_distr_functs as mdf
 import K2_properties as prop
+import TAR as tt
 
 mpl.rcParams['xtick.direction'] = 'out'
 mpl.rcParams['ytick.direction'] = 'out'
@@ -55,7 +56,11 @@ if __name__ == '__main__':
     APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
     # APK = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
 
-    APK2 = pd.read_csv(ext+'APOKASC/APOKASC.in.me',delimiter=r'\s+')
+    tar = tt.TAR(ext,'APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me', r'\s+')
+    APK2 = pd.DataFrame()
+    APK2 = tar()
+    print(APK2)
+    sys.exit()
     GES = pd.read_csv(ext+'GES/GES.in.me',delimiter=r'\s+')
     GES_v2 = pd.read_csv(ext+'GES_v2/GES.in.me',delimiter=r'\s+')
     GES_ns = pd.read_csv(ext+'GES_ns/GES.in.me',delimiter=r'\s+')
