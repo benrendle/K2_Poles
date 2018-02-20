@@ -40,8 +40,6 @@ C6 = dat.C6_cat()
 print("C6")
 GAP3, GAP6 = dat.K2_GAP()
 print( "GAP")
-# KASOC_GAP6 = dat.KASOC_LC_in()
-# EVC6 = pd.read_csv('/home/bmr135/Downloads/everest_search.txt',skiprows=[1]) # K2 Everest Light Curve Targets
 Yvonne_C3, Yvonne_C6, Yvonne_EC6, Yvonne_EC3 = dat.Yvonne()
 print( "Yvonne")
 Savita_C3, Savita_C6, Savita_EC3, Savita_EC6 = dat.Savita()
@@ -72,7 +70,6 @@ GAP3_v2 = GAP3_v2.reset_index(drop=True)
 GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
 GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
 GAP3_v2.to_csv('/home/bmr135/GA/K2Poles/GAP3')
-# GAP3_v2.to_csv('/home/ben/GAP3')
 
 GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
@@ -83,9 +80,6 @@ GAP6_v2 = GAP6_v2.reset_index(drop=True)
 GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
 GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
 GAP6_v2.to_csv('/home/bmr135/GA/K2Poles/GAP6')
-# GAP6_v2.to_csv('/home/ben/GAP6')
-
-print(len(GAP3_v2),len(GAP6_v2))
 
 ''' Merge data with GAP target lists '''
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
@@ -254,11 +248,6 @@ print('Trilegal saved out')
 
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
 
-# BC3.to_csv('/home/bmr135/GA/K2Poles/matlab_in/BC3.csv',index=False,na_rep='Inf')
-# BC6.to_csv('/home/bmr135/GA/K2Poles/matlab_in/BC6.csv',index=False,na_rep='Inf')
-# BC3.to_csv('/media/ben/SAMSUNG/GA/K2Poles/matlab_in/BC3.csv',index=False,na_rep='Inf')
-# BC6.to_csv('/media/ben/SAMSUNG/GA/K2Poles/matlab_in/BC6.csv',index=False,na_rep='Inf')
-
 Y6_dnu = pd.DataFrame()
 Y6_dnu = YC6[YC6['dnu'] != np.nan]
 Y6_dnu.reset_index(drop=True)
@@ -270,8 +259,6 @@ plt.hist(Y6_dnu['Radius'],bins=bins,histtype='step',label=r'With $\Delta\nu$')#,
 plt.xlabel(r'Radius [R$_{\odot}$]')
 plt.legend()
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-
-
 
 
 ''' Add detection flags to data/save out values for comparisons '''
@@ -288,214 +275,6 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 # #     print( i['Nseismo'][0])
 # YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6 = prop.nyq_refl(seismo_list,dnu,30,seismo_name)
 
-
-''' HRDs for simulations '''
-# plt.figure()
-# plt.subplot(1,2,1)
-# plt.scatter(besa3['Teff'],besa3['L'],color='r')
-# plt.xlim(max(besa3['Teff'])+500,min(besa3['Teff'])-500)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# plt.title(r'Besa C3',fontsize=20)
-# plt.tick_params(labelsize=15)
-# plt.subplot(1,2,2)
-# plt.scatter(besa6['Teff'],besa6['L'])
-# plt.xlim(max(besa6['Teff'])+500,min(besa6['Teff'])-500)
-# plt.tick_params(labelsize=15)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# plt.title(r'Besa C6',fontsize=20)
-# plt.tight_layout()
-#
-# plt.figure()
-# plt.subplot(1,2,1)
-# plt.scatter(BC3['Teff'],BC3['L'],label=r'C3')
-# plt.scatter(besa3['Teff'],besa3['L'],color='r',alpha=0.1,label=r'Besa')
-# plt.xlim(max(BC3['Teff'])+500,min(BC3['Teff'])-500)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# # plt.title(r'Benoit C3',fontsize=20)
-# plt.tick_params(labelsize=20)
-# plt.legend(prop={'size':15},loc=2)
-# plt.subplot(1,2,2)
-# plt.scatter(BC6['Teff'],BC6['L'],label=r'C6')
-# plt.scatter(besa6['Teff'],besa6['L'],color='r',alpha=0.1,label=r'Besa')
-# plt.xlim(max(BC6['Teff'])+500,min(BC6['Teff'])-500)
-# plt.tick_params(labelsize=20)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# # plt.title(r'Benoit C6',fontsize=20)
-# plt.legend(prop={'size':15},loc=2)
-# plt.tight_layout()
-#
-# plt.figure()
-# plt.subplot(1,2,1)
-# plt.scatter(BC3['Teff'],BC3['L'],label=r'Benoit')
-# plt.scatter(10**TRILEGAL_C3['logTe'],10**TRILEGAL_C3['logL'],color='r',alpha=0.1,label=r'Tri')
-# # plt.scatter(besa3['Teff'],besa3['L'],color='r',alpha=0.1,label=r'Besa')
-# plt.xlim(max(BC3['Teff'])+500,min(BC3['Teff'])-500)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# # plt.title(r'Benoit C3',fontsize=20)
-# plt.tick_params(labelsize=20)
-# plt.legend(prop={'size':15},loc=2)
-# plt.subplot(1,2,2)
-# plt.scatter(BC6['Teff'],BC6['L'],label=r'Benoit')
-# plt.scatter(10**TRILEGAL_C6['logTe'],10**TRILEGAL_C6['logL'],color='r',alpha=0.1,label=r'Tri')
-# # plt.scatter(besa6['Teff'],besa6['L'],color='r',alpha=0.1,label=r'Besa')
-# plt.xlim(max(BC6['Teff'])+500,min(BC6['Teff'])-500)
-# plt.tick_params(labelsize=20)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# # plt.title(r'Benoit C6',fontsize=20)
-# plt.legend(prop={'size':15},loc=2)
-# plt.tight_layout()
-#
-# plt.figure()
-# plt.subplot(1,2,1)
-# plt.scatter(10**TRILEGAL_C3['logTe'],10**TRILEGAL_C3['logL'],color='r')
-# plt.xlim(max(10**TRILEGAL_C3['logTe'])+500,min(10**TRILEGAL_C3['logTe'])-500)
-# plt.title(r'TRI C3',fontsize=20)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.tick_params(labelsize=15)
-# plt.subplot(1,2,2)
-# plt.scatter(10**TRILEGAL_C6['logTe'],10**TRILEGAL_C6['logL'])
-# plt.xlim(max(10**TRILEGAL_C6['logTe'])+500,min(10**TRILEGAL_C6['logTe'])-500)
-# plt.title(r'TRI C6',fontsize=20)
-# plt.ylabel(r'L',fontsize=20, labelpad=20)
-# plt.xlabel(r'T$_{\rm{eff}}$',fontsize=20, labelpad=10)
-# plt.tick_params(labelsize=15)
-# plt.tight_layout()
-
-''' Numax distributions for Besancon and Trilegal '''
-# plt.figure()
-# plt.subplot(2,2,1)
-# plt.hist(besa3['numax'],bins=54)
-# plt.ylabel(r'Frequency',fontsize=20, labelpad=20)
-# plt.title(r'Besa C3',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,2)
-# plt.hist(besa6['numax'],bins=54)
-# plt.title(r'Besa C6',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,3)
-# plt.hist(BC3['Bnumax'],bins=54)
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'Frequency',fontsize=20, labelpad=20)
-# plt.title(r'Benoit C3',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,4)
-# plt.hist(BC6['Bnumax'],bins=54)
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# plt.xlim(10,280)
-# plt.title(r'Benoit C6',fontsize=20)
-# plt.tight_layout()
-#
-# plt.figure()
-# plt.subplot(2,2,1)
-# plt.hist(TRILEGAL_C3['numax'],bins=54)
-# plt.ylabel(r'Frequency',fontsize=20, labelpad=20)
-# plt.title(r'Tri C3',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,2)
-# plt.hist(TRILEGAL_C6['numax'],bins=54)
-# plt.title(r'Tri C6',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,3)
-# plt.hist(BC3['Bnumax'],bins=54)
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# plt.ylabel(r'Frequency',fontsize=20, labelpad=20)
-# plt.title(r'Benoit C3',fontsize=20)
-# plt.xlim(10,280)
-# plt.subplot(2,2,4)
-# plt.hist(BC6['Bnumax'],bins=54)
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# plt.xlim(10,280)
-# plt.title(r'Benoit C6',fontsize=20)
-# plt.tight_layout()
-
-
-''' Comparative histograms of dnu/numax distributions for datasets post
-    selection function. Real and simulated '''
-# plt.figure()
-# plt.subplot(2,1,1)
-# bins=np.arange(0,20,1)
-# plt.hist(BC3['BDnu'],bins=bins,label=r'Mosser',histtype='step')
-# plt.hist(YC3['YDnu'],bins=bins,color='r',label=r'Elsworth',histtype='step')
-# plt.hist(SC3['SDnu'],bins=bins,color='k',label=r'Mathur',histtype='step')
-# plt.xlabel(r'$\Delta\nu$',fontsize=20, labelpad=10)
-# plt.legend(prop={'size':15})
-# plt.title(r'C3',fontsize='20')
-# plt.tight_layout()
-#
-#
-# plt.subplot(2,1,2)
-# bins=np.arange(10,280,4)
-# plt.hist(BC3['Bnumax'],bins=bins,label=r'Mosser',histtype='step')
-# plt.hist(YC3['Ynumax'],bins=bins,color='r',label=r'Elsworth',histtype='step')
-# plt.hist(SC3['Snumax'],bins=bins,color='k',label=r'Mathur',histtype='step')
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# # plt.legend(prop={'size':15})
-# plt.tight_layout()
-#
-# plt.figure()
-# plt.subplot(2,1,1)
-# bins=np.arange(0,20,1)
-# plt.hist(besa3['dnu'],bins=bins,label=r'Besa C3',histtype='step')
-# plt.hist(besa6['dnu'],bins=bins,color='r',label=r'Besa C6',histtype='step')
-# plt.xlabel(r'$\Delta\nu$',fontsize=20, labelpad=10)
-# plt.legend(prop={'size':15})
-# plt.tight_layout()
-#
-# plt.subplot(2,1,2)
-# bins=np.arange(10,280,4)
-# plt.hist(besa3['numax'],bins=bins,label=r'Besa C3',histtype='step')
-# plt.hist(besa6['numax'],bins=bins,color='r',label=r'Besa C6',histtype='step')
-# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-# plt.legend(prop={'size':15})
-# plt.tight_layout()
-
-
-''' Numax high/low pass and detection fractions '''
-# besa3l = besa3[besa3['numax'] < (min(besa3['numax']) + (max(besa3['numax'])-min(besa3['numax']))/2.0)]
-# YC3h = YC3[YC3['Ynumax'] >= (min(YC3['Ynumax']) + (max(YC3['Ynumax'])-min(YC3['Ynumax']))/2.0)]
-# YC3l = YC3[YC3['Ynumax'] < (min(YC3['Ynumax']) + (max(YC3['Ynumax'])-min(YC3['Ynumax']))/2.0)]
-# SC3h = SC3[SC3['Snumax'] >= (min(SC3['Snumax']) + (max(SC3['Snumax'])-min(SC3['Snumax']))/2.0)]
-# SC3l = SC3[SC3['Snumax'] < (min(SC3['Snumax']) + (max(SC3['Snumax'])-min(SC3['Snumax']))/2.0)]
-# BC3h = BC3[BC3['Bnumax'] >= (min(BC3['Bnumax']) + (max(BC3['Bnumax'])-min(BC3['Bnumax']))/2.0)]
-# BC3l = BC3[BC3['Bnumax'] < (min(BC3['Bnumax']) + (max(BC3['Bnumax'])-min(BC3['Bnumax']))/2.0)]
-#
-# besa6h = besa6[besa6['numax'] >= (min(besa6['numax']) + (max(besa6['numax'])-min(besa6['numax']))/2.0)]
-# besa6l = besa6[besa6['numax'] < (min(besa6['numax']) + (max(besa6['numax'])-min(besa6['numax']))/2.0)]
-# YC6h = YC6[YC6['Ynumax'] >= (min(YC6['Ynumax']) + (max(YC6['Ynumax'])-min(YC6['Ynumax']))/2.0)]
-# YC6l = YC6[YC6['Ynumax'] < (min(YC6['Ynumax']) + (max(YC6['Ynumax'])-min(YC6['Ynumax']))/2.0)]
-# SC6h = SC6[SC6['Snumax'] >= (min(SC6['Snumax']) + (max(SC6['Snumax'])-min(SC6['Snumax']))/2.0)]
-# SC6l = SC6[SC6['Snumax'] < (min(SC6['Snumax']) + (max(SC6['Snumax'])-min(SC6['Snumax']))/2.0)]
-# BC6h = BC6[BC6['Bnumax'] >= (min(BC6['Bnumax']) + (max(BC6['Bnumax'])-min(BC6['Bnumax']))/2.0)]
-# BC6l = BC6[BC6['Bnumax'] < (min(BC6['Bnumax']) + (max(BC6['Bnumax'])-min(BC6['Bnumax']))/2.0)]
-# EC6h = EC6[EC6['Enumax'] >= (min(EC6['Enumax']) + (max(EC6['Enumax'])-min(EC6['Enumax']))/2.0)]
-# EC6l = EC6[EC6['Enumax'] < (min(EC6['Enumax']) + (max(EC6['Enumax'])-min(EC6['Enumax']))/2.0)]
-#
-# mag_fract_besa3h = prop.det_fract(besa3h)
-# mag_fract_YC3h = prop.det_fract(YC3h)
-# mag_fract_SC3h = prop.det_fract(SC3h)
-# mag_fract_BC3h = prop.det_fract(BC3h)
-# mag_fract_besa6h = prop.det_fract(besa6h)
-# mag_fract_YC6h = prop.det_fract(YC6h)
-# mag_fract_SC6h = prop.det_fract(SC6h)
-# mag_fract_BC6h = prop.det_fract(BC6h)
-# mag_fract_EC6h = prop.det_fract(EC6h)
-#
-# mag_fract_besa3l = prop.det_fract(besa3l)
-# mag_fract_YC3l = prop.det_fract(YC3l)
-# mag_fract_SC3l = prop.det_fract(SC3l)
-# mag_fract_BC3l = prop.det_fract(BC3l)
-# mag_fract_besa6l = prop.det_fract(besa6l)
-# mag_fract_YC6l = prop.det_fract(YC6l)
-# mag_fract_SC6l = prop.det_fract(SC6l)
-# mag_fract_BC6l = prop.det_fract(BC6l)
-# mag_fract_EC6l = prop.det_fract(EC6l)
 
 ''' Merging of GES data with single asteroseismic dets '''
 YG3,SG3,BG3,EG3 = dat.GES_merge(seismo3_list,GES3,seismo3_name)
@@ -518,7 +297,6 @@ APO.to_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/APOGEE_full.csv',index=False,na_r
 print( "APOGEE saved out")
 
 ''' Merging of LAMOST data with single asteroseismic dets '''
-# YL3,SL3,BL3,EL3 = dat.LAMOST_merge(seismo3_list,LC3,seismo3_name)
 YL3 = pd.merge(YC3,LAMOST3,how='inner',on=['EPIC'])
 BL3 = pd.merge(BC3,LAMOST3,how='inner',on=['EPIC'])
 SL3 = pd.merge(SC3,LAMOST3,how='inner',on=['EPIC'])
@@ -530,8 +308,6 @@ LST.to_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/LAMOST_full_C3.csv',index=False,n
 # LST.to_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/LAMOST_full_C3.csv',index=False,na_rep='Inf')
 print( "LAMOST C3 saved out ", len(LST))
 
-
-# YL6,SL6,BL6,EL6 = dat.LAMOST_merge(seismo6_list,LAMOST6,seismo6_name)
 YL6 = pd.merge(YC6,LAMOST6,how='inner',on=['EPIC'])
 BL6 = pd.merge(BC6,LAMOST6,how='inner',on=['EPIC'])
 SL6 = pd.merge(SC6,LAMOST6,how='inner',on=['EPIC'])
@@ -543,12 +319,8 @@ LAMOST.to_csv('/home/bmr135/GA/K2Poles/APO_LAMOST/LAMOST_full_C6.csv',index=Fals
 # LAMOST.to_csv('/media/ben/SAMSUNG/GA/K2Poles/LAMOST/LAMOST_full_C6.csv',index=False,na_rep='Inf')
 print( "LAMOST C6 saved out ", len(LAMOST))
 
-''' Saves out data sets minus the spectroscopic data '''
-# j=0
-# for i in seismo_list:
-        # i.to_csv('/home/bmr135/GA/K2Poles/GAP6.csv',index=False,sep='\t',na_rep='Inf')
-    # j+=1
 
+''' Complete asteroseismic lists '''
 camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
 camp3_0 = camp3_0.drop_duplicates(subset=['EPIC'])
 camp3_0 = camp3_0.reset_index(drop=True)
@@ -733,7 +505,6 @@ camp3 = prop.single_seismo(camp3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp3 = prop.single_seismo(camp3,['BDnu','dnu','SDnu'],'DNU')
 camp3 = prop.single_seismo(camp3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp3 = prop.met_filter(camp3)
-# sys.exit()
 camp3.to_csv('/home/bmr135/GA/K2Poles/matlab_in/C3_070218.csv',index=False)
 # camp3.to_csv('/media/ben/SAMSUNG/GA/K2Poles/matlab_in/C3.csv',index=False)
 
@@ -755,7 +526,6 @@ print(len(camp3),len(camp6))
 ''' Data Flag for EPIC parametric values - which [Fe/H] to use? '''
 spectro_EPICS_3 = camp3[camp3['stpropflag'] != 'rpm']
 spectro_EPICS_6 = camp6[camp6['stpropflag'] != 'rpm']
-# print(spectro_EPICS_6['stpropflag'])
 spectro_EPICS_3 = spectro_EPICS_3[spectro_EPICS_3['stpropflag'] != 'rav']
 spectro_EPICS_6 = spectro_EPICS_6[spectro_EPICS_6['stpropflag'] != 'rav']
 print(len(spectro_EPICS_6['stpropflag']))
@@ -866,49 +636,6 @@ print( "Processing Complete")
 
 ''' PLOTTING '''
 
-
-''' Gaia-ESO comp plots '''
-# # Comparison plot for logg and teff for Gaia_ESO and asteroseismic values
-# # plt.subplot(3,3,1)
-# # plt.scatter(YG3['TEFFIRFM_Giant'],YG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-IRFM$_{Giant}$')
-# # plt.ylabel(r'YC3 Photometric Teff')
-# #
-# # plt.subplot(3,3,2)
-# # plt.scatter(SG3['TEFFIRFM_Giant'],SG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-IRFM$_{Giant}$')
-# # plt.ylabel(r'SC3 Photometric Teff')
-# #
-# # plt.subplot(3,3,3)
-# # plt.scatter(BG3['TEFFIRFM_Giant'],BG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-IRFM$_{Giant}$')
-# # plt.ylabel(r'BC3 Photometric Teff')
-# #
-# # plt.subplot(3,3,4)
-# # plt.scatter(YG3['TEFF_iDR5'],YG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-iDR5$_{Giant}$')
-# # plt.ylabel(r'YC3 Photometric Teff')
-# #
-# # plt.subplot(3,3,5)
-# # plt.scatter(SG3['TEFF_iDR5'],SG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-iDR5$_{Giant}$')
-# # plt.ylabel(r'SC3 Photometric Teff')
-# #
-# # plt.subplot(3,3,6)
-# # plt.scatter(BG3['TEFF_iDR5'],BG3['Teff'])
-# # plt.plot([4100,5500],[4100,5500],color='r')
-# # plt.xlabel(r'GES TEFF-iDR5$_{Giant}$')
-# # plt.ylabel(r'BC3 Photometric Teff')
-# #
-# # YG3['logg_Gs'] = np.log10(solar_g*(YG3['Ynumax']/const.solar_Numax_y)*(YG3['TEFFIRFM_Giant']/const.solar_Teff))
-# # SG3['logg_Gs'] = np.log10(solar_g*(SG3['Snumax']/const.solar_Numax_s)*(SG3['TEFFIRFM_Giant']/const.solar_Teff))
-# # BG3['logg_Gs'] = np.log10(solar_g*(BG3['Bnumax']/const.solar_Numax)*(BG3['TEFFIRFM_Giant']/const.solar_Teff))
-
 ''' Gaia-ESO log-g iteration calculations '''
 # YG3['LOGG_Seis'] = np.log10(const.solar_g*(YG3['Ynumax']/const.solar_Numax_y)*np.sqrt(YG3['TEFF']/const.solar_Teff))
 # SG3['LOGG_Seis'] = np.log10(const.solar_g*(SG3['Snumax']/const.solar_Numax_s)*np.sqrt(SG3['TEFF']/const.solar_Teff))
@@ -970,131 +697,7 @@ print( "Processing Complete")
 #
 #
 # print( out_file['ID'])
-# GES[['EPIC','Spec_TEFF','LOGG_Seis','Teff','slogg','Spec_LOGG']].to_csv('/home/bmr135/GA/K2Poles/Gaia_ESO/GES_seismo',index=False,sep='\t')
-# # #
-# # #
-# # plt.subplot(3,3,1)
-# # plt.scatter(YG3['Spec_LOGG'],YG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Spectroscopic Logg')
-# # plt.ylabel(r'YC3 Photometric Logg')
-# #
-# # plt.subplot(3,3,2)
-# # plt.scatter(SG3['Spec_LOGG'],SG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Spectroscopic Logg')
-# # plt.ylabel(r'SC3 Photometric Logg')
-# #
-# # plt.subplot(3,3,3)
-# # plt.scatter(BG3['Spec_LOGG'],BG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Spectroscopic Logg')
-# # plt.ylabel(r'BC3 Photometric Logg')
-# #
-# # plt.subplot(3,3,4)
-# # plt.scatter(YG3['LOGG_Seis'],YG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Seismic logg')
-# # plt.ylabel(r'YC3 Photometric logg')
-# #
-# # plt.subplot(3,3,5)
-# # plt.scatter(SG3['LOGG_Seis'],SG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Seismic logg')
-# # plt.ylabel(r'SC3 Photometric logg')
-# #
-# # plt.subplot(3,3,6)
-# # plt.scatter(BG3['LOGG_Seis'],BG3['slogg'])
-# # plt.plot([1.0,4.0],[1.0,4.0],color='r')
-# # plt.xlabel(r'GES Seismic logg')
-# # plt.ylabel(r'BC3 Photometric logg')
-# #
-# # plt.subplot(3,3,7)
-# # plt.scatter(YG3['slogg'],(YG3['slogg']-YG3['LOGG_Seis'])/YG3['slogg'])
-# # plt.plot([1.0,4.0],[.0,.0],color='r')
-# # plt.xlabel(r'YC3 Photometric logg')
-# # plt.ylabel(r'Frac. Diff. [(Seis-Spec)/Seis]')
-# #
-# # plt.subplot(3,3,8)
-# # plt.scatter(SG3['slogg'],(SG3['slogg']-SG3['LOGG_Seis'])/SG3['slogg'])
-# # plt.plot([1.0,4.0],[.0,.0],color='r')
-# # plt.xlabel(r'SC3 Photometric logg')
-# # plt.ylabel(r'Frac. Diff. [(Seis-Spec)/Seis]')
-# #
-# # plt.subplot(3,3,9)
-# # plt.scatter(BG3['slogg'],(BG3['slogg']-BG3['LOGG_Seis'])/BG3['slogg'])
-# # plt.plot([1.0,4.0],[.0,.0],color='r')
-# # plt.xlabel(r'BC3 Photometric logg')
-# # plt.ylabel(r'Frac. Diff. [(Seis-Spec)/Seis]')
-# #
-# # plt.tight_layout()
 
-''' Gaia-ESO Clare Comp '''
-# YUVES = YG3[(YG3['Spec_Source'] == 'UVES:iDR5Rec') | (YG3['Spec_Source'] == 'UVES:NiceNodeParameters')]
-# SUVES = SG3[(SG3['Spec_Source'] == 'UVES:iDR5Rec') | (SG3['Spec_Source'] == 'UVES:NiceNodeParameters')]
-# BUVES = BG3[(BG3['Spec_Source'] == 'UVES:iDR5Rec') | (BG3['Spec_Source'] == 'UVES:NiceNodeParameters')]
-# YGIR = YG3[(YG3['Spec_Source'] == 'GIRAFFE:iDR5Rec') | (YG3['Spec_Source'] == 'GIRAFFE:RadialVelocityTemplateParameters')]
-# SGIR = SG3[(SG3['Spec_Source'] == 'GIRAFFE:iDR5Rec') | (SG3['Spec_Source'] == 'GIRAFFE:RadialVelocityTemplateParameters')]
-# BGIR = BG3[(BG3['Spec_Source'] == 'GIRAFFE:iDR5Rec') | (BG3['Spec_Source'] == 'GIRAFFE:RadialVelocityTemplateParameters')]
-#
-# # print( len(SGIR))
-#
-# plt.figure()
-# plt.subplot(3,3,1)
-# plt.scatter(YG3['Spec_TEFF'],YG3['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-# plt.ylabel(r'Yvonne GES Seismic logg')
-# plt.title(r'All')
-#
-# plt.subplot(3,3,2)
-# plt.scatter(YUVES['Spec_TEFF'],YUVES['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-# plt.title(r'UVES')
-#
-# plt.subplot(3,3,3)
-# plt.scatter(YGIR['Spec_TEFF'],YGIR['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-# plt.title(r'GIRAFFE')
-#
-# plt.subplot(3,3,4)
-# plt.scatter(SG3['Spec_TEFF'],SG3['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-# plt.ylabel(r'Savita GES Seismic logg')
-#
-# plt.subplot(3,3,5)
-# plt.scatter(SUVES['Spec_TEFF'],SUVES['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-#
-# plt.subplot(3,3,6)
-# plt.scatter(SGIR['Spec_TEFF'],SGIR['LOGG_Seis'])
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-#
-# plt.subplot(3,3,7)
-# plt.scatter(BG3['Spec_TEFF'],BG3['LOGG_Seis'])
-# plt.xlabel(r'Spec Teff')
-# plt.ylabel(r'Benoit GES Seismic logg')
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-#
-# plt.subplot(3,3,8)
-# plt.scatter(BUVES['Spec_TEFF'],BUVES['LOGG_Seis'])
-# plt.xlabel(r'Spec Teff')
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-#
-# plt.subplot(3,3,9)
-# plt.scatter(BGIR['Spec_TEFF'],BGIR['LOGG_Seis'])
-# plt.xlabel(r'Spec Teff')
-# plt.xlim(5750,4000)
-# plt.ylim(4.0,1.0)
-#
-# plt.tight_layout()
 
 ''' CMD/HRD comp plots '''
 # C3 CMD/HRDs
@@ -1547,17 +1150,5 @@ plt.tight_layout()
 # plt.hist(BC3['Grad']/1000,bins=75)
 # plt.xlabel(r'Galactocentric Distance [kpc]')
 
-bins = np.linspace(0,5,50)
-plt.figure()
-plt.hist(BC3['mass'],bins=bins,histtype='step',label=r'Benoit C3')
-plt.hist(camp3['mass'],bins=bins,histtype='step',label=r'Multi-Det C3')
-plt.xlabel(r'Mass [M$_{\odot}$]')
-plt.legend(prop={'size':15})
-
-plt.figure()
-plt.hist(BC6['mass'],bins=bins,histtype='step',label=r'Benoit C6')
-plt.hist(camp6['mass'],bins=bins,histtype='step',label=r'Multi-Det C6')
-plt.xlabel(r'Mass [M$_{\odot}$]')
-plt.legend(prop={'size':15})
 
 # plt.show()
