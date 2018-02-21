@@ -53,8 +53,8 @@ if __name__ == '__main__':
     save_out = 0 # 0 - no saving; 1 - save all figures
 
     ''' Read in files '''
-    # APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
-    APK = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
+    APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
+    # APK = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
 
     # a = [['APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me'], \
     #      ['GES.tar.gz', 'GES/', 'GES.in.me'], \
@@ -115,13 +115,13 @@ if __name__ == '__main__':
     C6_40_06FeH = pd.read_csv(ext+'C6_40_06FeH/C6_40_06FeH.in.me',delimiter=r'\s+')
     C6_ns = pd.read_csv(ext+'C6_ns/C6.in.me',delimiter=r'\s+')
 
-    # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
-    TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
+    TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
+    # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
-    # TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
-    TRI6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
-    # Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
-    Kep_Sim = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    # TRI6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
 
     ''' [Fe/H] correct PARAM runs '''
     C3_True = pd.read_csv(ext+'C3_TRUE/C3_True.in.me',delimiter=r'\s+')

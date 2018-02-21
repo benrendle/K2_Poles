@@ -31,11 +31,11 @@ matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
 ''' Dropbox Path '''
-# ext_DB = '/home/bmr135/' # Work
-ext_DB = '/home/ben/'   # Laptop
+ext_DB = '/home/bmr135/' # Work
+# ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-# ext_GA = '/home/bmr135/' # Work
-ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
+ext_GA = '/home/bmr135/' # Work
+# ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
 
 ''' Read in simulated and real data '''
 besa3, besa6 = dat.BESANCON()
