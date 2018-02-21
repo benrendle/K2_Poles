@@ -28,8 +28,8 @@ def p_in(name,df1,field):
     '''
     EPIC = pd.DataFrame()
     EPIC['#Id'] = df1['#Id']
-    df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
-    # df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    # df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
     df.rename(columns={'ID':'#Id'},inplace=True)
     df = pd.merge(df,EPIC,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -58,8 +58,8 @@ def p_in(name,df1,field):
 
 def Nseismo_link(field,df):
     ''' Match number of seismic detections to EPIC numbers '''
-    a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
-    # a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    # a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
     a.rename(columns={'EPIC':'#Id'},inplace=True)
     df = pd.merge(df,a,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -393,14 +393,14 @@ def Z_subplots(df1,df2,param,ran,xtag,z):
 def sim_coords(df,field):
     ''' Give simulations values for GLAT and GLON from the input coords '''
     if field == 3:
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
     if field == 6:
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
     if field == 'K':
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
 
     df['Glon'] = 0
     df['Glat'] = 0

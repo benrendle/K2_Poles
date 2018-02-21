@@ -31,11 +31,11 @@ matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
 ''' Dropbox Path '''
-ext_DB = '/home/bmr135/' # Work
-# ext_DB = '/home/ben/'   # Laptop
+# ext_DB = '/home/bmr135/' # Work
+ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-ext_GA = '/home/bmr135/' # Work
-# ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
+# ext_GA = '/home/bmr135/' # Work
+ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
 
 ''' Read in simulated and real data '''
 besa3, besa6 = dat.BESANCON()
@@ -77,7 +77,7 @@ GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
 GAP3_v2 = GAP3_v2.reset_index(drop=True)
 GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
 GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
-GAP3_v2.to_csv('/home/bmr135/GA/K2Poles/GAP3')
+# GAP3_v2.to_csv('/home/bmr135/GA/K2Poles/GAP3')
 
 GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
@@ -87,7 +87,7 @@ GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
 GAP6_v2 = GAP6_v2.reset_index(drop=True)
 GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
 GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
-GAP6_v2.to_csv('/home/bmr135/GA/K2Poles/GAP6')
+# GAP6_v2.to_csv('/home/bmr135/GA/K2Poles/GAP6')
 
 ''' Merge data with GAP target lists '''
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
@@ -295,7 +295,7 @@ LST = pd.concat([BL3,SL3,YL3],ignore_index=True)
 LST = LST.drop_duplicates(subset=['EPIC'])
 LST = LST.fillna(value='NaN',method=None)
 LST = LST.reset_index(drop=True)
-LST.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/LAMOST_full_C3.csv',index=False,na_rep='Inf')
+# LST.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/LAMOST_full_C3.csv',index=False,na_rep='Inf')
 print( "LAMOST C3 saved out ", len(LST))
 
 YL6 = pd.merge(YC6,LAMOST6,how='inner',on=['EPIC'])
@@ -305,7 +305,7 @@ LAMOST = pd.concat([BL6,SL6,YL6],ignore_index=True)
 LAMOST = LAMOST.drop_duplicates(subset=['EPIC'],keep='first')
 LAMOST = LAMOST.fillna(value='NaN',method=None)
 LAMOST = LAMOST.reset_index(drop=True)
-LAMOST.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/LAMOST_full_C6.csv',index=False,na_rep='Inf')
+# LAMOST.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/LAMOST_full_C6.csv',index=False,na_rep='Inf')
 print( "LAMOST C6 saved out ", len(LAMOST))
 
 
