@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import tar_test as tt
+import TAR as tt
 
 filename = '/home/bmr135/GA/K2Poles/Benoit.tar.gz'
 sf = '' # If there are no subfolders, leave as two apostrophes. Else, write '<dirname>/'
