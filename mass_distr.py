@@ -56,41 +56,65 @@ if __name__ == '__main__':
     APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
     # APK = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
 
-    tar = tt.TAR(ext,'APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me', r'\s+')
-    APK2 = pd.DataFrame()
-    APK2 = tar()
+    a = [['APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me'], \
+         ['GES.tar.gz', 'GES/', 'GES.in.me'], \
+         ['GES_v2.tar.gz', 'GES_v2/', 'GES.in.me'], \
+         ['GES_ns.tar.gz', 'GES_ns/', 'GES.in.me'], \
+         ['GES_A40.tar.gz', 'GES_A40/', 'GES.in.me'], \
+         ['APO6.tar.gz', 'APO6/','APOGEE.in.me'], \
+         ['APO6_ns.tar.gz', 'APO6_ns/', 'APOGEE.in.me'], \
+         ['RC3.tar.gz', 'RC3/', 'RC3.in.me'], \
+         ['RC3_ns.tar.gz', 'RC3_ns/', 'RC3.in.me'], \
+         ['RC3_A40.tar.gz', 'RC3_A40/', 'RC3.in.me'], \
+         ['RC6.tar.gz', 'RC6/', 'RC6.in.me'], \
+         ['RC6_ns.tar.gz', 'RC6_ns/', 'RC6.in.me'], \
+         ['RC6_A40.tar.gz', 'RC6_A40/', 'RC6.in.me'], \
+         ['C3.tar.gz', 'C3/', 'C3.in.me'], \
+         ['C3_ns.tar.gz', 'C3_ns/', 'C3.in.me'], \
+         ['C3_A40.tar.gz', 'C3_A40/', 'C3.in.me'], \
+         ['C3_40_06FeH.tar.gz', 'C3_40_06FeH/', 'C3_40_06FeH.in.me'], \
+         ['C6.tar.gz', 'C6/', 'C6.in.me'], \
+         ['C6_ns.tar.gz', 'C6_ns/', 'C6.in.me'], \
+         ['C6_A40.tar.gz', 'C6_A40/', 'C6.in.me'], \
+         ['C6_40_06FeH.tar.gz', 'C6_40_06FeH/', 'C6_40_06FeH.in.me'], \
+         ['C3_TRUE.tar.gz', 'C3_TRUE/', 'C3_True.in.me'], \
+         ['C6_TRUE.tar.gz', 'C6_TRUE/', 'C6_TRUE.in.me'], \
+         ['C6_TRUE_2.tar.gz', 'C6_TRUE_2/', 'C6_TRUE_2.in.me'], \
+         ]
 
-    tar = tt.TAR(ext,'GES.tar.gz', 'GES/', 'GES.in.me', r'\s+')
-    GES = pd.DataFrame()
-    GES = tar()
+    z=[pd.DataFrame()]*len(a)
+    for i in range(len(a)):
+        tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
+        z[i] = tar()
 
-    tar = tt.TAR(ext,'GES_v2.tar.gz', 'GES_v2/', 'GES.in.me', r'\s+')
-    GES_v2 = pd.DataFrame()
-    GES_v2 = tar()
-
-    tar = tt.TAR(ext,'GES_ns.tar.gz', 'GES_ns/', 'GES.in.me', r'\s+')
-    GES_ns = pd.DataFrame()
-    GES_ns = tar()
+    APK2, GES, GES_v2, GES_ns, GES_A40, APO, APO_ns, RC3, RC3_ns, RC3_A40, \
+    RC6, RC6_ns, RC6_A40, C3, C3_ns, C3_A40, C3_40_06FeH, C6, C6_ns, C6_A40, \
+    C6_40_06FeH, C3_True, C6_True, C6_True_2 = z
+    print(C6_True_2)
     sys.exit()
 
-    GES_ns = pd.read_csv(ext+'GES_ns/GES.in.me',delimiter=r'\s+')
-    GES_A40 = pd.read_csv(ext+'GES_A40/GES.in.me',delimiter=r'\s+')
-    APO = pd.read_csv(ext+'APO6/APOGEE.in.me',delimiter=r'\s+')
-    APO_ns = pd.read_csv(ext+'APO6_ns/APOGEE.in.me',delimiter=r'\s+')
-    RC3 = pd.read_csv(ext+'RC3/RC3.in.me',delimiter=r'\s+')
-    RC3_ns = pd.read_csv(ext+'RC3_ns/RC3.in.me',delimiter=r'\s+')
-    RC3_A40 = pd.read_csv(ext+'RC3_A40/RC3.in.me',delimiter=r'\s+')
-    RC6_A40 = pd.read_csv(ext+'RC6_A40/RC6.in.me',delimiter=r'\s+')
-    RC6 = pd.read_csv(ext+'RC6/RC6.in.me',delimiter=r'\s+')
-    RC6_ns = pd.read_csv(ext+'RC6_ns/RC6.in.me',delimiter=r'\s+')
-    C3 = pd.read_csv(ext+'C3/C3.in.me',delimiter=r'\s+')
-    C3_ns = pd.read_csv(ext+'C3_ns/C3.in.me',delimiter=r'\s+')
-    C3_A40 = pd.read_csv(ext+'C3_A40/C3.in.me',delimiter=r'\s+')
-    C3_40_06FeH = pd.read_csv(ext+'C3_40_06FeH/C3_40_06FeH.in.me',delimiter=r'\s+')
-    C6 = pd.read_csv(ext+'C6/C6.in.me',delimiter=r'\s+')
-    C6_A40 = pd.read_csv(ext+'C6_A40/C6.in.me',delimiter=r'\s+')
-    C6_40_06FeH = pd.read_csv(ext+'C6_40_06FeH/C6_40_06FeH.in.me',delimiter=r'\s+')
+    # APK2 = pd.read_csv(ext+'APOKASC/APOKASC.in.me',delimiter=r'\s+')
+    # GES = pd.read_csv(ext+'GES/GES.in.me',delimiter=r'\s+')
+    # GES_v2 = pd.read_csv(ext+'GES_v2/GES.in.me',delimiter=r'\s+')
+    # GES_ns = pd.read_csv(ext+'GES_ns/GES.in.me',delimiter=r'\s+')
+    # GES_A40 = pd.read_csv(ext+'GES_A40/GES.in.me',delimiter=r'\s+')
+    # APO = pd.read_csv(ext+'APO6/APOGEE.in.me',delimiter=r'\s+')
+    # APO_ns = pd.read_csv(ext+'APO6_ns/APOGEE.in.me',delimiter=r'\s+')
+    # RC3 = pd.read_csv(ext+'RC3/RC3.in.me',delimiter=r'\s+')
+    # RC3_ns = pd.read_csv(ext+'RC3_ns/RC3.in.me',delimiter=r'\s+')
+    # RC3_A40 = pd.read_csv(ext+'RC3_A40/RC3.in.me',delimiter=r'\s+')
+    # RC6_A40 = pd.read_csv(ext+'RC6_A40/RC6.in.me',delimiter=r'\s+')
+    # RC6 = pd.read_csv(ext+'RC6/RC6.in.me',delimiter=r'\s+')
+    # RC6_ns = pd.read_csv(ext+'RC6_ns/RC6.in.me',delimiter=r'\s+')
+    # C3 = pd.read_csv(ext+'C3/C3.in.me',delimiter=r'\s+')
+    # C3_ns = pd.read_csv(ext+'C3_ns/C3.in.me',delimiter=r'\s+')
+    # C3_A40 = pd.read_csv(ext+'C3_A40/C3.in.me',delimiter=r'\s+')
+    # C3_40_06FeH = pd.read_csv(ext+'C3_40_06FeH/C3_40_06FeH.in.me',delimiter=r'\s+')
+    # C6 = pd.read_csv(ext+'C6/C6.in.me',delimiter=r'\s+')
+    # C6_A40 = pd.read_csv(ext+'C6_A40/C6.in.me',delimiter=r'\s+')
+    # C6_40_06FeH = pd.read_csv(ext+'C6_40_06FeH/C6_40_06FeH.in.me',delimiter=r'\s+')
     # C6_ns = pd.read_csv(ext+'C6_ns/C6.in.me',delimiter=r'\s+')
+
     TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
@@ -99,13 +123,13 @@ if __name__ == '__main__':
     Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
     # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
 
-
     ''' [Fe/H] correct PARAM runs '''
-    C3_True = pd.read_csv(ext+'C3_TRUE/C3_True.in.me',delimiter=r'\s+')
-    C6_True = pd.read_csv(ext+'C6_TRUE/C6_TRUE.in.me',delimiter=r'\s+')
-    C6_True_2 = pd.read_csv(ext+'C6_TRUE_2/C6_TRUE_2.in.me',delimiter=r'\s+')
+    # C3_True = pd.read_csv(ext+'C3_TRUE/C3_True.in.me',delimiter=r'\s+')
+    # C6_True = pd.read_csv(ext+'C6_TRUE/C6_TRUE.in.me',delimiter=r'\s+')
+    # C6_True_2 = pd.read_csv(ext+'C6_TRUE_2/C6_TRUE_2.in.me',delimiter=r'\s+')
     C6_True = pd.concat([C6_True,C6_True_2],ignore_index=True)
     C6_True = C6_True.reset_index(drop=True)
+
 
     ''' Application of K2 Selection Function to Kepler Simulation '''
     Kep_Sim['Teff'] = 10**(Kep_Sim['logTe'])
