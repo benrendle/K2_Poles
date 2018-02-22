@@ -109,30 +109,28 @@ def K2_GAP():
     C3_flag = pd.read_csv(ext_DB+'Dropbox/K2Poles/C3_EPIC_param_flags.txt')
     C6_flag = pd.read_csv(ext_DB+'Dropbox/K2Poles/C6_EPIC_param_flags.txt')
     GAP3['JK'] = GAP3['Jmag'] - GAP3['Kmag']
-    GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
-    GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     GAP3['sig_Teff'] = (abs(GAP3['ep_teff'])+abs(GAP3['em_teff']))/2
     GAP3['sig_logg'] = (abs(GAP3['ep_logg'])+abs(GAP3['em_logg']))/2
     GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2
+    GAP3['[Fe/H]'] = np.random.normal(-0.294,0.305,len(GAP3)) # mu/std dev. from RAVE (22/02/2018)
+    GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
+    GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
+    GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)
 
     ''' Minimum threshold uncertainty based on distribution width '''
-    min_fehsig3 = np.std(GAP3['[Fe/H]'])/2
-    min_fehsig6 = np.std(GAP6['[Fe/H]'])/2
-    print(min_fehsig3,min_fehsig6)
-
     for i in range(len(GAP3['sig_Teff'])):
         if GAP3['sig_Teff'][i] < 100:
             GAP3['sig_Teff'][i] = 100
-        if GAP3['sig_feh'][i] < min_fehsig3:
-            GAP3['sig_feh'][i] = min_fehsig3
+        if GAP3['sig_feh'][i] < 0.25:
+            GAP3['sig_feh'][i] = 0.25
     GAP6['sig_logg'] = (abs(GAP6['ep_logg'])+abs(GAP6['em_logg']))/2
     GAP6['sig_feh'] = (abs(GAP6['ep_[Fe/H]'])+abs(GAP6['em_[Fe/H]']))/2
     for i in range(len(GAP6['sig_Teff'])):
         if GAP6['sig_Teff'][i] < 100:
             GAP6['sig_Teff'][i] = 100
-        if GAP6['sig_feh'][i] < min_fehsig6:
-            GAP6['sig_feh'][i] = min_fehsig6
+        if GAP6['sig_feh'][i] < 0.25:
+            GAP6['sig_feh'][i] = 0.25
 
     GAP3 = pd.merge(GAP3,C3_flag,how='inner',on=['EPIC'])
     GAP3 = GAP3.reset_index(drop=True)
