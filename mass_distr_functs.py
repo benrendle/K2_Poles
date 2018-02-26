@@ -28,8 +28,8 @@ def p_in(name,df1,field):
     '''
     EPIC = pd.DataFrame()
     EPIC['#Id'] = df1['#Id']
-    # df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
-    df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    # df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
     df.rename(columns={'ID':'#Id'},inplace=True)
     df = pd.merge(df,EPIC,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -58,8 +58,8 @@ def p_in(name,df1,field):
 
 def Nseismo_link(field,df):
     ''' Match number of seismic detections to EPIC numbers '''
-    # a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
-    a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    # a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
     a.rename(columns={'EPIC':'#Id'},inplace=True)
     df = pd.merge(df,a,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -253,7 +253,7 @@ def met_comp(X,name,p1,p2,colour,label):
 def histo(df,name,bins,label,log,tag):
     ''' Distribution histogram '''
     # plt.figure()
-    n, bins, patches = plt.hist(df[name][np.isfinite(df[name])], bins=bins, label=tag, linewidth=2, histtype='step', normed=True)
+    n, bins, patches = plt.hist(df[name][np.isfinite(df[name])], bins=bins, label=tag, linewidth=2, histtype='step')#, normed=True)
     x=np.zeros(len(n))
     for i in np.arange(0,len(bins),1):
         try: x[i] = (bins[i] + bins[i+1])/2
@@ -393,14 +393,14 @@ def Z_subplots(df1,df2,param,ran,xtag,z):
 def sim_coords(df,field):
     ''' Give simulations values for GLAT and GLON from the input coords '''
     if field == 3:
-        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
-        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
     if field == 6:
-        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
-        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
     if field == 'K':
-        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
-        coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
 
     df['Glon'] = 0
     df['Glat'] = 0
@@ -605,6 +605,20 @@ def space_density2(obs):
     ecpar1.append(myoutput1.sd_beta[1])
     # myoutput1.pprint()
 
+    def f2(Par,z):
+        return 1-(Par[0]*np.exp(-z/Par[1]) + Par[2]*np.exp(-z/Par[3])) #+ (1-Par[3]*np.exp(-z*Par[1]/Par[4]))
+        # return Par[0]*((Par[1]*z + Par[2])+(Par[3]*z + Par[4]))
+    mpar2, cpar2, empar2, ecpar2 = [], [], [], []
+    linear2 = odrpack.Model(f2)
+    mydata2 = odrpack.RealData(bin_10, rho10, sy=sig_rho)
+    myodr2 = odrpack.ODR(mydata2, linear2, beta0=[1e-3, 500, 1e-3, 1000],maxit=20000)
+    myoutput2 = myodr2.run()
+    mpar2.append(myoutput2.beta[0])
+    cpar2.append(myoutput2.beta[1])
+    empar2.append(myoutput2.sd_beta[0])
+    ecpar2.append(myoutput2.sd_beta[1])
+    myoutput2.pprint()
+
     plt.figure()
     plt.scatter(bin_10,rho)
     # plt.scatter(bin_10[6:11],rho[6:11],color='r')
@@ -614,6 +628,8 @@ def space_density2(obs):
             label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar[0],cpar[0]))
     plt.plot(bin_10,np.log10(myoutput1.beta[0]*np.exp(-bin_10/myoutput1.beta[1])),color='orange',linestyle='--', \
             label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar1[0],cpar1[0]))
+    plt.plot(bin_10,np.log10(myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1])), \
+            label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar2[0],cpar2[0]))
     plt.ylim(-7.75,-3.5)
     plt.xlim(100, 5100)
     plt.tick_params(labelsize=15)
