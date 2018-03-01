@@ -15,11 +15,11 @@ import K2_data as dat
 from numbers import Number
 
 ''' Dropbox Path '''
-# ext_DB = '/home/bmr135/' # Work
-ext_DB = '/home/ben/'   # Laptop
+ext_DB = '/home/bmr135/' # Work
+# ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-# ext_GA = '/home/bmr135/' # Work
-ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
+ext_GA = '/home/bmr135/' # Work
+# ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
 
 
 def TRILEGAL():
@@ -136,15 +136,6 @@ def K2_GAP():
     GAP3 = GAP3.reset_index(drop=True)
     GAP6 = pd.merge(GAP6,C6_flag,how='inner',on=['EPIC'])
     GAP6 = GAP6.reset_index(drop=True)
-
-    GALAH = pd.read_csv(ext_GA+'/GA/K2Poles/GALAH_TGAS/catalog.dat',delimiter=r'\s+')
-    GALAH3 = pd.merge(GALAH,GAP3,how='inner',on=['2MASS'])
-    GALAH3 = GALAH3.reset_index(drop=True)
-    print(len(GALAH3))
-    GALAH6 = pd.merge(GALAH,GAP6,how='inner',on=['2MASS'])
-    GALAH6 = GALAH6.reset_index(drop=True)
-    print(len(GALAH6))
-    sys.exit()
     return GAP3, GAP6
 
 def KASOC_LC_in():
