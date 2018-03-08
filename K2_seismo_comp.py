@@ -544,6 +544,15 @@ cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
 GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+
+GES['ALPHA'] = GES['ALPHA'] + 0.1
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+GES['ALPHA'] = GES['ALPHA'] + 0.15
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+GES['ALPHA'] = GES['ALPHA'] - 0.35
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+GES['ALPHA'] = GES['ALPHA'] -0.15
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Merging of LAMOST data with multiple asteroseismic dets '''

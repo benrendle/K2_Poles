@@ -56,22 +56,27 @@ if __name__ == '__main__':
     APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
     # APK = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
 
-    # a = [['APOKASC.tar.gz', 'APOKASC/', 'APOKASC.in.me'], \
-    #      ['GES.tar.gz', 'GES/', 'GES.in.me'], \
-    #      ['APO6.tar.gz', 'APO6/','APOGEE.in.me'], \
-    #      ['RC3.tar.gz', 'RC3/', 'RC3.in.me'], \
-    #      ['RC6.tar.gz', 'RC6/', 'RC6.in.me'], \
-    #      ['C3.tar.gz', 'C3/', 'C3.in.me'], \
-    #      ['C6.tar.gz', 'C6/', 'C6.in.me'], \
-    #      ]
-    #
-    # z=[pd.DataFrame()]*len(a)
-    # for i in range(len(a)):
-    #     tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
-    #     z[i] = tar()
-    #
-    # APK2, GES, APO, RC3, \
-    # RC6, C3, C6 = z
+    a = [\
+        #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/', 'APOKASC.in.me'], \
+         ['ben_k2.tgz', 'GES_080218.in_STD_20Gyr/', 'GES_080218.in.me'], \
+         ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/','APO_080218.in.me'], \
+         ['ben_k2.tgz', 'RC3_080218.in_STD_20Gyr/', 'RC3_080218.in.me'], \
+         ['ben_k2.tgz', 'RC6_080218.in_STD_20Gyr/', 'RC6_080218.in.me'], \
+         ['ben_k2.tgz', 'C3_080218.in_STD_20Gyr/', 'C3_080218.in.me'], \
+         ['ben_k2.tgz', 'C6_080218_1.in_STD_20Gyr/', 'C6_080218_1.in.me'], \
+         ['ben_k2.tgz', 'C6_080218_2.in_STD_20Gyr/', 'C6_080218_2.in.me'], \
+         ['C3_C6.tar.gz', 'C3_new_FeH/', 'C3_220218.in.me'], \
+         ['C3_C6.tar.gz', 'C6_new_FeH/', 'C6_220218.in.me'], \
+         ]
+
+    z=[pd.DataFrame()]*len(a)
+    for i in range(len(a)):
+        tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
+        z[i] = tar()
+
+    GES_T, APO_T, RC3_T, \
+    RC6_T, C3, C6_1, C6_2, \
+    C3_New, C6_New = z
     # sys.exit()
 
     APK2 = pd.read_csv(ext+'APOKASC/APOKASC.in.me',delimiter=r'\s+')
@@ -85,14 +90,14 @@ if __name__ == '__main__':
     # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
 
     ''' [Fe/H] correct PARAM runs '''
-    C3 = pd.read_csv(ext+'C3_080218.in.me',delimiter=r'\s+')
-    C6 = pd.read_csv(ext+'C6_080218.in.me',delimiter=r'\s+')
-    GES_T = pd.read_csv(ext+'GES_080218.in.me',delimiter=r'\s+')
-    RC3_T = pd.read_csv(ext+'RC3_080218.in.me',delimiter=r'\s+')
-    RC6_T = pd.read_csv(ext+'RC6_080218.in.me',delimiter=r'\s+')
+    # C3 = pd.read_csv(ext+'C3_080218.in.me',delimiter=r'\s+')
+    # C6 = pd.read_csv(ext+'C6_080218.in.me',delimiter=r'\s+')
+    # GES_T = pd.read_csv(ext+'GES_080218.in.me',delimiter=r'\s+')
+    # RC3_T = pd.read_csv(ext+'RC3_080218.in.me',delimiter=r'\s+')
+    # RC6_T = pd.read_csv(ext+'RC6_080218.in.me',delimiter=r'\s+')
     L3_T = pd.read_csv(ext+'L3_080218.in.me',delimiter=r'\s+')
     L6_T = pd.read_csv(ext+'L6_080218.in.me',delimiter=r'\s+')
-    APO_T = pd.read_csv(ext+'APO_080218.in.me',delimiter=r'\s+')
+    # APO_T = pd.read_csv(ext+'APO_080218.in.me',delimiter=r'\s+')
 
     ''' Application of K2 Selection Function to Kepler Simulation '''
     Kep_Sim['Teff'] = 10**(Kep_Sim['logTe'])
@@ -107,14 +112,18 @@ if __name__ == '__main__':
 
     ''' Additional PARAM inputs that aren't output values '''
     C3 = mdf.p_in('C3_080218',C3,'C3')
+    C3_New = mdf.p_in('C3_220218',C3_New,'C3')
     GES = mdf.p_in('GES_080218',GES_T,'C3')
     RC3 = mdf.p_in('RC3_080218',RC3_T,'C3')
     L3 = mdf.p_in('L3_080218',L3_T,'C3')
-    C6 = mdf.p_in('C6_080218',C6,'C6')
+    C6_1 = mdf.p_in('C6_080218_1',C6_1,'C6')
+    C6_2 = mdf.p_in('C6_080218_2',C6_2,'C6')
+    C6_New = mdf.p_in('C6_220218',C6_New,'C6')
     APO = mdf.p_in('APO_080218',APO_T,'C6')
     RC6 = mdf.p_in('RC6_080218',RC6_T,'C6')
     L6 = mdf.p_in('L6_080218',L6_T,'C6')
 
+    C6 = pd.concat([C6_1,C6_2],ignore_index=True)
 
     TRI3['age'] = (10**TRI3['logAge'])/1e9
     TRI3['Vcut'] = TRI3['Kmag'] + 2*(TRI3['JK']+0.14) + 0.382*np.exp(2*(TRI3['JK']-0.2))
@@ -139,7 +148,9 @@ if __name__ == '__main__':
     mdf.vert_dist(TRI6)
     mdf.vert_dist(Kep_Sim)
     mdf.vert_dist(C3)
+    mdf.vert_dist(C3_New)
     mdf.vert_dist(C6)
+    mdf.vert_dist(C6_New)
     mdf.vert_dist(APK2)
     mdf.vert_dist(GES)
     mdf.vert_dist(APO)
@@ -178,10 +189,15 @@ if __name__ == '__main__':
     K2.reset_index(drop=True)
     K2.reset_index(drop=True)
 
+    K2_New = pd.concat([C3_New,C6_New],ignore_index=True)
+    K2_New.reset_index(drop=True)
+    K2_New.reset_index(drop=True)
+
     TRI = pd.concat([TRI3,TRI6],ignore_index=True)
     TRI.reset_index(drop=True)
 
     K2['lgs'] = np.log10(27400 * (K2['nmx']/3090) * np.sqrt(K2['Teff']/5777))
+    K2_New['lgs'] = np.log10(27400 * (K2_New['nmx']/3090) * np.sqrt(K2_New['Teff']/5777))
     AS['lgs'] = np.log10(27400 * (AS['nmx']/3090) * np.sqrt(AS['Teff']/5777))
     mdf.vert_dist(AS)
     # AS['feh'] = AS['feh'] + 3
@@ -338,32 +354,32 @@ if __name__ == '__main__':
     ''' Parameter distribution plots '''
     # K2_RGB = pd.DataFrame()
     # APK2 = APK2[APK2['radius'] > 0.0]
-    # K2 = K2[K2['logAge'] > 9.9]
+    # K2_New = K2_New[K2_New['logAge'] > 9.9]
     # AS = AS[AS['logAge'] > 9.9]
-    # fig, axes = plt.subplots(3,2)
-    # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-    # # plt.suptitle(r'log$_{10}$(Age) $> 10.0$', fontsize=15)
-    # # plt.suptitle(r'$\forall$ R', fontsize=15)
-    # ax0.hist(K2['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Photometric',normed=True)
-    # ax0.hist(AS['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Spectroscopic',normed=True)
-    # ax0.legend(prop={'size':10})
-    # ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-    # ax1.hist(K2['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'R $< 9$',normed=True)
-    # ax1.hist(AS['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'$\forall$ R',normed=True)
-    # ax1.set_xlabel(r'log$_{10}$(Age)')
-    # ax2.hist(K2['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'Spectroscopic')#,normed=1.0)
-    # ax2.hist(AS['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'K2')#,normed=1.0)
-    # ax2.set_xlabel(r'Radius [R$_{\odot}$]')
-    # ax3.hist(K2['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'Spectroscopic',normed=True)
-    # ax3.hist(AS['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'K2',normed=True)
-    # ax3.set_xlabel(r'Z [kpc]')
-    # ax4.hist(K2['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'Spectroscopic',normed=1)
-    # ax4.hist(AS['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
-    # ax4.set_xlabel(r'[Fe/H]')
-    # ax5.axis('off')
-    # # fig.subplots_adjust(top=3.0)
-    # plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    # plt.show()
+    fig, axes = plt.subplots(3,2)
+    ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+    # plt.suptitle(r'log$_{10}$(Age) $> 10.0$', fontsize=15)
+    # plt.suptitle(r'$\forall$ R', fontsize=15)
+    ax0.hist(K2['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Photometric',normed=True)
+    ax0.hist(K2_New['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Spectro. based Met.',normed=True)
+    ax0.legend(prop={'size':10})
+    ax0.set_xlabel(r'Mass [M$_{\odot}$]')
+    ax1.hist(K2['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'R $< 9$',normed=True)
+    ax1.hist(K2_New['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'$\forall$ R',normed=True)
+    ax1.set_xlabel(r'log$_{10}$(Age)')
+    ax2.hist(K2['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'Spectroscopic')#,normed=1.0)
+    ax2.hist(K2_New['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'K2')#,normed=1.0)
+    ax2.set_xlabel(r'Radius [R$_{\odot}$]')
+    ax3.hist(K2['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'Spectroscopic',normed=True)
+    ax3.hist(K2_New['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'K2',normed=True)
+    ax3.set_xlabel(r'Z [kpc]')
+    ax4.hist(K2['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'Spectroscopic',normed=1)
+    ax4.hist(K2_New['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
+    ax4.set_xlabel(r'[Fe/H]')
+    ax5.axis('off')
+    # fig.subplots_adjust(top=3.0)
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show()
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
@@ -661,18 +677,31 @@ if __name__ == '__main__':
     ''' Radius vs Scaling Radius '''
     # C3['Rs'] = (C3['nmx']/3090) * (C3['dnu']/135.1)**-2 * (C3['Teff']/5777)**0.5
     # C6['Rs'] = (C6['nmx']/3090) * (C6['dnu']/135.1)**-2 * (C6['Teff']/5777)**0.5
-    # K2['Rs'] = (K2['nmx']/3090) * (K2['dnu']/135.1)**-2 * (K2['Teff']/5777)**0.5
+    K2_New['Rs'] = (K2['nmx']/3090) * (K2['dnu']/135.1)**-2 * (K2['Teff']/5777)**0.5
     # AS['Rs'] = (AS['nmx']/3090) * (AS['dnu']/135.1)**-2 * (AS['Teff']/5777)**0.5
     # K2_AS['Rs'] = (K2_AS['nmx']/3090) * (K2_AS['dnu']/135.1)**-2 * (K2_AS['Teff']/5777)**0.5
-    # plt.figure()
-    # plt.scatter(K2['rad'],K2['rad']-K2['Rs'])
-    # plt.plot([0,max(K2['rad'])+0.1],[0,0])
-    # plt.xlim(0,max(K2['rad'])+0.1)
-    # plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
-    # plt.ylabel(r'R - R$_{sr}$', fontsize=15)
-    # plt.tight_layout()
+    K2_New['drad'] = (K2_New['rad']-K2_New['Rs'])/K2_New['rad']
+    K2_New = K2_New[K2_New['drad'] > -0.5]
+    K2_New = K2_New[K2_New['drad'] < 0.5]
+    plt.figure()
+    plt.scatter(K2_New['rad'],K2_New['drad'])
+    plt.plot([0,max(K2_New['rad'])+0.1],[0,0])
+    plt.xlim(0,max(K2_New['rad'])+0.1)
+    plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
+    plt.ylabel(r'R - R$_{sr}$', fontsize=15)
+    plt.tight_layout()
     # plt.show()
-    #
+
+    K2_New['Ms'] = (K2_New['nmx']/3090)**3 * (K2_New['dnu']/135.1)**-4 * (K2_New['Teff']/5777)**1.5
+    plt.figure()
+    plt.scatter(K2_New['mass'],(K2_New['mass']-K2_New['Ms'])/K2_New['mass'])
+    plt.plot([0,max(K2_New['mass'])+0.1],[0,0])
+    plt.xlim(0,max(K2_New['mass'])+0.1)
+    plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    plt.ylabel(r'M - M$_{sr}$', fontsize=15)
+    plt.tight_layout()
+    plt.show()
+
     # plt.figure()
     # hist, bins, patches = plt.hist(C3['rad'],bins=50,histtype='step',label=r'PARAM R',normed=True,linewidth=2)
     # plt.hist(C3['Rs'],bins=bins,histtype='step',label=r'Scaling R',normed=True,linewidth=2)
@@ -738,9 +767,10 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Space Density plots '''
-    # mdf.space_density2(C6)
-    # mdf.space_density2(AS)
-    # plt.show()
+    import mass_distr_functs as mdf
+    mdf.space_density2(C6)
+    # # mdf.space_density2(AS)
+    plt.show()
     # sys.exit()
 
     ''' Mass vs Z scatter plots with trend lines '''
@@ -790,7 +820,6 @@ if __name__ == '__main__':
     # plt.legend()
     # plt.tight_layout()
     # plt.show()
-
 
     ''' [Fe/H] vs [Alpha/Fe] '''
     # AS = AS[AS['alpha'] > -4]

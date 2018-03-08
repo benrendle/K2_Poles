@@ -606,12 +606,12 @@ def space_density2(obs):
     # myoutput1.pprint()
 
     def f2(Par,z):
-        return 1-(Par[0]*np.exp(-z/Par[1]) + Par[2]*np.exp(-z/Par[3])) #+ (1-Par[3]*np.exp(-z*Par[1]/Par[4]))
+        return (Par[0])*np.exp(-abs(z)/Par[1]) + (Par[2])*np.exp(-abs(z)/Par[3])
         # return Par[0]*((Par[1]*z + Par[2])+(Par[3]*z + Par[4]))
     mpar2, cpar2, empar2, ecpar2 = [], [], [], []
     linear2 = odrpack.Model(f2)
-    mydata2 = odrpack.RealData(bin_10, rho10, sy=sig_rho)
-    myodr2 = odrpack.ODR(mydata2, linear2, beta0=[1e-3, 500, 1e-3, 1000],maxit=20000)
+    mydata2 = odrpack.RealData(bin_10[3:], rho10[3:], sy=sig_rho[3:])
+    myodr2 = odrpack.ODR(mydata2, linear2, beta0=[4e-4, 500, 3e-5, 1000],maxit=20000)
     myoutput2 = myodr2.run()
     mpar2.append(myoutput2.beta[0])
     cpar2.append(myoutput2.beta[1])
@@ -628,8 +628,14 @@ def space_density2(obs):
             label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar[0],cpar[0]))
     plt.plot(bin_10,np.log10(myoutput1.beta[0]*np.exp(-bin_10/myoutput1.beta[1])),color='orange',linestyle='--', \
             label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar1[0],cpar1[0]))
-    plt.plot(bin_10,np.log10(myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1])), \
+    plt.plot(bin_10, \
+            np.log10((myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1]) + myoutput2.beta[2]*np.exp(-bin_10/myoutput2.beta[3]))), \
             label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar2[0],cpar2[0]))
+            #  - (*(np.tan(myoutput2.beta[5]*z))^-1 + )), \
+
+    hz = (rho10)*np.exp(-abs(bin_10)/500) + ((rho10))*np.exp(-abs(bin_10)/1000)
+    plt.plot(bin_10,np.log10(hz))
+
     plt.ylim(-7.75,-3.5)
     plt.xlim(100, 5100)
     plt.tick_params(labelsize=15)

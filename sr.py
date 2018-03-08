@@ -14,9 +14,9 @@ if __name__ == "__main__":
     df = df[df.mass > 0] # Kill stars with no mass
 
     ### Read in the new sample
-    sample_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C3.csv'
+    sample_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C3_22022018_130200.csv'
     sample = pd.read_csv(sample_csv_file)
-    sample6_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C6.csv'
+    sample6_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C6_22022018_130200.csv'
     sample6 = pd.read_csv(sample6_csv_file)
 
     ### Set up the plot
