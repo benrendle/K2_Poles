@@ -114,6 +114,7 @@ def K2_GAP():
     GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2
     GAP3['[Fe/H]'] = np.random.normal(-0.294,0.305,len(GAP3)) # mu/std dev. from RAVE (22/02/2018)
     GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
+    GAP6['BV'] = GAP6['Bmag'] - GAP6['Vmag']
     GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
     GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)

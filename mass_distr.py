@@ -229,6 +229,7 @@ if __name__ == '__main__':
     AS_red = AS_red[AS_red['logAge'] > 9.6]
     AS_red.reset_index(drop=True)
 
+
     ''' [Fe/H] vs [alpha/Fe] '''
     # mdf.met_comp([RC3,RC6,GES,APO],[r'RC3',r'RC6',r'GES',r'APOGEE'],'feh','alpha',['r','g','b','m'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
     # plt.show()
@@ -681,12 +682,14 @@ if __name__ == '__main__':
     # AS['Rs'] = (AS['nmx']/3090) * (AS['dnu']/135.1)**-2 * (AS['Teff']/5777)**0.5
     # K2_AS['Rs'] = (K2_AS['nmx']/3090) * (K2_AS['dnu']/135.1)**-2 * (K2_AS['Teff']/5777)**0.5
     K2_New['drad'] = (K2_New['rad']-K2_New['Rs'])/K2_New['rad']
-    K2_New = K2_New[K2_New['drad'] > -0.5]
-    K2_New = K2_New[K2_New['drad'] < 0.5]
+    # K2_New = K2_New[K2_New['drad'] > -0.5]
+    # K2_New = K2_New[K2_New['drad'] < 0.5]
     plt.figure()
     plt.scatter(K2_New['rad'],K2_New['drad'])
     plt.plot([0,max(K2_New['rad'])+0.1],[0,0])
     plt.xlim(0,max(K2_New['rad'])+0.1)
+    plt.plot([0,max(K2_New['rad'])+0.1],[0.5,0.5],color='r',linewidth=3)
+    plt.plot([0,max(K2_New['rad'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
     plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
     plt.ylabel(r'R - R$_{sr}$', fontsize=15)
     plt.tight_layout()
@@ -697,6 +700,8 @@ if __name__ == '__main__':
     plt.scatter(K2_New['mass'],(K2_New['mass']-K2_New['Ms'])/K2_New['mass'])
     plt.plot([0,max(K2_New['mass'])+0.1],[0,0])
     plt.xlim(0,max(K2_New['mass'])+0.1)
+    plt.plot([0,max(K2_New['mass'])+0.1],[0.5,0.5],color='r',linewidth=3)
+    plt.plot([0,max(K2_New['mass'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
     plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     plt.ylabel(r'M - M$_{sr}$', fontsize=15)
     plt.tight_layout()

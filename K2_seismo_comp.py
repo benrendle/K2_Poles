@@ -129,10 +129,6 @@ YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6 = prop.galactic_coords(seism
 C3,C6,GAP3,GAP6 = prop.galactic_coords([C3,C6,GAP3,GAP6])
 YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6 = prop.lmrl_comps(seismo_list,numax,dnu,Numax,Dnu,1)
 
-plt.figure()
-GAP6 = GAP6[GAP6['[Fe/H]'] > -10]
-plt.hist(GAP6['[Fe/H]'],bins=50)
-plt.show()
 
 def hist_orig(df,df1,cut,bins,ext,n):
     '''
@@ -538,6 +534,16 @@ cols_to_use = cols_to_use.union(['EPIC'])
 RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
 RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
+
+
+C6_nospec = pd.DataFrame()
+C6_nospec = pd.concat([camp6,RC6],ignore_index=True)
+C6_nospec = C6_nospec.drop_duplicates(subset=['EPIC'],keep=False)
+# C6_nospec = C6_nospec.dropna()
+df = C6_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
+print(df)
+df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_TL',index=False)
+sys.exit()
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
