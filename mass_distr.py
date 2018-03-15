@@ -772,10 +772,10 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Space Density plots '''
-    import mass_distr_functs as mdf
-    mdf.space_density2(C6)
+    # import mass_distr_functs as mdf
+    # mdf.space_density2(C6)
     # # mdf.space_density2(AS)
-    plt.show()
+    # plt.show()
     # sys.exit()
 
     ''' Mass vs Z scatter plots with trend lines '''
@@ -791,20 +791,28 @@ if __name__ == '__main__':
     # mass_Z, edges, number = scipy.stats.binned_statistic(C3['mass'],C3['feh'],statistic='median',bins=bins)
     # mass_Z6, edges6, number6 = scipy.stats.binned_statistic(C6['mass'],C6['feh'],statistic='median',bins=bins)
     #
-    # plt.figure()
-    # plt.scatter(AS['mass'],AS['Z'],label=r'Full Sample')
-    # plt.scatter(AS_red['mass'],AS_red['Z'],label=r'Peak Age Sample')#,c=AS_red['age'],cmap=colormaps.parula)
+    f = plt.figure()
+    # plt.scatter(C6_New['mass'],C6_New['Z'],label=r'Full Sample')
+    x = np.linspace(0,max(C6_New['mass'])+0.05)
+    plt.fill_between(x, 0.1, max(APK2['Z']), facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    plt.scatter(C6_New['mass'],C6_New['Z'],c=C6_New['feh'],cmap=colormaps.parula,label=None)
     # plt.errorbar(2.25, -3, xerr=m_err, yerr=z_err*1e-3,color='k')
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
+    cbar = plt.colorbar()
+    cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
     # plt.plot(edges[:-1],mass_Z,color='k',linewidth=2)
     # plt.plot(edges6[:-1],abs(mass_Z6),color='k',linewidth=2)
-    # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
-    # plt.ylabel(r'Z [kpc]', fontsize=15)
+    # plt.plot([2.25,2.25],[0.1,max(APK2['Z'])],color='k',linewidth=2,label=r'Kepler Z range',alpha=0.2)
+    # plt.plot([2.24,2.26],[0.1,0.1],color='k',linewidth=2,label=None,alpha=0.2)
+    # plt.plot([2.24,2.26],[max(APK2['Z']),max(APK2['Z'])],color='k',linewidth=2,label=None,alpha=0.2)
+    plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    plt.ylabel(r'Z [kpc]', fontsize=15)
+    plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    f.set_rasterized(True)
     # plt.title(r'Exploring Spectroscopic Peak Age Properties')
-    # plt.legend()
-    # plt.tight_layout()
-    # plt.show()
+    plt.legend()
+    plt.tight_layout()
+    f.savefig('/home/bmr135/Dropbox/GES-K2/Ages/figure_1.eps',rasterized=True,dpi=400)
+    plt.show()
 
     ''' Age vs Z '''
     # plt.figure()
@@ -817,14 +825,21 @@ if __name__ == '__main__':
     # plt.figure()
     # K2_RGB = K2[K2['rad'] < 10.0]
     # AS_RGB = AS[AS['rad'] < 10.0]
-    # plt.hist(K2['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',normed=True,label=r'Photom',linewidth=2)
-    # plt.hist(AS['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',normed=True,label=r'Spectro',linewidth=2)
-    # # plt.hist(np.log10(APK2['age']*10**9),bins=np.linspace(8.5,10.5,75),histtype='step')#,normed=True)
-    # plt.xlabel(r'log$_{10}$(Age)')
-    # # plt.title(r'Clump cut: R $< 10.0$')
-    # plt.legend()
-    # plt.tight_layout()
-    # plt.show()
+    plt.hist(C6_New['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'C6 Photometry',linewidth=2)
+    plt.hist(RC6['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'RAVE C6',linewidth=2,alpha=0.65)
+    # plt.hist(np.log10(APK2['age']*10**9),bins=np.linspace(8.5,10.5,75),histtype='step')#,normed=True)
+    plt.xlabel(r'log$_{10}$(Age)')
+    cur_axes = plt.gca()
+    cur_axes.axes.get_yaxis().set_ticklabels([])
+    cur_axes.axes.get_yaxis().set_ticks([])
+    # plt.title(r'Clump cut: R $< 10.0$')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    C6_New.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_New',index=False)
+    APK2.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/APK2',index=False)
+    RC6.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC6',index=False)
 
     ''' [Fe/H] vs [Alpha/Fe] '''
     # AS = AS[AS['alpha'] > -4]

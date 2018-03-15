@@ -535,15 +535,22 @@ RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
 RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
-
+''' Stars in C6 with no RAVE spectra --> Using for WHT-ISIS proposal '''
 C6_nospec = pd.DataFrame()
 C6_nospec = pd.concat([camp6,RC6],ignore_index=True)
 C6_nospec = C6_nospec.drop_duplicates(subset=['EPIC'],keep=False)
 # C6_nospec = C6_nospec.dropna()
 df = C6_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
-print(df)
-df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_TL',index=False)
-sys.exit()
+df = df[df.Vmag != 'NaN']
+# df = df[df.values != 'NaN']
+df = df.reset_index(drop=True)
+# df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_TL',index=False)
+# plt.figure()
+hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
+print(hist,bins)
+# plt.xlabel(r'V',fontsize=15)
+# plt.show()
+# sys.exit()
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
@@ -1133,9 +1140,23 @@ plt.tight_layout()
 # plt.tight_layout()
 
 ''' Sky projection plot '''
-# plt.figure()
-# plt.hist(BC3['Grad']/1000,bins=75)
-# plt.xlabel(r'Galactocentric Distance [kpc]')
+plt.figure()
+# plt.hist(C6_nospec['Grad']/1000,bins=75)
+v9 = C6_nospec[C6_nospec['Vmag'] < 10]
+v10 = C6_nospec[(C6_nospec['Vmag'] >= 10) & (C6_nospec['Vmag'] < 11)]
+v11 = C6_nospec[(C6_nospec['Vmag'] >= 11) & (C6_nospec['Vmag'] < 12)]
+v12 = C6_nospec[(C6_nospec['Vmag'] >= 12) & (C6_nospec['Vmag'] < 13)]
+v13 = C6_nospec[(C6_nospec['Vmag'] >= 13) & (C6_nospec['Vmag'] < 14)]
+v14 = C6_nospec[(C6_nospec['Vmag'] >= 14) & (C6_nospec['Vmag'] <= 15)]
+# plt.scatter(C6_nospec['RA'],C6_nospec['Dec'])
+plt.scatter(v9['RA'],v9['Dec'],label=r'V = 9-10')
+plt.scatter(v10['RA'],v10['Dec'],label=r'V = 10-11',color='r')
+plt.scatter(v11['RA'],v11['Dec'],label=r'V = 11-12',color='g')
+plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
+plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
+plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
+plt.xlabel(r'RA')
+plt.ylabel(r'DEC')
+plt.legend()
 
-
-# plt.show()
+plt.show()
