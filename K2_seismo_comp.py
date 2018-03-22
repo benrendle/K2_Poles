@@ -535,22 +535,7 @@ RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
 RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
-''' Stars in C6 with no RAVE spectra --> Using for WHT-ISIS proposal '''
-C6_nospec = pd.DataFrame()
-C6_nospec = pd.concat([camp6,RC6],ignore_index=True)
-C6_nospec = C6_nospec.drop_duplicates(subset=['EPIC'],keep=False)
-# C6_nospec = C6_nospec.dropna()
-df = C6_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
-df = df[df.Vmag != 'NaN']
-# df = df[df.values != 'NaN']
-df = df.reset_index(drop=True)
-# df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_TL',index=False)
-# plt.figure()
-hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
-print(hist,bins)
-# plt.xlabel(r'V',fontsize=15)
-# plt.show()
-# sys.exit()
+
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
@@ -567,6 +552,25 @@ GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S"
 GES['ALPHA'] = GES['ALPHA'] -0.15
 GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
+
+''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''
+C3_nospec = pd.DataFrame()
+C3_nospec = pd.concat([camp3,RC3,GES],ignore_index=True)
+C3_nospec = C3_nospec.drop_duplicates(subset=['EPIC'],keep=False)
+# C6_nospec = C6_nospec.dropna()
+df = C3_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
+df = df[df.Vmag != 'NaN']
+# df = df[df.values != 'NaN']
+df = df.reset_index(drop=True)
+# df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL',index=False)
+plt.figure()
+# hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
+# print(hist,bins)
+plt.hist(df['Vmag'],bins=[9,10,11,12,13,14,15])
+plt.xlabel(r'V',fontsize=15)
+plt.show()
+sys.exit()
+
 
 ''' Merging of LAMOST data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(LAMOST3.columns)

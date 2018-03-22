@@ -109,6 +109,7 @@ def K2_GAP():
     C3_flag = pd.read_csv(ext_DB+'Dropbox/K2Poles/C3_EPIC_param_flags.txt')
     C6_flag = pd.read_csv(ext_DB+'Dropbox/K2Poles/C6_EPIC_param_flags.txt')
     GAP3['JK'] = GAP3['Jmag'] - GAP3['Kmag']
+    GAP3['BV'] = GAP3['Bmag'] - GAP3['Vmag']
     GAP3['sig_Teff'] = (abs(GAP3['ep_teff'])+abs(GAP3['em_teff']))/2
     GAP3['sig_logg'] = (abs(GAP3['ep_logg'])+abs(GAP3['em_logg']))/2
     GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2

@@ -184,6 +184,9 @@ if __name__ == '__main__':
     c_six.reset_index(drop=True)
     AS = pd.concat([c_three,c_six],ignore_index=True)
     AS.reset_index(drop=True)
+    print(len(c_three))
+    # c_three.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_spec')
+
 
     K2 = pd.concat([C3,C6],ignore_index=True)
     K2.reset_index(drop=True)
@@ -837,9 +840,18 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    C6_New.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_New',index=False)
-    APK2.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/APK2',index=False)
-    RC6.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC6',index=False)
+    # APK2.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/APK2',index=False)
+    # RC3.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC3',index=False)
+    # GES.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/GES',index=False)
+    # C6_New.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_New',index=False)
+    # RC6.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC6',index=False)
+
+    C3_New['sig_age'] = ((C3_New['age_68U']-C3_New['age']) + (C3_New['age']-C3_New['age_68L']))/2
+    C3_New.to_csv('/home/bmr135/K2_BG/C3_New',index=False)
+    C6_New['sig_age'] = ((C6_New['age_68U']-C6_New['age']) + (C6_New['age']-C6_New['age_68L']))/2
+    C6_New.to_csv('/home/bmr135/K2_BG/C6_New',index=False)
+
+
 
     ''' [Fe/H] vs [Alpha/Fe] '''
     # AS = AS[AS['alpha'] > -4]
