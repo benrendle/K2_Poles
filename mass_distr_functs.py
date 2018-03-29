@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 import scipy.odr.odrpack as odrpack
 from scipy import integrate
+from scipy.stats import beta
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
@@ -17,7 +18,8 @@ import colormaps
 from pyqt_fit import kde
 import sim_pert as sp
 from decimal import Decimal
-
+import pystan
+from pystan import stan
 
 def p_in(name,df1,field):
     ''' Extract input data from input PARAM files as necessary.
@@ -253,7 +255,7 @@ def met_comp(X,name,p1,p2,colour,label):
 def histo(df,name,bins,label,log,tag):
     ''' Distribution histogram '''
     # plt.figure()
-    n, bins, patches = plt.hist(df[name][np.isfinite(df[name])], bins=bins, label=tag, linewidth=2, histtype='step')#, normed=True)
+    n, bins, patches = plt.hist(df[name][np.isfinite(df[name])], bins=bins, label=tag, linewidth=2, histtype='step', normed=True)
     x=np.zeros(len(n))
     for i in np.arange(0,len(bins),1):
         try: x[i] = (bins[i] + bins[i+1])/2
@@ -537,7 +539,7 @@ def space_density2(obs):
     bins = np.linspace(np.log10(100),np.log10(5000),19)
     Z = np.log10(np.abs(obs['Z'])*1000)
     hist, bin_edges = np.histogram(Z, bins = bins)
-    print(bin_edges)
+    # print(bin_edges)
     print(hist)
     volume = []
 
@@ -550,15 +552,18 @@ def space_density2(obs):
         Vol = vol2[0] - vol1[0]
         volume.append(Vol)
 
-    print(volume)
+    # print(volume)
     rho = []
     rho10 = np.zeros(len(volume))
+    sigma = np.zeros(len(volume))
     for i in range(len(volume)):
         density = hist[i]/volume[i]
         rho10[i] = density
+        sigma[i] = np.sqrt(hist[i])
         rho.append(np.log10(density)) # In units number of stars/pc^3
 
-    print(rho)
+    print(sigma)
+    # print(rho10)
 
     bin_10 = 10**bin_edges[1:]
     # x = pd.DataFrame()
@@ -571,6 +576,7 @@ def space_density2(obs):
     # x.to_csv('/home/bmr135/Dropbox/K2Poles/pop_trends/Ioana_Scale_Heights/C6',index=False)
     # x.to_csv('/home/ben/Dropbox/K2Poles/pop_trends/Ioana_Scale_Heights/C6',index=False)
     sig_rho = np.sqrt(hist)/volume
+    print(sig_rho)
 
     ''' Least squares fitting '''
     def f(Par,z):
@@ -606,37 +612,142 @@ def space_density2(obs):
     # myoutput1.pprint()
 
     def f2(Par,z):
-        return (Par[0])*np.exp(-abs(z)/Par[1]) + (Par[2])*np.exp(-abs(z)/Par[3])
+        return (beta.pdf(abs(z),Par[4],Par[5])) + (Par[0])*np.exp(-abs(z)/Par[1]) + (Par[2])*np.exp(-abs(z)/Par[3])
         # return Par[0]*((Par[1]*z + Par[2])+(Par[3]*z + Par[4]))
-    mpar2, cpar2, empar2, ecpar2 = [], [], [], []
+    par2, epar2 = [], []
     linear2 = odrpack.Model(f2)
     mydata2 = odrpack.RealData(bin_10[3:], rho10[3:], sy=sig_rho[3:])
-    myodr2 = odrpack.ODR(mydata2, linear2, beta0=[4e-4, 500, 3e-5, 1000],maxit=20000)
+    myodr2 = odrpack.ODR(mydata2, linear2, beta0=[4e-4, 500, 3e-5, 1000, 1., 10.],maxit=20000)
     myoutput2 = myodr2.run()
-    mpar2.append(myoutput2.beta[0])
-    cpar2.append(myoutput2.beta[1])
-    empar2.append(myoutput2.sd_beta[0])
-    ecpar2.append(myoutput2.sd_beta[1])
-    myoutput2.pprint()
+    par2.append(myoutput2.beta[0])
+    par2.append(myoutput2.beta[1])
+    par2.append(myoutput2.beta[2])
+    par2.append(myoutput2.beta[3])
+    par2.append(myoutput2.beta[4])
+    par2.append(myoutput2.beta[5])
+    epar2.append(myoutput2.sd_beta[0])
+    epar2.append(myoutput2.sd_beta[1])
+    epar2.append(myoutput2.sd_beta[2])
+    epar2.append(myoutput2.sd_beta[3])
+    epar2.append(myoutput2.sd_beta[4])
+    epar2.append(myoutput2.sd_beta[5])
+    print(par2)
+    print(epar2)
+    # myoutput2.pprint()
 
+    sig_rho = (np.sqrt(hist)/volume) / (rho10 * np.log(10))
+    print(sig_rho)
     plt.figure()
-    plt.scatter(bin_10,rho)
+    plt.errorbar(bin_10,rho,yerr=sig_rho, fmt='o', color='k')
     # plt.scatter(bin_10[6:11],rho[6:11],color='r')
     # plt.scatter(bin_10[12:16],rho[12:16],color='y')
     # plt.scatter(b,np.log10(r))
-    plt.plot(bin_10,np.log10(myoutput.beta[0]*np.exp(-bin_10/myoutput.beta[1])),color='orange', \
-            label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar[0],cpar[0]))
-    plt.plot(bin_10,np.log10(myoutput1.beta[0]*np.exp(-bin_10/myoutput1.beta[1])),color='orange',linestyle='--', \
-            label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar1[0],cpar1[0]))
     plt.plot(bin_10, \
-            np.log10((myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1]) + myoutput2.beta[2]*np.exp(-bin_10/myoutput2.beta[3]))), \
-            label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar2[0],cpar2[0]))
-            #  - (*(np.tan(myoutput2.beta[5]*z))^-1 + )), \
+    np.log10((beta.pdf(bin_10,myoutput2.beta[4],myoutput2.beta[5])) + (myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1]) + myoutput2.beta[2]*np.exp(-bin_10/myoutput2.beta[3]))), \
+    label=r'\zeta(\rm{Z})')
+    plt.plot(bin_10,np.log10((myoutput2.beta[0])*np.exp(-bin_10/myoutput2.beta[1])),color='orange', \
+            label=r'H$_{\rm{z}} = $ %.4g pc'%(myoutput2.beta[1]))
+    plt.plot(bin_10,np.log10((myoutput2.beta[2])*np.exp(-bin_10/myoutput2.beta[3])),color='orange',linestyle='--', \
+            label=r'H$_{\rm{z}} = $ %.4g pc'%(myoutput2.beta[3]))
+            # label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(myoutput2.beta[3]))
 
     hz = (rho10)*np.exp(-abs(bin_10)/500) + ((rho10))*np.exp(-abs(bin_10)/1000)
-    plt.plot(bin_10,np.log10(hz))
+    # plt.plot(bin_10,np.log10(hz))
 
-    plt.ylim(-7.75,-3.5)
+
+    plt.ylim(-7.75,-3.0)
+    plt.xlim(100, 5100)
+    plt.tick_params(labelsize=15)
+    plt.ylabel(r'Log Space Density',fontsize=20)
+    plt.xlabel(r'Z [pc]',fontsize=20)
+    plt.legend(prop={'size':10})
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    # plt.show()
+
+def sp3(obs):
+    '''
+    Using stan to perform fitting
+    '''
+    theta = np.deg2rad(np.sqrt(116))
+    t1 = theta/2.0
+    alpha_c3 = np.deg2rad(61.4) # degrees
+    alpha_c6 = np.deg2rad(50.4) # degrees
+
+    bins = np.linspace(np.log10(100),np.log10(5000),19)
+    Z = np.log10(np.abs(obs['Z'])*1000)
+    hist, bin_edges = np.histogram(Z, bins = bins)
+    theta = np.deg2rad(np.sqrt(116))
+    t1 = theta/2.0
+    alpha_c3 = np.deg2rad(61.4) # degrees
+    alpha_c6 = np.deg2rad(50.4) # degrees
+
+    bins = np.linspace(np.log10(100),np.log10(5000),19)
+    Z = np.log10(np.abs(obs['Z'])*1000)
+    hist, bin_edges = np.histogram(Z, bins = bins)
+    volume = []
+    for i in range(len(bin_edges)-1):
+        x2 = lambda x: ((10**bin_edges[i])**3)*(1-np.cos(theta))*np.cos(t1)*(np.sin(alpha_c3 + t1 - x)**-3)
+        x3 = lambda xa: ((10**bin_edges[i+1])**3)*(1-np.cos(theta))*np.cos(t1)*(np.sin(alpha_c3 + t1 - xa)**-3)
+        vol1 = integrate.quad(x2,0,theta)
+        vol2 = integrate.quad(x3,0,theta)
+        Vol = vol2[0] - vol1[0]
+        volume.append(Vol)
+
+    rho = []
+    rho10 = np.zeros(len(volume))
+    for i in range(len(volume)):
+        density = hist[i]/volume[i]
+        rho10[i] = density
+        rho.append(np.log10(density)) # In units number of stars/pc^3
+    bin_10 = 10**bin_edges[1:]
+    dens_model = '''
+    data {
+        int<lower=0> N;
+        real M[N];
+        real Z[N];
+    }
+    parameters {
+        //real<lower =0.001> sigma;
+        //real<lower = 0> alpha;
+        real M_true_std[N];
+        real<lower = 0> sh1;
+        real<lower = 0> sh2;
+        real<lower = 0> c1;
+        real<lower = 0> c2;
+    }
+    //transformed parameters {
+    //    real M_true[N]; // Transform from N(0,1) back to M
+    //    for (i in 1:N)
+    //        M_true[i] = mu + sigma * M_true_std[i];
+    //}
+    model {
+        M_true_std ~ c1*np.exp(-abs(Z)/sh1) + c2*np.exp(-abs(Z)/sh2)
+        sh1 ~ normal( 500, 200);
+        sh2 ~ normal( 800, 200);
+        c1 ~ normal( 0, 1);
+        c2 ~ normal( 0, 1);
+        //sigma ~ normal(0, 10);
+    }
+    '''
+    sm = pystan.StanModel(model_code=dens_model, model_name='DensityModel')
+    dat = {'N': len(rho10),
+           'M': rho10,
+           'Z': bin_10
+          }
+    fit = sm.sampling(data=dat, iter=5000, chains=1, pars=['sh1', 'sh2', 'c1', 'c2'])
+    print(fit)
+    fit.plot()
+
+    plt.figure()
+    plt.scatter(bin_10,rho)
+    # plt.plot(bin_10,np.log10(myoutput2.beta[0]*np.exp(-bin_10/myoutput2.beta[1])),color='orange', \
+    #         label=r'$\rho_{0} =$ %.4g pc$^{-3}$, H$_{\rm{z}} = $ %.4g pc'%(mpar2[0],cpar2[0]))
+
+    plt.plot(bin_10, \
+            np.log10(fit['c1'].mean()*np.exp(-bin_10/fit['sh1'].mean()) + fit['c2'].mean()*np.exp(-bin_10/fit['sh2'].mean())))
+            #  - (*(np.tan(myoutput2.beta[5]*z))^-1 + )), \
+
+    # plt.ylim(-7.75,-3.5)
     plt.xlim(100, 5100)
     plt.tick_params(labelsize=15)
     plt.ylabel(r'Log Space Density',fontsize=20)

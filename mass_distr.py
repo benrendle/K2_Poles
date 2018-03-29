@@ -79,7 +79,7 @@ if __name__ == '__main__':
     C3_New, C6_New = z
     # sys.exit()
 
-    APK2 = pd.read_csv(ext+'APOKASC/APOKASC.in.me',delimiter=r'\s+')
+    APK2 = pd.read_csv('/home/bmr135/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June272017_090630.in.me',delimiter=r'\s+')
 
     TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
@@ -232,6 +232,11 @@ if __name__ == '__main__':
     AS_red = AS_red[AS_red['logAge'] > 9.6]
     AS_red.reset_index(drop=True)
 
+    print(len(C3_New),len(C6_New))
+    print(len(c_three),len(c_six))
+    print(len(RC3),len(RC6))
+    print(len(L3),len(L6))
+    print(len(GES),len(APO))
 
     ''' [Fe/H] vs [alpha/Fe] '''
     # mdf.met_comp([RC3,RC6,GES,APO],[r'RC3',r'RC6',r'GES',r'APOGEE'],'feh','alpha',['r','g','b','m'],[r'[Fe/H]',r'[$\alpha$/Fe]'])
@@ -357,33 +362,34 @@ if __name__ == '__main__':
 
     ''' Parameter distribution plots '''
     # K2_RGB = pd.DataFrame()
-    # APK2 = APK2[APK2['radius'] > 0.0]
+    APK2 = APK2[APK2['radius'] > 0.0]
+    print(max(APK2.age))
     # K2_New = K2_New[K2_New['logAge'] > 9.9]
     # AS = AS[AS['logAge'] > 9.9]
     fig, axes = plt.subplots(3,2)
     ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
     # plt.suptitle(r'log$_{10}$(Age) $> 10.0$', fontsize=15)
     # plt.suptitle(r'$\forall$ R', fontsize=15)
-    ax0.hist(K2['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Photometric',normed=True)
-    ax0.hist(K2_New['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Spectro. based Met.',normed=True)
+    ax0.hist(K2_New['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Photom.',normed=True)
+    ax0.hist(AS['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Spec.',normed=True)
     ax0.legend(prop={'size':10})
     ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-    ax1.hist(K2['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'R $< 9$',normed=True)
-    ax1.hist(K2_New['logAge'],bins=np.linspace(8.5,10.5,75),histtype='step',label=r'$\forall$ R',normed=True)
+    ax1.hist(K2_New['logAge'],bins=np.linspace(8.5,10.5,50),histtype='step',label=None,normed=True)
+    ax1.hist(AS['logAge'],bins=np.linspace(8.5,10.5,50),histtype='step',label=None,normed=True)
     ax1.set_xlabel(r'log$_{10}$(Age)')
-    ax2.hist(K2['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'Spectroscopic')#,normed=1.0)
-    ax2.hist(K2_New['rad'],bins=np.linspace(3,20,50),histtype='step',label=r'K2')#,normed=1.0)
+    ax2.hist(K2_New['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
+    ax2.hist(AS['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
     ax2.set_xlabel(r'Radius [R$_{\odot}$]')
-    ax3.hist(K2['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'Spectroscopic',normed=True)
-    ax3.hist(K2_New['Z'],bins=np.linspace(-8,8,130),histtype='step',label=r'K2',normed=True)
+    ax3.hist(K2_New['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
+    ax3.hist(AS['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
     ax3.set_xlabel(r'Z [kpc]')
-    ax4.hist(K2['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'Spectroscopic',normed=1)
     ax4.hist(K2_New['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
+    ax4.hist(AS['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=None,normed=1)
     ax4.set_xlabel(r'[Fe/H]')
     ax5.axis('off')
     # fig.subplots_adjust(top=3.0)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.show()
+    # plt.show()
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
@@ -596,14 +602,15 @@ if __name__ == '__main__':
     #     plt.savefig(ext_fig+folder_loc+'Age_as_funct_Z_K2.png')
 
     ''' Radius Distributions '''
-    # plt.figure()
-    # mdf.histo(K2_AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
-    # mdf.histo(AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Spectro')
-    # mdf.histo(AS_red,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Spectro Age Peak')
-    # plt.legend(prop={'size':15})
-    # plt.show()
+    APK2_alpha = APK2[APK2['alpha'] > 0.1]
+    plt.figure()
+    mdf.histo(K2_New,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Photom.')
+    mdf.histo(AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Spectro.')
+    mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich \textit{Kepler}')
+    plt.legend(prop={'size':15})
+    plt.show()
     # if save_out == 1:
-    # plt.savefig(ext_fig+'K2_sim_radius_spectro.png')
+    #     plt.savefig(ext_fig+'K2_sim_radius_spectro.png')
 
     ''' KEPLER vs K2 simulations '''
     # plt.figure()
@@ -681,34 +688,34 @@ if __name__ == '__main__':
     ''' Radius vs Scaling Radius '''
     # C3['Rs'] = (C3['nmx']/3090) * (C3['dnu']/135.1)**-2 * (C3['Teff']/5777)**0.5
     # C6['Rs'] = (C6['nmx']/3090) * (C6['dnu']/135.1)**-2 * (C6['Teff']/5777)**0.5
-    K2_New['Rs'] = (K2['nmx']/3090) * (K2['dnu']/135.1)**-2 * (K2['Teff']/5777)**0.5
-    # AS['Rs'] = (AS['nmx']/3090) * (AS['dnu']/135.1)**-2 * (AS['Teff']/5777)**0.5
-    # K2_AS['Rs'] = (K2_AS['nmx']/3090) * (K2_AS['dnu']/135.1)**-2 * (K2_AS['Teff']/5777)**0.5
-    K2_New['drad'] = (K2_New['rad']-K2_New['Rs'])/K2_New['rad']
-    # K2_New = K2_New[K2_New['drad'] > -0.5]
-    # K2_New = K2_New[K2_New['drad'] < 0.5]
-    plt.figure()
-    plt.scatter(K2_New['rad'],K2_New['drad'])
-    plt.plot([0,max(K2_New['rad'])+0.1],[0,0])
-    plt.xlim(0,max(K2_New['rad'])+0.1)
-    plt.plot([0,max(K2_New['rad'])+0.1],[0.5,0.5],color='r',linewidth=3)
-    plt.plot([0,max(K2_New['rad'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
-    plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
-    plt.ylabel(r'R - R$_{sr}$', fontsize=15)
-    plt.tight_layout()
-    # plt.show()
-
-    K2_New['Ms'] = (K2_New['nmx']/3090)**3 * (K2_New['dnu']/135.1)**-4 * (K2_New['Teff']/5777)**1.5
-    plt.figure()
-    plt.scatter(K2_New['mass'],(K2_New['mass']-K2_New['Ms'])/K2_New['mass'])
-    plt.plot([0,max(K2_New['mass'])+0.1],[0,0])
-    plt.xlim(0,max(K2_New['mass'])+0.1)
-    plt.plot([0,max(K2_New['mass'])+0.1],[0.5,0.5],color='r',linewidth=3)
-    plt.plot([0,max(K2_New['mass'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
-    plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
-    plt.ylabel(r'M - M$_{sr}$', fontsize=15)
-    plt.tight_layout()
-    plt.show()
+    # K2_New['Rs'] = (K2['nmx']/3090) * (K2['dnu']/135.1)**-2 * (K2['Teff']/5777)**0.5
+    # # AS['Rs'] = (AS['nmx']/3090) * (AS['dnu']/135.1)**-2 * (AS['Teff']/5777)**0.5
+    # # K2_AS['Rs'] = (K2_AS['nmx']/3090) * (K2_AS['dnu']/135.1)**-2 * (K2_AS['Teff']/5777)**0.5
+    # K2_New['drad'] = (K2_New['rad']-K2_New['Rs'])/K2_New['rad']
+    # # K2_New = K2_New[K2_New['drad'] > -0.5]
+    # # K2_New = K2_New[K2_New['drad'] < 0.5]
+    # plt.figure()
+    # plt.scatter(K2_New['rad'],K2_New['drad'])
+    # plt.plot([0,max(K2_New['rad'])+0.1],[0,0])
+    # plt.xlim(0,max(K2_New['rad'])+0.1)
+    # plt.plot([0,max(K2_New['rad'])+0.1],[0.5,0.5],color='r',linewidth=3)
+    # plt.plot([0,max(K2_New['rad'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
+    # plt.xlabel(r'Radius [R$_{\odot}$]', fontsize=15)
+    # plt.ylabel(r'R - R$_{sr}$', fontsize=15)
+    # plt.tight_layout()
+    # # plt.show()
+    #
+    # K2_New['Ms'] = (K2_New['nmx']/3090)**3 * (K2_New['dnu']/135.1)**-4 * (K2_New['Teff']/5777)**1.5
+    # plt.figure()
+    # plt.scatter(K2_New['mass'],(K2_New['mass']-K2_New['Ms'])/K2_New['mass'])
+    # plt.plot([0,max(K2_New['mass'])+0.1],[0,0])
+    # plt.xlim(0,max(K2_New['mass'])+0.1)
+    # plt.plot([0,max(K2_New['mass'])+0.1],[0.5,0.5],color='r',linewidth=3)
+    # plt.plot([0,max(K2_New['mass'])+0.1],[-0.5,-0.5],color='r',linewidth=3)
+    # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    # plt.ylabel(r'M - M$_{sr}$', fontsize=15)
+    # plt.tight_layout()
+    # # plt.show()
 
     # plt.figure()
     # hist, bins, patches = plt.hist(C3['rad'],bins=50,histtype='step',label=r'PARAM R',normed=True,linewidth=2)
@@ -776,8 +783,13 @@ if __name__ == '__main__':
 
     ''' Space Density plots '''
     # import mass_distr_functs as mdf
-    # mdf.space_density2(C6)
+    mdf.space_density2(C6_New)
+    mdf.space_density2(C3_New)
+    mdf.space_density2(K2_New)
+    mdf.space_density2(TRI3)
+    mdf.space_density2(TRI6)
     # # mdf.space_density2(AS)
+    # mdf.sp3(C6)
     # plt.show()
     # sys.exit()
 
@@ -797,8 +809,8 @@ if __name__ == '__main__':
     f = plt.figure()
     # plt.scatter(C6_New['mass'],C6_New['Z'],label=r'Full Sample')
     x = np.linspace(0,max(C6_New['mass'])+0.05)
-    plt.fill_between(x, 0.1, max(APK2['Z']), facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
-    plt.scatter(C6_New['mass'],C6_New['Z'],c=C6_New['feh'],cmap=colormaps.parula,label=None)
+    plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    plt.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None)
     # plt.errorbar(2.25, -3, xerr=m_err, yerr=z_err*1e-3,color='k')
     cbar = plt.colorbar()
     cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
@@ -810,11 +822,11 @@ if __name__ == '__main__':
     plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     plt.ylabel(r'Z [kpc]', fontsize=15)
     plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
-    f.set_rasterized(True)
+    # f.set_rasterized(True)
     # plt.title(r'Exploring Spectroscopic Peak Age Properties')
     plt.legend()
     plt.tight_layout()
-    f.savefig('/home/bmr135/Dropbox/GES-K2/Ages/figure_1.eps',rasterized=True,dpi=400)
+    # f.savefig('/home/bmr135/Dropbox/GES-K2/Ages/figure_1.eps',rasterized=True,dpi=400)
     plt.show()
 
     ''' Age vs Z '''
@@ -828,17 +840,17 @@ if __name__ == '__main__':
     # plt.figure()
     # K2_RGB = K2[K2['rad'] < 10.0]
     # AS_RGB = AS[AS['rad'] < 10.0]
-    plt.hist(C6_New['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'C6 Photometry',linewidth=2)
-    plt.hist(RC6['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'RAVE C6',linewidth=2,alpha=0.65)
-    # plt.hist(np.log10(APK2['age']*10**9),bins=np.linspace(8.5,10.5,75),histtype='step')#,normed=True)
-    plt.xlabel(r'log$_{10}$(Age)')
-    cur_axes = plt.gca()
-    cur_axes.axes.get_yaxis().set_ticklabels([])
-    cur_axes.axes.get_yaxis().set_ticks([])
-    # plt.title(r'Clump cut: R $< 10.0$')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    # plt.hist(C6_New['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'C6 Photometry',linewidth=2)
+    # plt.hist(RC6['logAge'],bins=np.linspace(8.5,10.5,40),histtype='step',normed=True,label=r'RAVE C6',linewidth=2,alpha=0.65)
+    # # plt.hist(np.log10(APK2['age']*10**9),bins=np.linspace(8.5,10.5,75),histtype='step')#,normed=True)
+    # plt.xlabel(r'log$_{10}$(Age)')
+    # cur_axes = plt.gca()
+    # cur_axes.axes.get_yaxis().set_ticklabels([])
+    # cur_axes.axes.get_yaxis().set_ticks([])
+    # # plt.title(r'Clump cut: R $< 10.0$')
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
 
     # APK2.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/APK2',index=False)
     # RC3.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC3',index=False)
@@ -846,10 +858,10 @@ if __name__ == '__main__':
     # C6_New.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C6_New',index=False)
     # RC6.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/RC6',index=False)
 
-    C3_New['sig_age'] = ((C3_New['age_68U']-C3_New['age']) + (C3_New['age']-C3_New['age_68L']))/2
-    C3_New.to_csv('/home/bmr135/K2_BG/C3_New',index=False)
-    C6_New['sig_age'] = ((C6_New['age_68U']-C6_New['age']) + (C6_New['age']-C6_New['age_68L']))/2
-    C6_New.to_csv('/home/bmr135/K2_BG/C6_New',index=False)
+    # C3_New['sig_age'] = ((C3_New['age_68U']-C3_New['age']) + (C3_New['age']-C3_New['age_68L']))/2
+    # C3_New.to_csv('/home/bmr135/K2_BG/C3_New',index=False)
+    # C6_New['sig_age'] = ((C6_New['age_68U']-C6_New['age']) + (C6_New['age']-C6_New['age_68L']))/2
+    # C6_New.to_csv('/home/bmr135/K2_BG/C6_New',index=False)
 
 
 
