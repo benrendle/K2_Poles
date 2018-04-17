@@ -18,8 +18,8 @@ import colormaps
 from pyqt_fit import kde
 import sim_pert as sp
 from decimal import Decimal
-import pystan
-from pystan import stan
+# import pystan
+# from pystan import stan
 
 def p_in(name,df1,field):
     ''' Extract input data from input PARAM files as necessary.
@@ -30,8 +30,8 @@ def p_in(name,df1,field):
     '''
     EPIC = pd.DataFrame()
     EPIC['#Id'] = df1['#Id']
-    df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
-    # df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    # df = pd.read_csv('/home/bmr135/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    df = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
     df.rename(columns={'ID':'#Id'},inplace=True)
     df = pd.merge(df,EPIC,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -47,6 +47,7 @@ def p_in(name,df1,field):
     df1['feh_err'] = df['efeh']
     df1['alpha'] = df['alpha']
     df1['m_seismo'] = (df1['nmx']/3090)**3 * (df1['dnu']/135.1)**-4 * (df1['Teff']/5777)**1.5
+    df1['r_seismo'] = (df1['nmx']/3090) * (df1['dnu']/135.1)**2 * (df1['Teff']/5777)**0.5
     df1 = df1[df1['dist'] > -90.0]
     df1 = df1[df1.mass > 0.0]
     df1 = df1[df1.feh > -90.0]
@@ -60,8 +61,8 @@ def p_in(name,df1,field):
 
 def Nseismo_link(field,df):
     ''' Match number of seismic detections to EPIC numbers '''
-    a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
-    # a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    # a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
+    a = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
     a.rename(columns={'EPIC':'#Id'},inplace=True)
     df = pd.merge(df,a,how='inner',on=['#Id'])
     df.reset_index(drop=True)
@@ -350,7 +351,10 @@ def vert_dist(i):
     ''' Calculate true vertical distance from coordinates and PARAM output '''
     d = coord.Galactic(l=i['Glon'].as_matrix()*u.degree, b=i['Glat'].as_matrix()*u.degree, distance=i['dist'].as_matrix()*u.pc)
     f = d.transform_to(coord.Galactocentric)
+    i['X'] = (f.x*u.pc)*1e-3
+    i['Y'] = (f.y*u.pc)*1e-3
     i['Z'] = (f.z*u.pc)*1e-3
+    i['Gal_Rad'] = np.sqrt(i['X']**2 + i['Y']**2)
     return i
 
 def spec(i):
@@ -395,14 +399,14 @@ def Z_subplots(df1,df2,param,ran,xtag,z):
 def sim_coords(df,field):
     ''' Give simulations values for GLAT and GLON from the input coords '''
     if field == 3:
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/avk_k2_complete_c3.txt',delimiter=r'\s+')
     if field == 6:
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/avk_k2_complete_c6.txt',delimiter=r'\s+')
     if field == 'K':
-        coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
-        # coords = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        # coords = pd.read_csv('/home/bmr135/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
+        coords = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/avk_kep_complete.txt',delimiter=r'\s+')
 
     df['Glon'] = 0
     df['Glat'] = 0
@@ -700,43 +704,44 @@ def sp3(obs):
         rho10[i] = density
         rho.append(np.log10(density)) # In units number of stars/pc^3
     bin_10 = 10**bin_edges[1:]
-    dens_model = '''
-    data {
-        int<lower=0> N;
-        real M[N];
-        real Z[N];
-    }
-    parameters {
-        //real<lower =0.001> sigma;
-        //real<lower = 0> alpha;
-        real M_true_std[N];
-        real<lower = 0> sh1;
-        real<lower = 0> sh2;
-        real<lower = 0> c1;
-        real<lower = 0> c2;
-    }
-    //transformed parameters {
-    //    real M_true[N]; // Transform from N(0,1) back to M
-    //    for (i in 1:N)
-    //        M_true[i] = mu + sigma * M_true_std[i];
-    //}
-    model {
-        M_true_std ~ c1*np.exp(-abs(Z)/sh1) + c2*np.exp(-abs(Z)/sh2)
-        sh1 ~ normal( 500, 200);
-        sh2 ~ normal( 800, 200);
-        c1 ~ normal( 0, 1);
-        c2 ~ normal( 0, 1);
-        //sigma ~ normal(0, 10);
-    }
-    '''
-    sm = pystan.StanModel(model_code=dens_model, model_name='DensityModel')
-    dat = {'N': len(rho10),
-           'M': rho10,
-           'Z': bin_10
-          }
-    fit = sm.sampling(data=dat, iter=5000, chains=1, pars=['sh1', 'sh2', 'c1', 'c2'])
-    print(fit)
-    fit.plot()
+    ''' pystan method of fitting '''
+    # dens_model = '''
+    # data {
+    #     int<lower=0> N;
+    #     real M[N];
+    #     real Z[N];
+    # }
+    # parameters {
+    #     //real<lower =0.001> sigma;
+    #     //real<lower = 0> alpha;
+    #     real M_true_std[N];
+    #     real<lower = 0> sh1;
+    #     real<lower = 0> sh2;
+    #     real<lower = 0> c1;
+    #     real<lower = 0> c2;
+    # }
+    # //transformed parameters {
+    # //    real M_true[N]; // Transform from N(0,1) back to M
+    # //    for (i in 1:N)
+    # //        M_true[i] = mu + sigma * M_true_std[i];
+    # //}
+    # model {
+    #     M_true_std ~ c1*np.exp(-abs(Z)/sh1) + c2*np.exp(-abs(Z)/sh2)
+    #     sh1 ~ normal( 500, 200);
+    #     sh2 ~ normal( 800, 200);
+    #     c1 ~ normal( 0, 1);
+    #     c2 ~ normal( 0, 1);
+    #     //sigma ~ normal(0, 10);
+    # }
+    # '''
+    # sm = pystan.StanModel(model_code=dens_model, model_name='DensityModel')
+    # dat = {'N': len(rho10),
+    #        'M': rho10,
+    #        'Z': bin_10
+    #       }
+    # fit = sm.sampling(data=dat, iter=5000, chains=1, pars=['sh1', 'sh2', 'c1', 'c2'])
+    # print(fit)
+    # fit.plot()
 
     plt.figure()
     plt.scatter(bin_10,rho)

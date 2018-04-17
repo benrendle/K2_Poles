@@ -31,11 +31,11 @@ matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
 ''' Dropbox Path '''
-ext_DB = '/home/bmr135/' # Work
-# ext_DB = '/home/ben/'   # Laptop
+# ext_DB = '/home/bmr135/' # Work
+ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-ext_GA = '/home/bmr135/' # Work
-# ext_GA = '/media/ben/SAMSUNG/' # Hard-Drive
+# ext_GA = '/home/bmr135/' # Work
+ext_GA = '/media/ben/SAMSUNG1/' # Hard-Drive
 
 ''' Read in simulated and real data '''
 besa3, besa6 = dat.BESANCON()
@@ -242,10 +242,12 @@ TRILEGAL_C6 = TRILEGAL_C6[ (TRILEGAL_C6['numax'] > 10) & (TRILEGAL_C6['numax'] <
 ''' Save out TRILEGAL simulations after selection function has been applied
     for use elsewhere '''
 
-TRI3 = TRILEGAL_C3[TRILEGAL_C3['logAge'] > np.log10(9e9)]
-TRI6 = TRILEGAL_C6[TRILEGAL_C6['logAge'] > np.log10(9e9)]
-TRI3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars',index=False)
-TRI6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_old_stars',index=False)
+# TRI3 = TRILEGAL_C3[TRILEGAL_C3['logAge'] > np.log10(9e9)]
+# TRI6 = TRILEGAL_C6[TRILEGAL_C6['logAge'] > np.log10(9e9)]
+# TRI3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars',index=False)
+# TRI6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_old_stars',index=False)
+TRILEGAL_C3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_self',index=False)
+TRILEGAL_C6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_self',index=False)
 print('Trilegal saved out')
 
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
@@ -318,6 +320,9 @@ camp6_0 = camp6_0.fillna(value='NaN',method=None)
 
 print(len(camp3_0),len(camp6_0))
 
+# YC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/YC3_TL',index=False)
+# BC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/BC3_TL',index=False)
+# SC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/SC3_TL',index=False)
 
 ''' Merging of multiple fields for comparison '''
 cols_to_use = YC3.columns.difference(SC3.columns)
@@ -543,14 +548,14 @@ cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
 GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 
-GES['ALPHA'] = GES['ALPHA'] + 0.1
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
-GES['ALPHA'] = GES['ALPHA'] + 0.15
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
-GES['ALPHA'] = GES['ALPHA'] - 0.35
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
-GES['ALPHA'] = GES['ALPHA'] -0.15
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES['ALPHA'] = GES['ALPHA'] + 0.1
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES['ALPHA'] = GES['ALPHA'] + 0.15
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES['ALPHA'] = GES['ALPHA'] - 0.35
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES['ALPHA'] = GES['ALPHA'] -0.15
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''
@@ -569,8 +574,7 @@ plt.figure()
 plt.hist(df['Vmag'],bins=[9,10,11,12,13,14,15])
 plt.xlabel(r'V',fontsize=15)
 plt.show()
-sys.exit()
-
+# sys.exit()
 
 ''' Merging of LAMOST data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(LAMOST3.columns)
@@ -1144,23 +1148,23 @@ plt.tight_layout()
 # plt.tight_layout()
 
 ''' Sky projection plot '''
-plt.figure()
-# plt.hist(C6_nospec['Grad']/1000,bins=75)
-v9 = C6_nospec[C6_nospec['Vmag'] < 10]
-v10 = C6_nospec[(C6_nospec['Vmag'] >= 10) & (C6_nospec['Vmag'] < 11)]
-v11 = C6_nospec[(C6_nospec['Vmag'] >= 11) & (C6_nospec['Vmag'] < 12)]
-v12 = C6_nospec[(C6_nospec['Vmag'] >= 12) & (C6_nospec['Vmag'] < 13)]
-v13 = C6_nospec[(C6_nospec['Vmag'] >= 13) & (C6_nospec['Vmag'] < 14)]
-v14 = C6_nospec[(C6_nospec['Vmag'] >= 14) & (C6_nospec['Vmag'] <= 15)]
-# plt.scatter(C6_nospec['RA'],C6_nospec['Dec'])
-plt.scatter(v9['RA'],v9['Dec'],label=r'V = 9-10')
-plt.scatter(v10['RA'],v10['Dec'],label=r'V = 10-11',color='r')
-plt.scatter(v11['RA'],v11['Dec'],label=r'V = 11-12',color='g')
-plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
-plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
-plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
-plt.xlabel(r'RA')
-plt.ylabel(r'DEC')
-plt.legend()
+# plt.figure()
+# # plt.hist(C6_nospec['Grad']/1000,bins=75)
+# v9 = C6_nospec[C6_nospec['Vmag'] < 10]
+# v10 = C6_nospec[(C6_nospec['Vmag'] >= 10) & (C6_nospec['Vmag'] < 11)]
+# v11 = C6_nospec[(C6_nospec['Vmag'] >= 11) & (C6_nospec['Vmag'] < 12)]
+# v12 = C6_nospec[(C6_nospec['Vmag'] >= 12) & (C6_nospec['Vmag'] < 13)]
+# v13 = C6_nospec[(C6_nospec['Vmag'] >= 13) & (C6_nospec['Vmag'] < 14)]
+# v14 = C6_nospec[(C6_nospec['Vmag'] >= 14) & (C6_nospec['Vmag'] <= 15)]
+# # plt.scatter(C6_nospec['RA'],C6_nospec['Dec'])
+# plt.scatter(v9['RA'],v9['Dec'],label=r'V = 9-10')
+# plt.scatter(v10['RA'],v10['Dec'],label=r'V = 10-11',color='r')
+# plt.scatter(v11['RA'],v11['Dec'],label=r'V = 11-12',color='g')
+# plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
+# plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
+# plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
+# plt.xlabel(r'RA')
+# plt.ylabel(r'DEC')
+# plt.legend()
 
-plt.show()
+# plt.show()
