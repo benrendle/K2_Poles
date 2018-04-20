@@ -80,13 +80,28 @@ if __name__ == '__main__':
     # C3_New, C6_New = z
     # # sys.exit()
     #
-    # APK2 = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June272017_090630.in.me',delimiter=r'\s+')
+    # APK2 = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June222017_150813.in.me',delimiter=r'\s+')
     #
     # # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
     # # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
     # # TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
     # TRI6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    #
+    # ''' Kepler Simulation if required '''
+    # # Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    # ''' Application of K2 Selection Function to Kepler Simulation '''
+    # Kep_Sim['Teff'] = 10**(Kep_Sim['logTe'])
+    # Kep_Sim['g'] = 10**(Kep_Sim['logg'])
+    # Kep_Sim['L'] = 10**(Kep_Sim['logL'])
+    # Kep_Sim['radius'] = np.sqrt(Kep_Sim['Mass'] / (Kep_Sim['g']/4.441))
+    # Kep_Sim['JK'] = Kep_Sim['Jmag'] - Kep_Sim['Kmag']
+    # Kep_Sim['Vcut'] = Kep_Sim['Kmag'] + 2*(Kep_Sim['JK']+0.14) + 0.382*np.exp(2*(Kep_Sim['JK']-0.2))
+    # # Kep_Sim = prop.det_prob_Kepler(Kep_Sim,'numax',3090.0,135.1)
+    # # Kep_Sim = Kep_Sim[ (Kep_Sim['numax'] > 10) & (Kep_Sim['numax'] < 280) & \
+    # # (Kep_Sim['Vcut'] > 9) & (Kep_Sim['Vcut'] < 15) & (Kep_Sim['JK'] > 0.5)]
+    #
     #
     # ''' [Fe/H] correct PARAM runs '''
     # # C3 = pd.read_csv(ext+'C3_080218.in.me',delimiter=r'\s+')
@@ -227,6 +242,55 @@ if __name__ == '__main__':
     # print(len(L3),len(L6))
     # print(len(GES),len(APO))
     #
+    # ''' Quality Flagging '''
+    # # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+    # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
+    # C3_skew = pd.read_csv(ext_load+'C3_EPIC_skew')
+    # C6_skew = pd.read_csv(ext_load+'C6_EPIC_skew')
+    #
+    # C3_New['Mass_Flag'] = 0
+    # C3_New['Radius_Flag'] = 0
+    # C3_New['Age_Flag'] = 0
+    # C3_New['mass_comp'] = abs((C3_New['mass'] - C3_New['m_seismo'])/C3_New['mass'])
+    # for i in range(len(C3_New)):
+    #     if C3_New['mass_comp'].iloc[i] > 0.5:
+    #         C3_New['Mass_Flag'].iloc[i] == 1
+    #     if abs((C3_New['rad'].iloc[i] - C3_New['r_seismo'].iloc[i])/C3_New['rad'].iloc[i]) > 0.5:
+    #         C3_New['Radius_Flag'].iloc[i] == 1
+    # for i in range(len(C3_New)):
+    #     for j in range(len(C3_skew)):
+    #         if C3_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
+    #             C3_New['Age_Flag'].iloc[i] = 1
+    #
+    # C6_New['Mass_Flag'] = 0
+    # C6_New['Radius_Flag'] = 0
+    # C6_New['Age_Flag'] = 0
+    # for i in range(len(C6_New)):
+    #     if abs((C6_New['mass'].iloc[i] - C6_New['m_seismo'].iloc[i])/C6_New['mass'].iloc[i]) > 0.5:
+    #         C6_New['Mass_Flag'].iloc[i] == 1
+    #     if abs((C6_New['rad'].iloc[i] - C6_New['r_seismo'].iloc[i])/C6_New['rad'].iloc[i]) > 0.5:
+    #         C6_New['Radius_Flag'].iloc[i] == 1
+    # for i in range(len(C6_New)):
+    #     for j in range(len(C6_skew)):
+    #         if C6_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
+    #             C6_New['Age_Flag'].iloc[i] = 1
+    #
+    # K2_New['Mass_Flag'] = 0
+    # K2_New['Radius_Flag'] = 0
+    # K2_New['Age_Flag'] = 0
+    # for i in range(len(K2_New)):
+    #     if abs((K2_New['mass'].iloc[i] - K2_New['m_seismo'].iloc[i])/K2_New['mass'].iloc[i]) > 0.5:
+    #         K2_New['Mass_Flag'].iloc[i] == 1
+    #     if abs((K2_New['rad'].iloc[i] - K2_New['r_seismo'].iloc[i])/K2_New['rad'].iloc[i]) > 0.5:
+    #         K2_New['Radius_Flag'].iloc[i] == 1
+    # for i in range(len(K2_New)):
+    #     for j in range(len(C3_skew)):
+    #         if K2_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
+    #             K2_New['Age_Flag'].iloc[i] = 1
+    #     for j in range(len(C3_skew)):
+    #         if K2_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
+    #             K2_New['Age_Flag'].iloc[i] = 1
+    #
     # ''' Save out updated files for quick read in - only process file updates
     #     once to save computation time later '''
     # # ext_save = '/home/bmr135/K2_Poles/Mass_Distr_In/'
@@ -253,34 +317,33 @@ if __name__ == '__main__':
         of running the code above '''
     # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
-    C3_New = pd.read_csv(ext_load+'C3_17042018')
-    C6_New = pd.read_csv(ext_load+'C6_17042018')
-    K2_New = pd.read_csv(ext_load+'K2_17042018')
-    K2_AS = pd.read_csv(ext_load+'K2_AS_17042018')
-    AS = pd.read_csv(ext_load+'AS_17042018')
-    APK2 = pd.read_csv(ext_load+'APPKASC_17042018')
-    c_three = pd.read_csv(ext_load+'Spec_C3_17042018')
-    c_six = pd.read_csv(ext_load+'Spec_C6_17042018')
-    RC3 = pd.read_csv(ext_load+'RC3_17042018')
-    RC6 = pd.read_csv(ext_load+'RC6_17042018')
-    L3 = pd.read_csv(ext_load+'L3_17042018')
-    L6 = pd.read_csv(ext_load+'L6_17042018')
-    GES = pd.read_csv(ext_load+'GES_17042018')
-    APO = pd.read_csv(ext_load+'APO_17042018')
-    TRI3 = pd.read_csv(ext_load+'TRI3_17042018')
-    TRI6 = pd.read_csv(ext_load+'TRI6_17042018')
-
-    ''' Quality Flagging '''
-    K2_New['Mass_Flag'] = 0
-    K2_New['Radius_Flag'] = 0
-    for i in range(len(K2_New)):
-        if abs((K2_New['mass'][i] - K2_New['m_seismo'][i])/K2_New['mass'][i]) > 0.5:
-            K2_New['Mass_Flag'] == 1
-        if abs((K2_New['rad'][i] - K2_New['r_seismo'][i])/K2_New['rad'][i]) > 0.5:
-            K2_New['Radius_Flag'] == 1
+    C3_New = pd.read_csv(ext_load+'C3_19042018')
+    C6_New = pd.read_csv(ext_load+'C6_19042018')
+    K2_New = pd.read_csv(ext_load+'K2_19042018')
+    K2_AS = pd.read_csv(ext_load+'K2_AS_19042018')
+    AS = pd.read_csv(ext_load+'AS_19042018')
+    APK2 = pd.read_csv(ext_load+'APPKASC_19042018')
+    c_three = pd.read_csv(ext_load+'Spec_C3_19042018')
+    c_six = pd.read_csv(ext_load+'Spec_C6_19042018')
+    RC3 = pd.read_csv(ext_load+'RC3_19042018')
+    RC6 = pd.read_csv(ext_load+'RC6_19042018')
+    L3 = pd.read_csv(ext_load+'L3_19042018')
+    L6 = pd.read_csv(ext_load+'L6_19042018')
+    GES = pd.read_csv(ext_load+'GES_19042018')
+    APO = pd.read_csv(ext_load+'APO_19042018')
+    TRI3 = pd.read_csv(ext_load+'TRI3_19042018')
+    TRI6 = pd.read_csv(ext_load+'TRI6_19042018')
 
     TRI = pd.concat([TRI3,TRI6],ignore_index=True)
     TRI.reset_index(drop=True)
+
+    ''' PARAM based mass cuts if desired '''
+    # C3_New = C3_New[abs((C3_New['mass'] - C3_New['m_seismo'])/C3_New['mass']) < 0.1]
+    # C3_New = C3_New.reset_index(drop=True)
+    # C6_New = C6_New[abs((C6_New['mass'] - C6_New['m_seismo'])/C6_New['mass']) < 0.1]
+    # C6_New = C6_New.reset_index(drop=True)
+    # print(len(C3_New),len(C6_New))
+
 
     ''' Kepler Simulation if required '''
     # # Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
@@ -419,6 +482,28 @@ if __name__ == '__main__':
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Mass_comp_param_sim_SR.png')
 
+    ''' Age Distribution '''
+    fig, ax1 = plt.subplots(1)
+    ax1.hist(10**K2_New['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'Photom.',normed=True,linewidth=2)
+    ax1.hist(10**AS['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'Spectro.',normed=True,linewidth=2)
+    ax1.hist(10**APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'APOKASC',normed=True,linewidth=2)
+    ax1.set_xlabel(r'Age [Gyr]')
+    ax1.legend()
+
+    K2_New['sig_age'] = (K2_New['age_68U']-K2_New['age_68L'])/2
+    AS['sig_age'] = (AS['age_68U']-AS['age_68L'])/2
+    fig, ax1 = plt.subplots(1)
+    ax1.scatter(AS['age'],(AS['sig_age']/AS['age']))
+    ax1.set_xlabel(r'Age [Gyr]')
+    ax1.set_ylabel(r'Fract. $\sigma_{\rm{Age}}$')
+
+    K2_gd_age = AS[(AS['sig_age']/AS['age']) < 0.35]
+    fig, ax1 = plt.subplots(1)
+    ax1.hist(K2_gd_age['age'],bins=np.linspace(0,20,40),histtype='step',label=r'AS',normed=True,linewidth=2)
+    ax1.set_xlabel(r'Age [Gyr]')
+    ax1.legend()
+    plt.show()
+
     ''' Parameter distribution plots '''
     # K2_RGB = pd.DataFrame()
     APK2 = APK2[APK2['radius'] > 0.0]
@@ -430,42 +515,35 @@ if __name__ == '__main__':
     ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
     # plt.suptitle(r'log$_{10}$(Age) $> 10.0$', fontsize=15)
     # plt.suptitle(r'$\forall$ R', fontsize=15)
-    ax0.hist(K2_c['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2 Clump',normed=True)
-    ax0.hist(APK2c['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'APOKASC Clump',normed=True)
+    ax0.hist(AS['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2 AS',normed=True)
+    ax0.hist(K2_gd_age['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2 AS $\sigma_{\rm{Age}}$ cut',normed=True)
     ax0.legend(prop={'size':10})
     ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-    ax1.hist(K2_c['logAge'],bins=np.linspace(8.5,10.5,50),histtype='step',label=None,normed=True)
-    ax1.hist(APK2c['age'],bins=np.linspace(8.5,10.5,50),histtype='step',label=None,normed=True)
-    ax1.set_xlabel(r'log$_{10}$(Age)')
-    ax2.hist(K2_c['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
-    ax2.hist(APK2c['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
+    ax1.hist(AS['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
+    ax1.hist(K2_gd_age['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
+    ax1.set_xlabel(r'Age [Gyr]')
+    ax2.hist(AS['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
+    ax2.hist(K2_gd_age['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
     ax2.set_xlabel(r'Radius [R$_{\odot}$]')
-    ax3.hist(K2_c['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
-    ax3.hist(APK2c['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
+    ax3.hist(AS['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
+    ax3.hist(K2_gd_age['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
     ax3.set_xlabel(r'Z [kpc]')
-    ax4.hist(K2_c['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
-    ax4.hist(APK2c['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=None,normed=1)
+    ax4.hist(AS['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
+    ax4.hist(K2_gd_age['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=None,normed=1)
     ax4.set_xlabel(r'[Fe/H]')
     ax5.axis('off')
     # fig.subplots_adjust(top=3.0)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    # plt.show()
+    plt.show()
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
-    fig, ax1 = plt.subplots(1)
-    ax1.hist(10**K2_AS['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'K2',normed=True,linewidth=2)
-    ax1.hist(10**AS['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'AS',normed=True,linewidth=2)
-    # ax1.hist(10**APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'APOKASC',normed=True,linewidth=2)
-    ax1.set_xlabel(r'Age [Gyr]')
-    ax1.legend()
-
-    fig, ax1 = plt.subplots(1)
-    ax1.hist(K2_AS['Kepler'],bins=6,histtype='step',label=r'K2_AS',normed=True,linewidth=2)
-    ax1.hist(AS['Kepler'],bins=6,histtype='step',label=r'AS',normed=True,linewidth=2)
-    ax1.hist(K2_New['Kepler'],bins=6,histtype='step',label=r'K2',normed=True,linewidth=2)
-    ax1.set_xlabel(r'Kep. Mag.')
-    ax1.legend()
+    # fig, ax1 = plt.subplots(1)
+    # ax1.hist(K2_AS['Kepler'],bins=6,histtype='step',label=r'K2_AS',normed=True,linewidth=2)
+    # ax1.hist(AS['Kepler'],bins=6,histtype='step',label=r'AS',normed=True,linewidth=2)
+    # ax1.hist(K2_New['Kepler'],bins=6,histtype='step',label=r'K2',normed=True,linewidth=2)
+    # ax1.set_xlabel(r'Kep. Mag.')
+    # ax1.legend()
 
     ''' Percentage Difference Between PARAM and Scaling Relations '''
     # df = pd.DataFrame()
@@ -684,14 +762,14 @@ if __name__ == '__main__':
     plt.legend(prop={'size':15})
     plt.show()
 
-    plt.figure()
-    plt.scatter(APK2_alpha['Teff'],APK2_alpha['logg'],label=r'APOKASC $\alpha$-rich',alpha=0.1)
-    plt.scatter(K2_AS['Teff'],K2_AS['logg'],label=r'K2',alpha=0.5)
-    plt.xlim(100+max(K2_New['Teff']),min(K2_New['Teff'])-100)
-    plt.ylim(0.1+max(K2_New['logg']),min(K2_New['logg'])-0.1)
-    plt.xlabel(r'T$_{\rm{eff}}$ [K]')
-    plt.ylabel(r'log$_{10}$(g)')
-    plt.legend()
+    # plt.figure()
+    # plt.scatter(APK2_alpha['Teff'],APK2_alpha['logg'],label=r'APOKASC $\alpha$-rich',alpha=0.1)
+    # plt.scatter(K2_AS['Teff'],K2_AS['logg'],label=r'K2',alpha=0.5)
+    # plt.xlim(100+max(K2_New['Teff']),min(K2_New['Teff'])-100)
+    # plt.ylim(0.1+max(K2_New['logg']),min(K2_New['logg'])-0.1)
+    # plt.xlabel(r'T$_{\rm{eff}}$ [K]')
+    # plt.ylabel(r'log$_{10}$(g)')
+    # plt.legend()
 
     ''' KEPLER vs K2 simulations '''
     # plt.figure()
@@ -910,6 +988,19 @@ if __name__ == '__main__':
     # # f.savefig('/home/bmr135/Dropbox/GES-K2/Ages/figure_1.eps',rasterized=True,dpi=400)
     # plt.show()
 
+    f = plt.figure()
+    plt.scatter(APK2['mass'],APK2['Z'],color='gray',alpha=0.2,label=r'Kepler')
+    plt.scatter(C6_New['mass'],C6_New['Z'],label=r'C6',alpha=0.7)
+    plt.scatter(C3_New['mass'],C3_New['Z'],label=r'C3',alpha=0.7)
+    plt.xlabel(r'Mass [M$_{\odot}$]')
+    plt.ylabel(r'Z [kpc]')
+    plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+
     ''' Age vs Z '''
     # plt.figure()
     # plt.scatter(K2['age'],K2['Z'])
@@ -975,29 +1066,52 @@ if __name__ == '__main__':
     # Kp_Z6, edges6, number6 = scipy.stats.binned_statistic(C6_40_06FeH['Z'],C6_40_06FeH['Kepler'],statistic='count',bins=bins6)
 
     ''' Distibution of stars by Galactic Radius and Z '''
-    # plt.figure()
-    # # print(K2_New['feh'])
-    # plt.scatter(APK2['Gal_Rad'],APK2['Z'],alpha=0.2,label='Kepler',color='gray')
-    # plt.scatter(K2_New['Gal_Rad'],K2_New['Z'],c=K2_New['feh'],label=r'K2',cmap=colormaps.parula)
+    plt.figure()
+    # print(K2_New['feh'])
+    plt.plot([min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
+    plt.scatter(APK2['Gal_Rad'],APK2['Z'],alpha=0.2,label='Kepler',color='gray')
+    plt.scatter(C6_New['Gal_Rad'],C6_New['Z'],label=r'C6',alpha=0.4)#,c=K2_New['feh'],cmap=colormaps.parula)
+    plt.scatter(C3_New['Gal_Rad'],C3_New['Z'],label=r'C3',alpha=0.4)#,c=K2_New['feh'],cmap=colormaps.parula)
     # cbar = plt.colorbar()
     # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    plt.xlabel(r'Galactic Radius [kpc]')
+    plt.xlim(min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2)
+    plt.ylabel(r'Z [kpc]')
+    plt.legend()
+    plt.show()
+
+    ''' Alpha-rich young stars '''
+    # K2_ar = AS[(AS['alpha'] > 0.2) & ((10**AS['logAge']/1e9) < 7)]
+    # K2_ar = K2_ar[abs((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']) < 0.5]
+    # K2_ar = K2_ar.reset_index(drop=True)
+    # # K2_ar.to_csv('/home/ben/K2_Poles/Mass_Distr_In/Young_Alpha_Rich',index=False)
+    # plt.figure()
+    # plt.scatter(K2_ar['mass'],((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']))
+    # plt.xlabel(r'Mass')
+    # plt.ylabel(r'(Param - Scaling)/Param')
+    # plt.show()
+    #
+    # plt.figure()
+    # plt.scatter(K2_New['nmx'],K2_New['dnu'],alpha=0.1,label=r'K2')
+    # plt.scatter(K2_ar['nmx'],K2_ar['dnu'],alpha=0.5,label=r'K2 $\alpha$-RY')
+    # plt.xlabel(r'$\nu_{\rm{max}}$ [$\mu$Hz]')
+    # plt.ylabel(r'$\Delta\nu$ [$\mu$Hz]')
     # plt.legend()
     # plt.show()
 
-    ''' Alpha-rich young stars '''
-    K2_ar = AS[(AS['alpha'] > 0.2) & ((10**AS['logAge']/1e9) < 7)]
-    K2_ar = K2_ar[abs((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']) < 0.5]
-    K2_ar = K2_ar.reset_index(drop=True)
-    plt.figure()
-    plt.scatter(K2_ar['mass'],((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']))
-    plt.xlabel(r'Mass')
-    plt.ylabel(r'(Param - Scaling)/Param')
-    plt.show()
-
-    plt.figure()
-    plt.scatter(K2_New['nmx'],K2_New['dnu'],alpha=0.1,label=r'K2')
-    plt.scatter(K2_ar['nmx'],K2_ar['dnu'],alpha=0.5,label=r'K2 $\alpha$-RY')
-    plt.xlabel(r'$\nu_{\rm{max}}$ [$\mu$Hz]')
-    plt.ylabel(r'$\Delta\nu$ [$\mu$Hz]')
-    plt.legend()
+    ''' Radial MDF - 1kpc bins '''
+    low3 = c_three[c_three['Gal_Rad'] < 7]
+    high3 = c_three[c_three['Gal_Rad'] > 7]
+    low6 = c_six[c_six['Gal_Rad'] < 7]
+    high6 = c_six[c_six['Gal_Rad'] > 7]
+    fig, (ax1,ax2) = plt.subplots(2)
+    ax1.hist(low3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
+    ax1.hist(high3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
+    ax1.legend()
+    ax1.set_xlabel(r'[Fe/H] - C3')
+    ax2.hist(low6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
+    ax2.hist(high6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
+    ax2.legend()
+    ax2.set_xlabel(r'[Fe/H] - C6')
+    plt.tight_layout()
     plt.show()

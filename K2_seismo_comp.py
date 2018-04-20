@@ -58,7 +58,7 @@ RAVE3, RAVE6 = dat.RAVE()
 print( "RAVE")
 GES3 = dat.Gaia_ESO()
 print( "Gaia-ESO")
-APO6 = dat.APOGEE()
+APO3, APO6 = dat.APOGEE()
 print( "APOGEE ")
 LAMOST3, LAMOST6 = dat.LAMOST()
 print("LAMOST")
@@ -103,6 +103,7 @@ SEC3 = pd.merge(Savita_EC3,GAP3,how='inner',on=['EPIC'])
 SEC6 = pd.merge(Savita_EC6,GAP6,how='inner',on=['EPIC'])
 EC3 = pd.merge(Everest_C3,GAP3,how='inner',on=['EPIC'])
 GG3 = pd.merge(GES3,GAP3,how='inner',on=['EPIC'])
+AC3 = pd.merge(APO3,GAP3,how='inner',on=['EPIC'])
 AC6 = pd.merge(APO6,GAP6,how='inner',on=['EPIC'])
 # LC3 = pd.merge(LAMOST3,GAP3,how='inner',on=['EPIC'])
 # LC6 = pd.merge(LAMOST6,GAP6,how='inner',on=['EPIC'])
@@ -277,12 +278,19 @@ GES.to_csv(ext_GA+'GA/K2Poles/Gaia_ESO/GES_full.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out")
 
 ''' Merging of APOGEE data with single asteroseismic dets '''
+YA3,SA3,BA3,EA3 = dat.APO_merge(seismo3_list,APO3,seismo3_name)
+AP3 = pd.concat([BA3,SA3,YA3],ignore_index=True)
+AP3 = AP3.drop_duplicates(subset=['EPIC'])
+AP3 = AP3.fillna(value='NaN',method=None)
+AP3 = AP3.reset_index(drop=True)
+AP3.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C3.csv',index=False,na_rep='Inf')
+
 YA6,SA6,BA6,EA6 = dat.APO_merge(seismo6_list,APO6,seismo6_name)
-APO = pd.concat([BA6,SA6,YA6],ignore_index=True)
-APO = APO.drop_duplicates(subset=['EPIC'])
-APO = APO.fillna(value='NaN',method=None)
-APO = APO.reset_index(drop=True)
-APO.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full.csv',index=False,na_rep='Inf')
+AP6 = pd.concat([BA6,SA6,YA6],ignore_index=True)
+AP6 = AP6.drop_duplicates(subset=['EPIC'])
+AP6 = AP6.fillna(value='NaN',method=None)
+AP6 = AP6.reset_index(drop=True)
+AP6.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C6.csv',index=False,na_rep='Inf')
 print( "APOGEE saved out")
 
 ''' Merging of LAMOST data with single asteroseismic dets '''
@@ -476,7 +484,7 @@ RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE_C6.csv',index=False,na_rep='Inf')
 # RAVEGES = RAVEGES.drop_duplicates(subset=['EPIC'])
 # print( len(RAVEGES))
 
-APORAVE = pd.merge(APO,RAVE6,how='inner',on=['EPIC'])
+APORAVE = pd.merge(AP6,RAVE6,how='inner',on=['EPIC'])
 # print( len(APORAVE))
 
 ''' Concatenated lists of stars in each campaign, K2P2 and Everest.
@@ -559,22 +567,22 @@ GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.c
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''
-C3_nospec = pd.DataFrame()
-C3_nospec = pd.concat([camp3,RC3,GES],ignore_index=True)
-C3_nospec = C3_nospec.drop_duplicates(subset=['EPIC'],keep=False)
-# C6_nospec = C6_nospec.dropna()
-df = C3_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
-df = df[df.Vmag != 'NaN']
-# df = df[df.values != 'NaN']
-df = df.reset_index(drop=True)
-# df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL',index=False)
-plt.figure()
-# hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
-# print(hist,bins)
-plt.hist(df['Vmag'],bins=[9,10,11,12,13,14,15])
-plt.xlabel(r'V',fontsize=15)
-plt.show()
-# sys.exit()
+# C3_nospec = pd.DataFrame()
+# C3_nospec = pd.concat([camp3,RC3,GES],ignore_index=True)
+# C3_nospec = C3_nospec.drop_duplicates(subset=['EPIC'],keep=False)
+# # C6_nospec = C6_nospec.dropna()
+# df = C3_nospec[['EPIC','RA','Dec','Vmag','Bmag','rmag','Jmag','Hmag','Kmag','JK','BV']]
+# df = df[df.Vmag != 'NaN']
+# # df = df[df.values != 'NaN']
+# df = df.reset_index(drop=True)
+# # df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL',index=False)
+# plt.figure()
+# # hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
+# # print(hist,bins)
+# plt.hist(df['Vmag'],bins=[9,10,11,12,13,14,15])
+# plt.xlabel(r'V',fontsize=15)
+# plt.show()
+# # sys.exit()
 
 ''' Merging of LAMOST data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(LAMOST3.columns)
@@ -589,17 +597,31 @@ L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y_%H%M%S")+
 print( "LAMOST6 saved out ", len(LAMOST6))
 
 ''' Merging of APOGEE data with multiple asteroseismic dets '''
+cols_to_use = camp3.columns.difference(APO3.columns)
+cols_to_use = cols_to_use.union(['EPIC'])
+AP3 = pd.merge(APO3,camp3[cols_to_use],how='inner',on=['EPIC'])
+AP3.to_csv(ext_GA+'GA/K2Poles/APOGEE_C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+
+print(len(APO3),len(APO6))
 cols_to_use = camp6.columns.difference(APO6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
-APO = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
-APO.to_csv(ext_GA+'GA/K2Poles/APOGEE_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
-print( "APOGEE saved out", len(APO))
+AP6 = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
+AP6.to_csv(ext_GA+'GA/K2Poles/APOGEE_C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+print( "APOGEE saved out", len(AP3), len(AP6))
 
-print(len(pd.merge(L3,GES,how='inner',on=['EPIC'])))
-print(len(pd.merge(L3,RC3,how='inner',on=['EPIC'])))
+print('APOGEE overlaps')
+print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
+print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
+print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge(RC3,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge(GES,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge((pd.merge(GES,RC3,how='inner',on=['EPIC'])),AP3,how='inner',on=['EPIC'])))
+
+print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
+print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
 print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
-print(len(pd.merge(L6,APO,how='inner',on=['EPIC'])))
-print(len(L6),len(RC6))
+
+
 cols_to_use = RC6.columns.difference(L6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 LR6 = pd.merge(L6,RC6[cols_to_use],how='inner',on=['EPIC'])
