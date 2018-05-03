@@ -89,6 +89,10 @@ GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
 GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
 # GAP6_v2.to_csv('/home/bmr135/GA/K2Poles/GAP6')
 
+# cols = ['EPIC','2MASS','RA','Dec']#,'Teff','[Fe/H]','logg']
+# GAP3_v2.to_csv('/home/ben/Desktop/C3_GAP_Gaia',columns=cols,index=False)
+# GAP6_v2.to_csv('/home/ben/Desktop/C6_GAP_Gaia',columns=cols,index=False)
+
 ''' Merge data with GAP target lists '''
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
 YC6 = pd.merge(Yvonne_C6,GAP6,how='inner',on=['EPIC'])
@@ -274,7 +278,7 @@ GES = pd.concat([BG3,SG3,YG3],ignore_index=True)
 GES = GES.drop_duplicates(subset=['EPIC'])
 GES = GES.fillna(value='NaN',method=None)
 GES = GES.reset_index(drop=True)
-GES.to_csv(ext_GA+'GA/K2Poles/Gaia_ESO/GES_full.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/Gaia_ESO/GES_full.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out")
 
 ''' Merging of APOGEE data with single asteroseismic dets '''
@@ -283,14 +287,14 @@ AP3 = pd.concat([BA3,SA3,YA3],ignore_index=True)
 AP3 = AP3.drop_duplicates(subset=['EPIC'])
 AP3 = AP3.fillna(value='NaN',method=None)
 AP3 = AP3.reset_index(drop=True)
-AP3.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C3.csv',index=False,na_rep='Inf')
+# AP3.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C3.csv',index=False,na_rep='Inf')
 
 YA6,SA6,BA6,EA6 = dat.APO_merge(seismo6_list,APO6,seismo6_name)
 AP6 = pd.concat([BA6,SA6,YA6],ignore_index=True)
 AP6 = AP6.drop_duplicates(subset=['EPIC'])
 AP6 = AP6.fillna(value='NaN',method=None)
 AP6 = AP6.reset_index(drop=True)
-AP6.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C6.csv',index=False,na_rep='Inf')
+# AP6.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/APOGEE_full_C6.csv',index=False,na_rep='Inf')
 print( "APOGEE saved out")
 
 ''' Merging of LAMOST data with single asteroseismic dets '''
@@ -326,7 +330,16 @@ camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
 camp6_0 = camp6_0.reset_index(drop=True)
 camp6_0 = camp6_0.fillna(value='NaN',method=None)
 
+cols = ['EPIC','RA','Dec','Teff','[Fe/H]','logg']
+print(len(GAP3),len(GAP6))
+K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
+K2_camp = K2_camp.reset_index(drop=True)
+K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
+# camp3_0.to_csv('/home/ben/Desktop/C3_Gaia',columns=cols,index=False)
+# camp6_0.to_csv('/home/ben/Desktop/C6_Gaia',columns=cols,index=False)
+
 print(len(camp3_0),len(camp6_0))
+sys.exit()
 
 # YC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/YC3_TL',index=False)
 # BC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/BC3_TL',index=False)
@@ -499,7 +512,7 @@ camp3 = prop.single_seismo(camp3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp3 = prop.single_seismo(camp3,['BDnu','dnu','SDnu'],'DNU')
 camp3 = prop.single_seismo(camp3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp3 = prop.met_filter(camp3)
-camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
+# camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
 
 camp6 = pd.concat([YB_C6,YS_C6,BS_C6],ignore_index=True)
 camp6 = camp6.drop_duplicates(subset=['EPIC'])
@@ -511,7 +524,7 @@ camp6 = prop.single_seismo(camp6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp6 = prop.single_seismo(camp6,['BDnu','dnu','SDnu'],'DNU')
 camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp6 = prop.met_filter(camp6)
-camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
+# camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
 
 print(len(camp3),len(camp6))
 
@@ -548,13 +561,13 @@ RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
 RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
-
+sys.exit()
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 
 # GES['ALPHA'] = GES['ALPHA'] + 0.1
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
@@ -563,7 +576,7 @@ GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.c
 # GES['ALPHA'] = GES['ALPHA'] - 0.35
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 # GES['ALPHA'] = GES['ALPHA'] -0.15
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''

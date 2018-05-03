@@ -26,6 +26,7 @@ import sim_pert as sp
 import copy
 import mass_distr_functs as mdf
 import K2_properties as prop
+import K2_data as dat
 import TAR as tt
 import time
 
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     # a = [\
     #     #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/', 'APOKASC.in.me'], \
     #      ['ben_k2.tgz', 'GES_080218.in_STD_20Gyr/', 'GES_080218.in.me'], \
-    #      ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/','APO_080218.in.me'], \
+    #     #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/','APO_080218.in.me'], \
     #      ['ben_k2.tgz', 'RC3_080218.in_STD_20Gyr/', 'RC3_080218.in.me'], \
     #      ['ben_k2.tgz', 'RC6_080218.in_STD_20Gyr/', 'RC6_080218.in.me'], \
     #      ['ben_k2.tgz', 'C3_080218.in_STD_20Gyr/', 'C3_080218.in.me'], \
@@ -68,6 +69,8 @@ if __name__ == '__main__':
     #      ['ben_k2.tgz', 'C6_080218_2.in_STD_20Gyr/', 'C6_080218_2.in.me'], \
     #      ['C3_C6.tar.gz', 'C3_new_FeH/', 'C3_220218.in.me'], \
     #      ['C3_C6.tar.gz', 'C6_new_FeH/', 'C6_220218.in.me'], \
+    #      ['APOGEE.tar.gz', 'AC3/', 'APOGEE_C3_20042018.in.me'], \
+    #      ['APOGEE.tar.gz', 'AC6/', 'APOGEE_C6_20042018.in.me'], \
     #      ]
     #
     # z=[pd.DataFrame()]*len(a)
@@ -75,9 +78,10 @@ if __name__ == '__main__':
     #     tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
     #     z[i] = tar()
     #
-    # GES_T, APO_T, RC3_T, \
+    # GES_T, RC3_T, \
     # RC6_T, C3, C6_1, C6_2, \
-    # C3_New, C6_New = z
+    # C3_New, C6_New, \
+    # APO3_T, APO6_T = z
     # # sys.exit()
     #
     # APK2 = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June222017_150813.in.me',delimiter=r'\s+')
@@ -123,7 +127,8 @@ if __name__ == '__main__':
     # C6_1 = mdf.p_in('C6_080218_1',C6_1,'C6')
     # C6_2 = mdf.p_in('C6_080218_2',C6_2,'C6')
     # C6_New = mdf.p_in('C6_220218',C6_New,'C6')
-    # APO = mdf.p_in('APO_080218',APO_T,'C6')
+    # AP3 = mdf.p_in('APOGEE_C3_20042018',APO3_T,'C3')
+    # AP6 = mdf.p_in('APOGEE_C6_20042018',APO6_T,'C6')
     # RC6 = mdf.p_in('RC6_080218',RC6_T,'C6')
     # L6 = mdf.p_in('L6_080218',L6_T,'C6')
     #
@@ -157,7 +162,8 @@ if __name__ == '__main__':
     # mdf.vert_dist(C6_New)
     # mdf.vert_dist(APK2)
     # mdf.vert_dist(GES)
-    # mdf.vert_dist(APO)
+    # mdf.vert_dist(AP3)
+    # mdf.vert_dist(AP6)
     # mdf.vert_dist(RC3)
     # mdf.vert_dist(RC6)
     # mdf.vert_dist(L3)
@@ -165,13 +171,15 @@ if __name__ == '__main__':
     #
     # ''' Spectro tests '''
     # ges,c3 = mdf.spectro(GES,C3)
-    # apo,c6 = mdf.spectro(APO,C6)
+    # ap3,c3a = mdf.spectro(AP3,C3)
+    # ap6,c6a = mdf.spectro(AP6,C6)
     # rc3,c3_R = mdf.spectro(RC3,C3)
     # rc6,c6_R = mdf.spectro(RC6,C6)
     # l3, c3_l = mdf.spectro(L3,C3)
     # l6, c6_l = mdf.spectro(L6,C6)
     # GR3,RG3 = mdf.spectro(GES,RC3)
-    # AR6,RA6 = mdf.spectro(APO,RC6)
+    # AR6,RA6 = mdf.spectro(AP6,RC6)
+    # AR3,RA3 = mdf.spectro(AP3,RC3)
     #
     # ''' Gaia-ESO Uncertainty Comps '''
     # param = ['mass','rad','age']
@@ -182,9 +190,9 @@ if __name__ == '__main__':
     # err4 = mdf.uncerts(c3,param,x)
     #
     # ''' Combine all spectroscopic data for each campaign '''
-    # c_three = pd.concat([ges,rc3,l3],ignore_index=True)
+    # c_three = pd.concat([ap3,rc3,ges,l3],ignore_index=True)
     # c_three.reset_index(drop=True)
-    # c_six = pd.concat([apo,rc6,l6],ignore_index=True)
+    # c_six = pd.concat([ap6,rc6,l6],ignore_index=True)
     # c_six.reset_index(drop=True)
     # AS = pd.concat([c_three,c_six],ignore_index=True)
     # AS.reset_index(drop=True)
@@ -240,10 +248,10 @@ if __name__ == '__main__':
     # print(len(c_three),len(c_six))
     # print(len(RC3),len(RC6))
     # print(len(L3),len(L6))
-    # print(len(GES),len(APO))
+    # print(len(GES),len(AP3),len(AP6))
     #
     # ''' Quality Flagging '''
-    # # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+    # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
     # C3_skew = pd.read_csv(ext_load+'C3_EPIC_skew')
     # C6_skew = pd.read_csv(ext_load+'C6_EPIC_skew')
@@ -290,10 +298,10 @@ if __name__ == '__main__':
     #     for j in range(len(C3_skew)):
     #         if K2_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
     #             K2_New['Age_Flag'].iloc[i] = 1
-    #
-    # ''' Save out updated files for quick read in - only process file updates
-    #     once to save computation time later '''
-    # # ext_save = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+
+    ''' Save out updated files for quick read in - only process file updates
+        once to save computation time later '''
+    # ext_save = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     # ext_save = '/home/ben/K2_Poles/Mass_Distr_In/'
     # C3_New.to_csv(ext_save+'C3_'+time.strftime("%d%m%Y"),index=False)
     # C6_New.to_csv(ext_save+'C6_'+time.strftime("%d%m%Y"),index=False)
@@ -308,7 +316,8 @@ if __name__ == '__main__':
     # L3.to_csv(ext_save+'L3_'+time.strftime("%d%m%Y"),index=False)
     # L6.to_csv(ext_save+'L6_'+time.strftime("%d%m%Y"),index=False)
     # GES.to_csv(ext_save+'GES_'+time.strftime("%d%m%Y"),index=False)
-    # APO.to_csv(ext_save+'APO_'+time.strftime("%d%m%Y"),index=False)
+    # AP3.to_csv(ext_save+'AP3_'+time.strftime("%d%m%Y"),index=False)
+    # AP6.to_csv(ext_save+'AP6_'+time.strftime("%d%m%Y"),index=False)
     # TRI3.to_csv(ext_save+'TRI3_'+time.strftime("%d%m%Y"),index=False)
     # TRI6.to_csv(ext_save+'TRI6_'+time.strftime("%d%m%Y"),index=False)
     # sys.exit()
@@ -320,23 +329,52 @@ if __name__ == '__main__':
     C3_New = pd.read_csv(ext_load+'C3_19042018')
     C6_New = pd.read_csv(ext_load+'C6_19042018')
     K2_New = pd.read_csv(ext_load+'K2_19042018')
-    K2_AS = pd.read_csv(ext_load+'K2_AS_19042018')
-    AS = pd.read_csv(ext_load+'AS_19042018')
+    K2_AS = pd.read_csv(ext_load+'K2_AS_25042018')
+    AS = pd.read_csv(ext_load+'AS_25042018')
     APK2 = pd.read_csv(ext_load+'APPKASC_19042018')
-    c_three = pd.read_csv(ext_load+'Spec_C3_19042018')
-    c_six = pd.read_csv(ext_load+'Spec_C6_19042018')
+    c_three = pd.read_csv(ext_load+'Spec_C3_25042018')
+    c_six = pd.read_csv(ext_load+'Spec_C6_25042018')
     RC3 = pd.read_csv(ext_load+'RC3_19042018')
     RC6 = pd.read_csv(ext_load+'RC6_19042018')
     L3 = pd.read_csv(ext_load+'L3_19042018')
     L6 = pd.read_csv(ext_load+'L6_19042018')
     GES = pd.read_csv(ext_load+'GES_19042018')
-    APO = pd.read_csv(ext_load+'APO_19042018')
+    AP3 = pd.read_csv(ext_load+'AP3_25042018')
+    AP6 = pd.read_csv(ext_load+'AP6_25042018')
     TRI3 = pd.read_csv(ext_load+'TRI3_19042018')
     TRI6 = pd.read_csv(ext_load+'TRI6_19042018')
+
+    ''' Addition of RAVE [alpha/Fe] '''
+    # R3alp = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/matlab_in/RC3_25042018_154829.csv')
+    # R6alp = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/matlab_in/RC6_25042018_154829.csv')
+    # RC3 = pd.merge(RC3,R3alp[['#Id','ALPHA']],how='inner',on=['#Id'])
+    # RC6 = pd.merge(RC6,R6alp[['#Id','ALPHA']],how='inner',on=['#Id'])
+    # RC3.to_csv(ext_load+'RC3_19042018',index=False)
+    # RC6.to_csv(ext_load+'RC6_19042018',index=False)
+    # sys.exit()
+
+    Rk2 = pd.concat([RC3,RC6],ignore_index=True)
+    Rk2 = Rk2.reset_index(drop=True)
+    for i in range(len(AS)):
+        for j in range(len(Rk2)):
+            if AS['#Id'].iloc[i] == Rk2['#Id'].iloc[j]:
+                AS['alpha'].iloc[i] = Rk2['ALPHA'].iloc[j]
 
     TRI = pd.concat([TRI3,TRI6],ignore_index=True)
     TRI.reset_index(drop=True)
 
+    GAP3, GAP6 = dat.K2_GAP()
+    GAP3 = GAP3[['EPIC','[Fe/H]']]
+    GAP6 = GAP6[['EPIC','[Fe/H]']]
+
+    K2_GAP = pd.concat([GAP3,GAP6],ignore_index=True)
+    K2_GAP.reset_index(drop=True)
+    K2_GAP.rename(columns={'EPIC':'#Id'},inplace=True)
+    K2_New = pd.merge(K2_New,K2_GAP,how='inner',on=['#Id'])
+    K2_New = K2_New.reset_index(drop=True)
+    C3_New = pd.merge(C3_New,K2_GAP,how='inner',on=['#Id'])
+    C3_New = C3_New.reset_index(drop=True)
+    # sys.exit()
     ''' PARAM based mass cuts if desired '''
     # C3_New = C3_New[abs((C3_New['mass'] - C3_New['m_seismo'])/C3_New['mass']) < 0.1]
     # C3_New = C3_New.reset_index(drop=True)
@@ -344,6 +382,24 @@ if __name__ == '__main__':
     # C6_New = C6_New.reset_index(drop=True)
     # print(len(C3_New),len(C6_New))
 
+    ''' Error propagation '''
+    APK2['sig_mass'] = abs(APK2['mass_68U'] - APK2['mass_68L'])/2
+    C3_New['sig_mass'] = abs(C3_New['mass_68U'] - C3_New['mass_68L'])/2
+    C6_New['sig_mass'] = abs(C6_New['mass_68U'] - C6_New['mass_68L'])/2
+    K2_New['sig_mass'] = abs(K2_New['mass_68U'] - K2_New['mass_68L'])/2
+    AS['sig_mass'] = abs(AS['mass_68U'] - AS['mass_68L'])/2
+
+    APK2['sig_Z'] = 1e-3 * abs(APK2['dist_68U'] - APK2['dist_68L'])/2
+    C3_New['sig_Z'] = 1e-3 * abs(C3_New['dist_68U'] - C3_New['dist_68L'])/2
+    C6_New['sig_Z'] = 1e-3 * abs(C6_New['dist_68U'] - C6_New['dist_68L'])/2
+    K2_New['sig_Z'] = 1e-3 * abs(K2_New['dist_68U'] - K2_New['dist_68L'])/2
+    AS['sig_Z'] = 1e-3 * abs(AS['dist_68U'] - AS['dist_68L'])/2
+
+    APK2['sig_Gal_Rad'] = np.sqrt((2*(APK2['sig_Z']/APK2['X'])**2) + (2*(APK2['sig_Z']/APK2['Y'])**2))
+    C3_New['sig_Gal_Rad'] = np.sqrt((2*(C3_New['sig_Z']/C3_New['X'])**2) + (2*(C3_New['sig_Z']/C3_New['Y'])**2))
+    C6_New['sig_Gal_Rad'] = np.sqrt((2*(C6_New['sig_Z']/C6_New['X'])**2) + (2*(C6_New['sig_Z']/C6_New['Y'])**2))
+    K2_New['sig_Gal_Rad'] = np.sqrt((2*(K2_New['sig_Z']/K2_New['X'])**2) + (2*(K2_New['sig_Z']/K2_New['Y'])**2))
+    AS['sig_Gal_Rad'] = np.sqrt((2*(AS['sig_Z']/AS['X'])**2) + (2*(AS['sig_Z']/AS['Y'])**2))
 
     ''' Kepler Simulation if required '''
     # # Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
@@ -482,27 +538,143 @@ if __name__ == '__main__':
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Mass_comp_param_sim_SR.png')
 
-    ''' Age Distribution '''
-    fig, ax1 = plt.subplots(1)
-    ax1.hist(10**K2_New['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'Photom.',normed=True,linewidth=2)
-    ax1.hist(10**AS['logAge']/1e9,bins=np.linspace(0,20,40),histtype='step',label=r'Spectro.',normed=True,linewidth=2)
-    ax1.hist(10**APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'APOKASC',normed=True,linewidth=2)
-    ax1.set_xlabel(r'Age [Gyr]')
-    ax1.legend()
-
+    ''' PARAMETER CUTS '''
+    C3_New['sig_age'] = (C3_New['age_68U']-C3_New['age_68L'])/2
+    c_three['sig_age'] = (c_three['age_68U']-c_three['age_68L'])/2
+    C6_New['sig_age'] = (C6_New['age_68U']-C6_New['age_68L'])/2
+    c_six['sig_age'] = (c_six['age_68U']-c_six['age_68L'])/2
     K2_New['sig_age'] = (K2_New['age_68U']-K2_New['age_68L'])/2
     AS['sig_age'] = (AS['age_68U']-AS['age_68L'])/2
-    fig, ax1 = plt.subplots(1)
-    ax1.scatter(AS['age'],(AS['sig_age']/AS['age']))
-    ax1.set_xlabel(r'Age [Gyr]')
-    ax1.set_ylabel(r'Fract. $\sigma_{\rm{Age}}$')
+    AP3['sig_age'] = (AP3['age_68U']-AP3['age_68L'])/2
+    AP6['sig_age'] = (AP6['age_68U']-AP6['age_68L'])/2
+    RC3['sig_age'] = (RC3['age_68U']-RC3['age_68L'])/2
+    RC6['sig_age'] = (RC6['age_68U']-RC6['age_68L'])/2
+    GES['sig_age'] = (GES['age_68U']-GES['age_68L'])/2
+    L6['sig_age'] = (L6['age_68U']-L6['age_68L'])/2
 
-    K2_gd_age = AS[(AS['sig_age']/AS['age']) < 0.35]
-    fig, ax1 = plt.subplots(1)
-    ax1.hist(K2_gd_age['age'],bins=np.linspace(0,20,40),histtype='step',label=r'AS',normed=True,linewidth=2)
-    ax1.set_xlabel(r'Age [Gyr]')
+    cut = 0.35
+    C3_New = C3_New[(C3_New['sig_age']/C3_New['age']) < cut]
+    C6_New = C6_New[(C6_New['sig_age']/C6_New['age']) < cut]
+    K2_New = K2_New[(K2_New['sig_age']/K2_New['age']) < cut]
+    AS = AS[(AS['sig_age']/AS['age']) < cut]
+    c_three = c_three[(c_three['sig_age']/c_three['age']) < cut]
+    c_six = c_six[(c_six['sig_age']/c_six['age']) < cut]
+    AP3 = AP3[(AP3['sig_age']/AP3['age']) < cut]
+    AP6 = AP6[(AP6['sig_age']/AP6['age']) < cut]
+    RC3 = RC3[(RC3['sig_age']/RC3['age']) < cut]
+    RC6 = RC6[(RC6['sig_age']/RC6['age']) < cut]
+    GES = GES[(GES['sig_age']/GES['age']) < cut]
+    L6 = L6[(L6['sig_age']/L6['age']) < cut]
+
+    C3_New_c = C3_New[(C3_New['rad'] > 10.0) & (C3_New['rad'] < 12.0)]
+    C6_New_c = C6_New[(C6_New['rad'] > 10.0) & (C6_New['rad'] < 12.0)]
+
+    z31 = TRI3[abs(TRI3['Z']) < 0.5]
+    z32 = TRI3[(abs(TRI3['Z']) >= 0.5) & (abs(TRI3['Z'] < 1.0))]
+    z33 = TRI3[(abs(TRI3['Z']) >= 1.0) & (abs(TRI3['Z'] < 1.5))]
+    z34 = TRI3[(abs(TRI3['Z']) >= 1.5) & (abs(TRI3['Z'] < 2.0))]
+    z35 = TRI3[(abs(TRI3['Z']) >= 2.0) & (abs(TRI3['Z'] < 2.5))]
+    z36 = TRI3[abs(TRI3['Z']) > 2.5]
+
+    z61 = TRI6[TRI6['Z'] < 0.5]
+    z62 = TRI6[(TRI6['Z'] >= 0.5) & (TRI6['Z'] < 1.0)]
+    z63 = TRI6[(TRI6['Z'] >= 1.0) & (TRI6['Z'] < 1.5)]
+    z64 = TRI6[(TRI6['Z'] >= 1.5) & (TRI6['Z'] < 2.0)]
+    z65 = TRI6[(TRI6['Z'] >= 2.0) & (TRI6['Z'] < 2.5)]
+    z66 = TRI6[TRI6['Z'] > 2.5]
+
+    ''' Age Distribution '''
+
+    fig, ((ax,ax1),(ax2,ax3),(ax4,ax5)) = plt.subplots(3,2,sharex='col',sharey=True)
+    ax.hist(z31['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $<$ 0.5',linewidth=2)
+    ax.legend()
+    ax1.hist(z32['age'],bins=np.linspace(0,20,40),histtype='step',label=r'0.5 $<$ Z $<$ 1.0',linewidth=2)
     ax1.legend()
+    ax2.hist(z33['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.0 $<$ Z $<$ 1.5',linewidth=2)
+    ax2.legend()
+    ax3.hist(z34['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.5 $<$ Z $<$ 2.0',linewidth=2)
+    ax3.legend()
+    ax4.hist(z35['age'],bins=np.linspace(0,20,40),histtype='step',label=r'2.0 $<$ Z $<$ 2.5',linewidth=2)
+    ax4.legend()
+    ax5.hist(z36['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $>$ 2.5',linewidth=2)
+    ax5.legend()
+    ax4.set_xlabel(r'Age [Gyr], Tri. C3')
+    ax5.set_xlabel(r'Age [Gyr], Tri. C3')
+    plt.tight_layout()
+    # plt.show()
+
+    fig, ((ax,ax1),(ax2,ax3),(ax4,ax5)) = plt.subplots(3,2,sharex='col',sharey=True)
+    ax.hist(z61['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $<$ 0.5',linewidth=2)
+    ax.legend()
+    ax1.hist(z62['age'],bins=np.linspace(0,20,40),histtype='step',label=r'0.5 $<$ Z $<$ 1.0',linewidth=2)
+    ax1.legend()
+    ax2.hist(z63['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.0 $<$ Z $<$ 1.5',linewidth=2)
+    ax2.legend()
+    ax3.hist(z64['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.5 $<$ Z $<$ 2.0',linewidth=2)
+    ax3.legend()
+    ax4.hist(z65['age'],bins=np.linspace(0,20,40),histtype='step',label=r'2.0 $<$ Z $<$ 2.5',linewidth=2)
+    ax4.legend()
+    ax5.hist(z66['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $>$ 2.5',linewidth=2)
+    ax5.legend()
+    ax4.set_xlabel(r'Age [Gyr], Tri. C6')
+    ax5.set_xlabel(r'Age [Gyr], Tri. C6')
+    plt.tight_layout()
     plt.show()
+    # sys.exit()
+    # # ax1.hist([10**RC6['logAge']/1e9,10**AP6['logAge']/1e9,10**L6['logAge']/1e9], \
+    # #         bins=np.linspace(0,20,40),stacked=True,label=[r'RAVE',r'APOGEE',r'LAMOST'])
+    # # ax1.hist(APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'APOKASC',normed=True,linewidth=2)
+    #
+    # ### Age KDEs ###
+    # # d6 = kde.KDE1D(c_six['age'])
+    # # dA6 = kde.KDE1D(AP6['age'])
+    # # dR6 = kde.KDE1D(RC6['age'])
+    # # dL6 = kde.KDE1D(L6['age'])
+    # # x0 = np.r_[min(c_six['age']):max(c_six['age']):1024j]
+    # # x1 = np.r_[min(AP6['age']):max(AP6['age']):1024j]
+    # # x2 = np.r_[min(RC6['age']):max(RC6['age']):1024j]
+    # # x3 = np.r_[min(L6['age']):max(L6['age']):1024j]
+    # # ax1.plot(x0,d6(x0),linewidth=2,label=r'Combined')
+    # # ax1.plot(x1,dA6(x1),linewidth=2,label=r'APOGEE')
+    # # ax1.plot(x2,dR6(x2),linewidth=2,label=r'RAVE')
+    # # ax1.plot(x3,dL6(x3),linewidth=2,label=r'LAMOST')
+#
+    # fig, ax1 = plt.subplots(1)
+    # ax1.scatter(AP3['age'],(AP3['sig_age']/AP3['age']),label=r'APOGEE')
+    # ax1.scatter(RC3['age'],(RC3['sig_age']/RC3['age']),label=r'RAVE')
+    # ax1.scatter(GES['age'],(GES['sig_age']/GES['age']),label=r'Gaia-ESo')
+    # ax1.set_xlabel(r'Age [Gyr], C3')
+    # ax1.set_ylabel(r'Fract. $\sigma_{\rm{Age}}$')
+    # ax1.legend()
+#
+    # K2_gd_age = AS[(AS['sig_age']/AS['age']) < 0.35]
+    # fig, ax1 = plt.subplots(1)
+    # ax1.hist(K2_gd_age['age'],bins=np.linspace(0,20,40),histtype='step',label=r'AS',normed=True,linewidth=2)
+    # ax1.set_xlabel(r'Age [Gyr]')
+    # ax1.legend()
+    # plt.show()
+
+    ''' [alpha/Fe] vs Age '''
+    '''
+    - APOGEE: alpha
+    - GES: alpha
+    - LAMOST: alpha
+    - RAVE: ALPHA
+    '''
+    # AP3 = AP3[AP3['alpha'] > -99.9]
+    # AP6 = AP6[AP6['alpha'] > -99.9]
+    # GES = GES[GES['alpha'] > -99.9]
+    # RC3 = RC3[RC3['ALPHA'] > -99.9]
+    # RC6 = RC6[RC6['ALPHA'] > -99.9]
+    fig, ax = plt.subplots(1)
+    ax.scatter(AP6['age'],AP6['feh'],label=r'APOGEE')
+    ax.scatter(RC6['age'],RC6['feh'],label=r'RAVE')
+    ax.scatter(L6['age'],L6['feh'],label=r'LAMOST')
+    ax.set_xlabel(r'Age [Gyr], C6')
+    ax.set_ylabel(r'[Fe/H]')
+    ax.legend()
+    plt.show()
+    # sys.exit()
 
     ''' Parameter distribution plots '''
     # K2_RGB = pd.DataFrame()
@@ -515,24 +687,23 @@ if __name__ == '__main__':
     ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
     # plt.suptitle(r'log$_{10}$(Age) $> 10.0$', fontsize=15)
     # plt.suptitle(r'$\forall$ R', fontsize=15)
-    ax0.hist(AS['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2 AS',normed=True)
-    ax0.hist(K2_gd_age['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2 AS $\sigma_{\rm{Age}}$ cut',normed=True)
+    ax0.hist(K2_New['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'K2',normed=True)
+    ax0.hist(APK2['mass'],bins=np.linspace(0.5,2.5,20),histtype='step',label=r'Kepler',normed=True)
     ax0.legend(prop={'size':10})
     ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-    ax1.hist(AS['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
-    ax1.hist(K2_gd_age['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
+    ax1.hist(K2_New['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
+    ax1.hist(APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=None,normed=True)
     ax1.set_xlabel(r'Age [Gyr]')
-    ax2.hist(AS['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
-    ax2.hist(K2_gd_age['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
+    ax2.hist(K2_New['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
+    ax2.hist(APK2['rad'],bins=np.linspace(3,20,50),histtype='step',label=None,normed=True)
     ax2.set_xlabel(r'Radius [R$_{\odot}$]')
-    ax3.hist(AS['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
-    ax3.hist(K2_gd_age['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
+    ax3.hist(K2_New['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
+    ax3.hist(APK2['Z'],bins=np.linspace(-8,8,130),histtype='step',label=None,normed=True)
     ax3.set_xlabel(r'Z [kpc]')
-    ax4.hist(AS['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
-    ax4.hist(K2_gd_age['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=None,normed=1)
+    ax4.hist(K2_New['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
+    ax4.hist(APK2['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=None,normed=1)
     ax4.set_xlabel(r'[Fe/H]')
     ax5.axis('off')
-    # fig.subplots_adjust(top=3.0)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
     # if save_out == 1:
@@ -754,13 +925,13 @@ if __name__ == '__main__':
     #     plt.savefig(ext_fig+folder_loc+'Age_as_funct_Z_K2.png')
 
     ''' Radius Distributions '''
-    APK2_alpha = APK2[APK2['alpha'] > 0.1]
-    plt.figure()
-    mdf.histo(K2_New,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Photom.')
-    mdf.histo(AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Spectro.')
-    mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich \textit{Kepler}')
-    plt.legend(prop={'size':15})
-    plt.show()
+    # APK2_alpha = APK2[APK2['alpha'] > 0.1]
+    # plt.figure()
+    # mdf.histo(K2_New,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Photom.')
+    # mdf.histo(AS,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Spectro.')
+    # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
+    # plt.legend(prop={'size':15})
+    # plt.show()
 
     # plt.figure()
     # plt.scatter(APK2_alpha['Teff'],APK2_alpha['logg'],label=r'APOKASC $\alpha$-rich',alpha=0.1)
@@ -820,18 +991,19 @@ if __name__ == '__main__':
 
     ''' Kiel Diagram '''
     # plt.figure()
-    # plt.scatter(K2['Teff'],K2['lgs'],c=K2['age'],cmap=colormaps.parula)
-    # # plt.scatter(AS['Teff'],AS['lgs'],c=AS['feh'],cmap=colormaps.parula)
+    # plt.scatter(K2_New['Teff'],K2_New['logg'],color='gray',alpha=0.1,label=r'K2 (Full)')
+    # plt.scatter(AP3['Teff'],AP3['logg'],c=AP3['feh'],cmap=colormaps.parula,label=r'APOGEE C3')
     # # plt.scatter(AS['Teff'],AS['lgs'],color='k')
     # cbar = plt.colorbar()
-    # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
+    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
     # plt.gca().invert_xaxis()
     # plt.gca().invert_yaxis()
     # plt.xlabel(r'T$_{\rm{eff}}$ [K]', fontsize=15)
     # plt.ylabel(r'log$_{10}$(g)', fontsize=15)
+    # plt.legend()
     # plt.tight_layout()
     # plt.show()
-    # plt.savefig(ext_fig+'Teff_logg.png')
+    # # plt.savefig(ext_fig+'Teff_logg.png')
 
     ''' Age vs Teff '''
     # plt.figure()
@@ -988,18 +1160,106 @@ if __name__ == '__main__':
     # # f.savefig('/home/bmr135/Dropbox/GES-K2/Ages/figure_1.eps',rasterized=True,dpi=400)
     # plt.show()
 
-    f = plt.figure()
-    plt.scatter(APK2['mass'],APK2['Z'],color='gray',alpha=0.2,label=r'Kepler')
-    plt.scatter(C6_New['mass'],C6_New['Z'],label=r'C6',alpha=0.7)
-    plt.scatter(C3_New['mass'],C3_New['Z'],label=r'C3',alpha=0.7)
-    plt.xlabel(r'Mass [M$_{\odot}$]')
-    plt.ylabel(r'Z [kpc]')
-    plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    # mu_m = C3_New['sig_mass'].mean()
+    # mu_Z = C3_New['sig_Z'].mean()
+    # plt.figure()
+    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # # plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    # plt.scatter(APK2['mass'],APK2['Z'],c=APK2['feh'],cmap=colormaps.parula,label=None,vmin=-2.5,vmax=0.5)
+    # plt.scatter(C3_New['mass'],C3_New['Z'],c=C3_New['[Fe/H]'],cmap=colormaps.parula,label=None,vmin=-2.5,vmax=0.5)
+    # cbar = plt.colorbar(spacing='uniform')
+    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    # # cbar.set_clim(-2.5,1.25)
+    # # cbar.set_ticks([-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0],update_ticks=True)
+    # # cbar.set_ticklabels([-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0],update_ticks=True)
+    # plt.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    # plt.ylabel(r'Z [kpc]', fontsize=15)
+    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # # plt.ylim(-6,8)
+    # # plt.legend()
+    # plt.tight_layout()
+    # print(max(C3_New['[Fe/H]']),max(APK2['feh']))
+    # plt.show()
 
+    # mu_m = AS['sig_mass'].mean()
+    # mu_Z = AS['sig_Z'].mean()
+    # plt.figure()
+    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    # plt.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None)
+    # cbar = plt.colorbar(spacing='uniform')
+    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    # cbar.set_clim(-2.5,1.25)
+    # cbar.set_ticks([-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0],update_ticks=True)
+    # cbar.set_ticklabels([-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0],update_ticks=True)
+    # cbar.update_ticks()
+    # plt.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    # plt.ylabel(r'Z [kpc]', fontsize=15)
+    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.ylim(-6,8)
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
 
+    ''' Joint Photom and Spec MZFeH '''
+    # mu_m = K2_New['sig_mass'].mean()
+    # mu_Z = K2_New['sig_Z'].mean()
+    # fig, (ax1,ax2,cax) = plt.subplots(ncols=3, gridspec_kw={"width_ratios" : [5,5,0.2]})
+    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # ax1.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    # one = ax1.scatter(K2_New['mass'],K2_New['Z'],c=K2_New['[Fe/H]'],cmap=colormaps.parula,label=None,vmin=-2.5, vmax=0.5)
+    # ax1.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # ax1.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
+    # ax1.set_xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    # ax1.set_ylabel(r'Z [kpc]', fontsize=15)
+    # ax1.set_xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # ax1.set_ylim(-6,8)
+    # ax1.legend()
+    #
+    # mu_m = AS['sig_mass'].mean()
+    # mu_Z = AS['sig_Z'].mean()
+    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # ax2.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
+    # two = ax2.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None,vmin=-2.5, vmax=0.5)
+    # ax2.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # ax2.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
+    # ax2.set_xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
+    # # ax2.set_ylabel(r'Z [kpc]', fontsize=15)
+    # ax2.set_xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # ax2.set_ylim(-6,8)
+    # ax2.set_yticklabels([])
+    # ax2.legend()
+    #
+    # # cax.set_yticks([-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0])
+    # # cax.set_yticklabels(['-2.0','-1.5','-1.0','-0.5','0.0','0.5','1.0'])
+    # cbar = fig.colorbar(two,cax=cax)
+    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=15)
+    # cbar.set_clim(-2.5,1.25)
+    # cbar.ax.set_yticks([-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5])#,update_ticks=True)
+    # cbar.ax.set_yticklabels(['-2.5','-2.0','-1.5','-1.0','-0.5','0.0','0.5'])#,update_ticks=True)
+    # # cbar.update_ticks()
+    # # plt.tight_layout()
+    # plt.show()
+
+    ''' M vs Z - no colourbar '''
+    # mu_m = (C3_New['sig_mass'].mean() + C6_New['sig_mass'].mean())/2
+    # mu_Z = (C3_New['sig_Z'].mean() + C6_New['sig_Z'].mean())/2
+    # f = plt.figure()
+    # plt.scatter(APK2['mass'],APK2['Z'],color='gray',alpha=0.2,label=r'Kepler')
+    # plt.scatter(C6_New['mass'],C6_New['Z'],label=r'C6',alpha=0.7)
+    # plt.scatter(C3_New['mass'],C3_New['Z'],label=r'C3',alpha=0.7)
+    # plt.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.xlabel(r'Mass [M$_{\odot}$]')
+    # plt.ylabel(r'Z [kpc]')
+    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
 
     ''' Age vs Z '''
     # plt.figure()
@@ -1037,12 +1297,38 @@ if __name__ == '__main__':
 
     ''' [Fe/H] vs [Alpha/Fe] '''
     # AS = AS[AS['alpha'] > -4]
+    # RG = pd.merge(RC3,GES,how='inner',on=['#Id'])
     # plt.figure()
-    # plt.scatter(AS['feh'],AS['alpha'],c=AS['age'],cmap=colormaps.parula)
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
+    # plt.scatter(RG['feh_x'],RG['ALPHA'],marker='<',label=r'RAVE')#,c=AS['age'],cmap=colormaps.parula)
+    # plt.scatter(RG['feh_y'],RG['alpha_y'],marker='>',label=r'Gaia-ESO')#,c=AS['age'],cmap=colormaps.parula)
+    # # cbar = plt.colorbar()
+    # # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
     # plt.xlabel(r'[Fe/H]', fontsize=15)
     # plt.ylabel(r'[$\alpha$/Fe]', fontsize=15)
+    # plt.title(r'RAVE Gaia-ESO cross match')
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
+    #
+    # fig, ((ax,ax1),(rax,rax1)) = plt.subplots(2,2,sharex='col',gridspec_kw={"height_ratios" : [5,1]})
+    # ax.plot([-0.9,0.4],[-0.9,0.4],linestyle='--',color='k')
+    # ax.scatter(RG['feh_x'],RG['feh_y'])
+    # ax.set_ylabel(r'[Fe/H] - Gaia-ESO', fontsize=15)
+    # ax.set_xlim(-0.9,0.4)
+    #
+    # ax1.plot([-0.1,0.25],[-0.1,0.25],linestyle='--',color='k')
+    # ax1.scatter(RG['ALPHA'],RG['alpha_y'])
+    # ax1.set_ylabel(r'[$\alpha$/Fe] - Gaia-ESO', fontsize=15)
+    # ax1.set_xlim(-0.1,0.25)
+    #
+    # rax.plot([-0.9,0.4],[0,0],color='k')
+    # rax.scatter(RG['feh_x'],(RG['feh_x']-RG['feh_y'])/RG['feh_x'])
+    # rax.set_xlabel(r'[Fe/H] - RAVE')
+    # rax.set_ylabel(r'Residual [%]')
+    # rax1.plot([-0.1,0.25],[0,0],color='k')
+    # rax1.scatter(RG['ALPHA'],(RG['ALPHA']-RG['alpha_y'])/RG['ALPHA'])
+    # rax1.set_xlabel(r'[$\alpha$/Fe] - RAVE')
+    # rax1.set_ylabel(r'Residual [%]')
     # plt.tight_layout()
     # plt.show()
 
@@ -1066,18 +1352,25 @@ if __name__ == '__main__':
     # Kp_Z6, edges6, number6 = scipy.stats.binned_statistic(C6_40_06FeH['Z'],C6_40_06FeH['Kepler'],statistic='count',bins=bins6)
 
     ''' Distibution of stars by Galactic Radius and Z '''
+
+    mu_GR = (C3_New['sig_Gal_Rad'].mean() + C6_New['sig_Gal_Rad'].mean())/2
+    mu_Z = (C3_New['sig_Z'].mean() + C6_New['sig_Z'].mean())/2
+    AS_clump = AS[(AS['rad'] > 10.0) & (AS['rad'] < 12.0)]
+    # AS = AS[AS['age'] <= 7.0]
+    # AS = AS[AS['alpha'] < -10]
     plt.figure()
     # print(K2_New['feh'])
-    plt.plot([min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
-    plt.scatter(APK2['Gal_Rad'],APK2['Z'],alpha=0.2,label='Kepler',color='gray')
-    plt.scatter(C6_New['Gal_Rad'],C6_New['Z'],label=r'C6',alpha=0.4)#,c=K2_New['feh'],cmap=colormaps.parula)
-    plt.scatter(C3_New['Gal_Rad'],C3_New['Z'],label=r'C3',alpha=0.4)#,c=K2_New['feh'],cmap=colormaps.parula)
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    plt.plot([min(AS['Gal_Rad'])-0.2,max(AS['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
+    plt.scatter(AS['Gal_Rad'],AS['Z'],c=AS['age'],cmap=colormaps.parula)
+    # plt.scatter(AS_clump['Gal_Rad'],AS_clump['Z'],label=r'Clump Spectr.',alpha=0.7)#,c=K2_New['feh'],cmap=colormaps.parula)
+    # plt.plot([9,9],[-2-mu_Z,-2+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
+    # plt.plot([9-mu_m,9+mu_m],[-2,-2],color='k',linewidth=2,alpha=0.7,label=None)
+    cbar = plt.colorbar()
+    cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
     plt.xlabel(r'Galactic Radius [kpc]')
-    plt.xlim(min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2)
+    plt.xlim(min(AS['Gal_Rad'])-0.2,max(AS['Gal_Rad'])+0.2)
     plt.ylabel(r'Z [kpc]')
-    plt.legend()
+    # plt.legend()
     plt.show()
 
     ''' Alpha-rich young stars '''
@@ -1100,18 +1393,18 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Radial MDF - 1kpc bins '''
-    low3 = c_three[c_three['Gal_Rad'] < 7]
-    high3 = c_three[c_three['Gal_Rad'] > 7]
-    low6 = c_six[c_six['Gal_Rad'] < 7]
-    high6 = c_six[c_six['Gal_Rad'] > 7]
-    fig, (ax1,ax2) = plt.subplots(2)
-    ax1.hist(low3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
-    ax1.hist(high3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
-    ax1.legend()
-    ax1.set_xlabel(r'[Fe/H] - C3')
-    ax2.hist(low6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
-    ax2.hist(high6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
-    ax2.legend()
-    ax2.set_xlabel(r'[Fe/H] - C6')
-    plt.tight_layout()
-    plt.show()
+    # low3 = c_three[c_three['Gal_Rad'] < 7]
+    # high3 = c_three[c_three['Gal_Rad'] > 7]
+    # low6 = c_six[c_six['Gal_Rad'] < 7]
+    # high6 = c_six[c_six['Gal_Rad'] > 7]
+    # fig, (ax1,ax2) = plt.subplots(2)
+    # ax1.hist(low3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
+    # ax1.hist(high3['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
+    # ax1.legend()
+    # ax1.set_xlabel(r'[Fe/H] - C3')
+    # ax2.hist(low6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $<$ 7kpc',normed=1,linewidth=2)
+    # ax2.hist(high6['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'R $>$ 7kpc',normed=1,linewidth=2)
+    # ax2.legend()
+    # ax2.set_xlabel(r'[Fe/H] - C6')
+    # plt.tight_layout()
+    # plt.show()

@@ -113,12 +113,12 @@ def K2_GAP():
     # GAP3['sig_Teff'] = (abs(GAP3['ep_teff'])+abs(GAP3['em_teff']))/2
     # GAP3['sig_logg'] = (abs(GAP3['ep_logg'])+abs(GAP3['em_logg']))/2
     # GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2
-    # GAP3['[Fe/H]'] = np.random.normal(-0.294,0.305,len(GAP3)) # mu/std dev. from RAVE (22/02/2018)
+    # # GAP3['[Fe/H]'] = np.random.normal(-0.294,0.305,len(GAP3)) # mu/std dev. from RAVE (22/02/2018)
     # GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
     # GAP6['BV'] = GAP6['Bmag'] - GAP6['Vmag']
     # GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     # GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
-    # GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)
+    # # GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)
     #
     # ''' Minimum threshold uncertainty based on distribution width '''
     # for i in range(len(GAP3['sig_Teff'])):
@@ -210,8 +210,18 @@ def RAVE():
     ''' RAVE C3/C6 Catalogues (Data from Marica) '''
     RAVE3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
     RAVE3.rename(columns={'EPIC_ID':'EPIC'},inplace=True)
+    RAVE3['ALPHA'] = (RAVE3['[Mg/H]']-RAVE3['[Fe/H]_RAVE'] + RAVE3['[Si/H]']-RAVE3['[Fe/H]_RAVE'])/2
+    RAVE3['sig_FEH'] = (abs(RAVE3['sup.3'])-abs(RAVE3['inf.3']))/2
     RAVE6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/RAVE/RAVE-K2C6_TGPfinal.csv')
     RAVE6.rename(columns={'EPIC ID':'EPIC'},inplace=True)
+    RAVE6['ALPHA'] = ((RAVE6['[Mg/H]']-RAVE6['[Fe/H]_RAVE']) + (RAVE6['[Si/H]']-RAVE6['[Fe/H]_RAVE']))/2
+    RAVE6['sig_FEH'] = (abs(RAVE6['sup.3'])-abs(RAVE6['inf.3']))/2
+    for i in range(len(RAVE3)):
+        if (RAVE3['ALPHA'].iloc[i] > 1.5) | (RAVE3['ALPHA'].iloc[i] < -2.5):
+            RAVE3['ALPHA'].iloc[i] = -99.9
+    for i in range(len(RAVE6)):
+        if (RAVE6['ALPHA'].iloc[i] > 1.5) | (RAVE6['ALPHA'].iloc[i] < -2.5):
+            RAVE6['ALPHA'].iloc[i] = -99.9
     RAVE3.to_csv(ext_GA+'GA/K2Poles/RAVE3.csv',index=False)
     RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE6.csv',index=False)
     return RAVE3, RAVE6
@@ -263,17 +273,22 @@ def APOGEE():
     #         'PARAM','FPARAM','PARAM_COV','FPARAM_COV','PARAMFLAG','FELEM','FELEM_ERR', \
     #         'X_H','X_H_ERR','X_M','X_M_ERR','ELEM_CHI2','ELEMFLAG','ALL_VISIT_PK', \
     #         'VISIT_PK','FPARAM_CLASS','CHI2_CLASS']
+    # cols_corogee = ['PARAM_COV_2','FPARAM_COV_2','FELEM_2','FELEM_ERR_2','X_H','X_H_ERR', \
+    #                 'X_M','X_M_ERR','ELEM_CHI2_2','ELEMFLAG_2']
     # t.remove_columns(cols)
     # flag = t['ASPCAPFLAG'] <= 5
     # APO3 = t[flag].to_pandas()
     # APO3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14_C3_180418',index=False)
     #
     # data = fits.getdata(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14Exploratory_C6GAP.fits', 1)
+    # data = fits.getdata(ext_DB+'Downloads/CoRoGEE_DR14.fits', 1)
     # t = Table(data)
-    # t.remove_columns(cols)
+    # print(t.info)
+    # t.remove_columns(cols_corogee)
     # flag = t['ASPCAPFLAG'] <= 5
     # APO6 = t[flag].to_pandas()
-    # APO6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14_C6_180418',index=False)
+    # APO6 = t.to_pandas()
+    # APO6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/CoRoGEE_DR14',index=False,na_rep='Inf')
     # sys.exit()
     ''' Input for current APOGEE data '''
     APO3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14_C3_180418')
