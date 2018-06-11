@@ -360,6 +360,16 @@ if __name__ == '__main__':
             if AS['#Id'].iloc[i] == Rk2['#Id'].iloc[j]:
                 AS['alpha'].iloc[i] = Rk2['ALPHA'].iloc[j]
 
+    for i in range(len(c_three)):
+        for j in range(len(RC3)):
+            if c_three['#Id'].iloc[i] == RC3['#Id'].iloc[j]:
+                c_three['alpha'].iloc[i] = RC3['ALPHA'].iloc[j]
+
+    for i in range(len(c_six)):
+        for j in range(len(RC6)):
+            if c_six['#Id'].iloc[i] == RC6['#Id'].iloc[j]:
+                c_six['alpha'].iloc[i] = RC6['ALPHA'].iloc[j]
+
     TRI = pd.concat([TRI3,TRI6],ignore_index=True)
     TRI.reset_index(drop=True)
 
@@ -552,7 +562,7 @@ if __name__ == '__main__':
     GES['sig_age'] = (GES['age_68U']-GES['age_68L'])/2
     L6['sig_age'] = (L6['age_68U']-L6['age_68L'])/2
 
-    cut = 0.35
+    cut = 1.0
     C3_New = C3_New[(C3_New['sig_age']/C3_New['age']) < cut]
     C6_New = C6_New[(C6_New['sig_age']/C6_New['age']) < cut]
     K2_New = K2_New[(K2_New['sig_age']/K2_New['age']) < cut]
@@ -661,20 +671,40 @@ if __name__ == '__main__':
     - LAMOST: alpha
     - RAVE: ALPHA
     '''
-    # AP3 = AP3[AP3['alpha'] > -99.9]
-    # AP6 = AP6[AP6['alpha'] > -99.9]
-    # GES = GES[GES['alpha'] > -99.9]
-    # RC3 = RC3[RC3['ALPHA'] > -99.9]
-    # RC6 = RC6[RC6['ALPHA'] > -99.9]
+    AP3 = AP3[AP3['alpha'] > -99.9]
+    AP6 = AP6[AP6['alpha'] > -99.9]
+    GES = GES[GES['alpha'] > -99.9]
+    RC3 = RC3[RC3['ALPHA'] > -99.9]
+    RC6 = RC6[RC6['ALPHA'] > -99.9]
+    L6 = L6[L6['alpha'] > -99.9]
     fig, ax = plt.subplots(1)
-    ax.scatter(AP6['age'],AP6['feh'],label=r'APOGEE')
-    ax.scatter(RC6['age'],RC6['feh'],label=r'RAVE')
-    ax.scatter(L6['age'],L6['feh'],label=r'LAMOST')
+    ax.scatter(AP3['age'],AP3['alpha'],label=r'APOGEE3')
+    ax.scatter(AP6['age'],AP6['alpha'],label=r'APOGEE6')
+    ax.scatter(RC3['age'],RC3['ALPHA'],label=r'RAVE3')
+    ax.scatter(RC6['age'],RC6['ALPHA'],label=r'RAVE6')
+    ax.scatter(GES['age'],GES['alpha'],label=r'GES3')
+    ax.scatter(L6['age'],L6['alpha'],label=r'LAMOST6')
     ax.set_xlabel(r'Age [Gyr], C6')
-    ax.set_ylabel(r'[Fe/H]')
+    ax.set_ylabel(r'[$\alpha$/Fe]')
     ax.legend()
     plt.show()
-    # sys.exit()
+
+    fig, ax = plt.subplots(1)
+    hist2, xb2, yb2, im2 = plt.hist2d(AS['age'],AS['alpha'],bins=[np.linspace(0,20,41),np.linspace(-0.3,0.7,11)],cmap=colormaps.parula)#,normed=True)
+    cbar = plt.colorbar()
+    cbar.set_label(r'Number', rotation=270, fontsize=15, labelpad=25)
+    ax.set_ylabel(r'[$\alpha$/Fe]',fontsize=15, labelpad=20)
+    ax.set_xlabel(r'Age [Gyr]',fontsize=15, labelpad=10)
+    plt.tight_layout()
+
+    fig, ax = plt.subplots(1)
+    ax.scatter(AS['age'],AS['alpha'])
+    ax.set_ylabel(r'[$\alpha$/Fe]',fontsize=15, labelpad=20)
+    ax.set_xlabel(r'Age [Gyr]',fontsize=15, labelpad=10)
+    plt.tight_layout()
+
+    plt.show()
+    sys.exit()
 
     ''' Parameter distribution plots '''
     # K2_RGB = pd.DataFrame()
@@ -709,12 +739,11 @@ if __name__ == '__main__':
     # if save_out == 1:
     #     plt.savefig(ext_fig+folder_loc+'Kep_K2_age_distr.png')
 
-    # fig, ax1 = plt.subplots(1)
-    # ax1.hist(K2_AS['Kepler'],bins=6,histtype='step',label=r'K2_AS',normed=True,linewidth=2)
-    # ax1.hist(AS['Kepler'],bins=6,histtype='step',label=r'AS',normed=True,linewidth=2)
-    # ax1.hist(K2_New['Kepler'],bins=6,histtype='step',label=r'K2',normed=True,linewidth=2)
-    # ax1.set_xlabel(r'Kep. Mag.')
-    # ax1.legend()
+    fig, ax1 = plt.subplots(1)
+    ax1.hist(K2_New['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2',normed=1)
+    ax1.hist(APK2['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'APOKASC',normed=1)
+    ax1.set_xlabel(r'Kep. Mag.')
+    ax1.legend()
 
     ''' Percentage Difference Between PARAM and Scaling Relations '''
     # df = pd.DataFrame()
