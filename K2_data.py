@@ -15,11 +15,11 @@ import K2_data as dat
 from numbers import Number
 
 ''' Dropbox Path '''
-# ext_DB = '/home/bmr135/' # Work
-ext_DB = '/home/ben/'   # Laptop
+ext_DB = '/home/bmr135/' # Work
+# ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-# ext_GA = '/home/bmr135/' # Work
-ext_GA = '/media/ben/SAMSUNG1/' # Hard-Drive
+ext_GA = '/media/bmr135/SAMSUNG/' # Work
+# ext_GA = '/media/ben/SAMSUNG1/' # Hard-Drive
 
 
 def TRILEGAL():
