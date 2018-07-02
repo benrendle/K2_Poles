@@ -347,7 +347,7 @@ def movingaverage(interval, window_size):
     return np.convolve(interval, window, 'same')
 
 def vert_dist(i):
-    ''' Calculate true vertical distance from coordinates and PARAM output '''
+    ''' Calculate true vertical distance (Z) from coordinates and PARAM output '''
     d = coord.Galactic(l=i['Glon'].as_matrix()*u.degree, b=i['Glat'].as_matrix()*u.degree, distance=i['dist'].as_matrix()*u.pc)
     f = d.transform_to(coord.Galactocentric)
     i['X'] = (f.x*u.pc)*1e-3
