@@ -33,7 +33,7 @@ def p_in(name,df1,field):
     df = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
     df.rename(columns={'ID':'#Id'},inplace=True)
     df = pd.merge(df,EPIC,how='inner',on=['#Id'])
-    df.reset_index(drop=True)
+    df = df.reset_index(drop=True)
     df1['nmx'] = df['numax']
     df1['nmx_err'] = df['enumax']
     df1['dnu'] = df['Dnu']
@@ -52,6 +52,7 @@ def p_in(name,df1,field):
     df1 = df1[df1.feh > -90.0]
     df1 = df1[df1.age > 0.0]
     df1['logAge'] = np.log10(df1['age']*10**9)
+    # print(df['GLAT'],df1['Glat'])
     # if name[:2] != 'TC':
     #     df1 = Nseismo_link(field,df1)
     # df1 = df1[df1.Nseismo == 1.0] # Filter for a specific number of seismic pipelines with detections
