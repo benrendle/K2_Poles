@@ -58,281 +58,291 @@ if __name__ == '__main__':
     # # APK = pd.read_csv('/home/bmr135/GA/K2Poles/APOKASC4BEN.txt')
     APK = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
     # #
-    # a = [\
-    #     #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/', 'APOKASC.in.mo'], \
-    #      ['ben_k2.tgz', 'GES_080218.in_STD_20Gyr/', 'GES_080218.in.mo'], \
-    #     #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/','APO_080218.in.mo'], \
-    #      ['ben_k2.tgz', 'RC3_080218.in_STD_20Gyr/', 'RC3_080218.in.mo'], \
-    #      ['ben_k2.tgz', 'RC6_080218.in_STD_20Gyr/', 'RC6_080218.in.mo'], \
-    #     #  ['ben_k2.tgz', 'C3_080218.in_STD_20Gyr/', 'C3_080218.in.mo'], \
-    #     #  ['ben_k2.tgz', 'C6_080218_1.in_STD_20Gyr/', 'C6_080218_1.in.mo'], \
-    #     #  ['ben_k2.tgz', 'C6_080218_2.in_STD_20Gyr/', 'C6_080218_2.in.mo'], \
-    #     #  ['C3_C6.tar.gz', 'C3_new_FeH/', 'C3_220218.in.mo'], \
-    #     #  ['C3_C6.tar.gz', 'C6_new_FeH/', 'C6_220218.in.mo'], \
-    #      ['APOGEE.tar.gz', 'AC3/', 'APOGEE_C3_20042018.in.mo'], \
-    #      ['APOGEE.tar.gz', 'AC6/', 'APOGEE_C6_20042018.in.mo'], \
-    #      ]
+    a = [\
+        #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/', 'APOKASC.in.mo'], \
+         ['ben_k2.tgz', 'GES_080218.in_STD_20Gyr/', 'GES_080218.in.mo'], \
+        #  ['ben_k2.tgz', 'APO_080218.in_STD_20Gyr/','APO_080218.in.mo'], \
+         ['ben_k2.tgz', 'RC3_080218.in_STD_20Gyr/', 'RC3_080218.in.mo'], \
+         ['ben_k2.tgz', 'RC6_080218.in_STD_20Gyr/', 'RC6_080218.in.mo'], \
+        #  ['ben_k2.tgz', 'C3_080218.in_STD_20Gyr/', 'C3_080218.in.mo'], \
+        #  ['ben_k2.tgz', 'C6_080218_1.in_STD_20Gyr/', 'C6_080218_1.in.mo'], \
+        #  ['ben_k2.tgz', 'C6_080218_2.in_STD_20Gyr/', 'C6_080218_2.in.mo'], \
+        #  ['C3_C6.tar.gz', 'C3_new_FeH/', 'C3_220218.in.mo'], \
+        #  ['C3_C6.tar.gz', 'C6_new_FeH/', 'C6_220218.in.mo'], \
+         ['APOGEE.tar.gz', 'AC3/', 'APOGEE_C3_20042018.in.mo'], \
+         ['APOGEE.tar.gz', 'AC6/', 'APOGEE_C6_20042018.in.mo'], \
+         ]
+    #
+    z=[pd.DataFrame()]*len(a)
+    for i in range(len(a)):
+        tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
+        z[i] = tar()
+    #
+    GES_T, RC3_T, \
+    RC6_T, \
+    APO3_T, APO6_T = z
+    # C3_New, C6_New, \
+    # # sys.exit()
     # #
-    # z=[pd.DataFrame()]*len(a)
-    # for i in range(len(a)):
-    #     tar = tt.TAR(ext,a[i][0],a[i][1],a[i][2],r'\s+')
-    #     z[i] = tar()
-    # #
-    # GES_T, RC3_T, \
-    # RC6_T, \
-    # APO3_T, APO6_T = z
-    # # C3_New, C6_New, \
-    # # # sys.exit()
-    # #
-    # APK2 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June222017_150813.in.mo',delimiter=r'\s+')
-    # #
-    # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
-    # # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
-    # # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
-    # TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
-    # # TRI6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    APK2 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/APOKASC/param_in_June222017_150813.in.mo',delimiter=r'\s+')
     #
-    # ''' Kepler Simulation if required '''
-    # Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
-    # # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
-    # ''' Application of K2 Selection Function to Kepler Simulation '''
-    # Kep_Sim['Teff'] = 10**(Kep_Sim['logTe'])
-    # Kep_Sim['g'] = 10**(Kep_Sim['logg'])
-    # Kep_Sim['L'] = 10**(Kep_Sim['logL'])
-    # Kep_Sim['radius'] = np.sqrt(Kep_Sim['Mass'] / (Kep_Sim['g']/4.441))
-    # Kep_Sim['JK'] = Kep_Sim['Jmag'] - Kep_Sim['Kmag']
-    # Kep_Sim['Vcut'] = Kep_Sim['Kmag'] + 2*(Kep_Sim['JK']+0.14) + 0.382*np.exp(2*(Kep_Sim['JK']-0.2))
-    # # Kep_Sim = prop.det_prob_Kepler(Kep_Sim,'numax',3090.0,135.1)
-    # # Kep_Sim = Kep_Sim[ (Kep_Sim['numax'] > 10) & (Kep_Sim['numax'] < 280) & \
-    # # (Kep_Sim['Vcut'] > 9) & (Kep_Sim['Vcut'] < 15) & (Kep_Sim['JK'] > 0.5)]
-    # #
-    # #
-    # ''' [Fe/H] correct PARAM runs '''
-    # # C3 = pd.read_csv(ext+'C3_080218.in.mo',delimiter=r'\s+')
-    # # C6 = pd.read_csv(ext+'C6_080218.in.mo',delimiter=r'\s+')
-    # # GES_T = pd.read_csv(ext+'GES_080218.in.mo',delimiter=r'\s+')
-    # # RC3_T = pd.read_csv(ext+'RC3_080218.in.mo',delimiter=r'\s+')
-    # # RC6_T = pd.read_csv(ext+'RC6_080218.in.mo',delimiter=r'\s+')
-    # L3_T = pd.read_csv(ext+'L3_080218.in.mo',delimiter=r'\s+')
-    # L6_T = pd.read_csv(ext+'L6_080218.in.mo',delimiter=r'\s+')
-    # # APO_T = pd.read_csv(ext+'APO_080218.in.mo',delimiter=r'\s+')
-    #
-    # ''' All spectroscopic parameter values run at once with PARAM '''
-    # C_three = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C3AS_280618.in.mo',delimiter=r'\s+')
-    # C_six = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C6AS_280618.in.mo',delimiter=r'\s+')
-    # C3_New = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C3_270618.in.mo',delimiter=r'\s+')
-    # C6_New = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C6_270618.in.mo',delimiter=r'\s+')
-    #
-    # ''' Additional PARAM inputs that aren't output values '''
-    # # C3 = mdf.p_in('C3_080218',C3,'C3')
-    # C6_New = mdf.p_in('K2_270618',C6_New,'C6')
-    # C3_New = mdf.p_in('K2_270618',C3_New,'C3')
-    # GES = mdf.p_in('GES_080218',GES_T,'C3')
-    # RC3 = mdf.p_in('RC3_080218',RC3_T,'C3')
-    # L3 = mdf.p_in('L3_080218',L3_T,'C3')
-    # # C6_1 = mdf.p_in('C6_080218_1',C6_1,'C6')
-    # # C6_2 = mdf.p_in('C6_080218_2',C6_2,'C6')
-    # AP3 = mdf.p_in('APOGEE_C3_20042018',APO3_T,'C3')
-    # AP6 = mdf.p_in('APOGEE_C6_20042018',APO6_T,'C6')
-    # RC6 = mdf.p_in('RC6_080218',RC6_T,'C6')
-    # L6 = mdf.p_in('L6_080218',L6_T,'C6')
-    # C_three = mdf.p_in('All_Spec_280618',C_three,'C3')
-    # C_six = mdf.p_in('All_Spec_280618',C_six,'C6')
-    #
-    # ''' Addition of RAVE [alpha/Fe] '''
-    # R3alp = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/matlab_in/RC3_25042018_154829.csv')
-    # R6alp = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/matlab_in/RC6_25042018_154829.csv')
-    # # print(R3alp.columns.values)
-    # RC3 = pd.merge(RC3,R3alp[['#Id','ALPHA']],how='inner',on=['#Id'])
-    # RC6 = pd.merge(RC6,R6alp[['#Id','ALPHA']],how='inner',on=['#Id'])
-    #
-    # # C6 = pd.concat([C6_1,C6_2],ignore_index=True)
-    #
-    # TRI3['age'] = (10**TRI3['logAge'])/1e9
-    # TRI3['Vcut'] = TRI3['Kmag'] + 2*(TRI3['JK']+0.14) + 0.382*np.exp(2*(TRI3['JK']-0.2))
-    # TRI6['age'] = (10**TRI6['logAge'])/1e9
-    #
-    # cols_to_use = APK.columns.difference(APK2.columns)
-    # cols_to_use = cols_to_use.union(['KIC'])
-    # APK2 = pd.merge(APK2,APK[cols_to_use],how='inner',on=['KIC'])
-    # APK2['dist'] = APK['dist']
-    # APK2['Z'] = APK['Z']
-    # APK2 = APK2[APK2['dist'] > -99.9]
+    TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
+    # TRI3 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
+    # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
+    TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    # TRI6 = pd.read_csv('/home/ben/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+
+    ''' Kepler Simulation if required '''
+    Kep_Sim = pd.read_csv('/home/bmr135/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    # Kep_Sim = pd.read_csv('/media/ben/SAMSUNG1/GA/K2Poles/Standard_kepler_field/k1.6_K15.all.out.txt',delimiter=r'\s+')
+    ''' Application of K2 Selection Function to Kepler Simulation '''
+    Kep_Sim['Teff'] = 10**(Kep_Sim['logTe'])
+    Kep_Sim['g'] = 10**(Kep_Sim['logg'])
+    Kep_Sim['L'] = 10**(Kep_Sim['logL'])
+    Kep_Sim['radius'] = np.sqrt(Kep_Sim['Mass'] / (Kep_Sim['g']/4.441))
+    Kep_Sim['JK'] = Kep_Sim['Jmag'] - Kep_Sim['Kmag']
+    Kep_Sim['Vcut'] = Kep_Sim['Kmag'] + 2*(Kep_Sim['JK']+0.14) + 0.382*np.exp(2*(Kep_Sim['JK']-0.2))
+    # Kep_Sim = prop.det_prob_Kepler(Kep_Sim,'numax',3090.0,135.1)
+    # Kep_Sim = Kep_Sim[ (Kep_Sim['numax'] > 10) & (Kep_Sim['numax'] < 280) & \
+    # (Kep_Sim['Vcut'] > 9) & (Kep_Sim['Vcut'] < 15) & (Kep_Sim['JK'] > 0.5)]
     #
     #
-    #
-    # ''' Adding coordinates to K2 simulations '''
-    # mdf.sim_coords(TRI3,3)
-    # mdf.sim_coords(TRI6,6)
-    # mdf.sim_coords(Kep_Sim,'K')
-    # mdf.sim_dist(TRI3)
-    # mdf.sim_dist(TRI6)
-    # mdf.sim_dist(Kep_Sim)
-    # Kep_Sim = Kep_Sim[Kep_Sim['dist'] < 2e4]
-    # mdf.vert_dist(TRI3)
-    # mdf.vert_dist(TRI6)
-    # mdf.vert_dist(Kep_Sim)
-    # # mdf.vert_dist(C3)
-    # mdf.vert_dist(C3_New)
-    # # mdf.vert_dist(C6)
-    # mdf.vert_dist(C6_New)
-    # mdf.vert_dist(APK2)
-    # mdf.vert_dist(GES)
-    # mdf.vert_dist(AP3)
-    # mdf.vert_dist(AP6)
-    # mdf.vert_dist(RC3)
-    # mdf.vert_dist(RC6)
-    # mdf.vert_dist(L3)
-    # mdf.vert_dist(L6)
-    # mdf.vert_dist(C_three)
-    # mdf.vert_dist(C_six)
-    #
-    # ''' Spectro tests '''
-    # ges,c3 = mdf.spectro(GES,C3_New)
-    # ap3,c3a = mdf.spectro(AP3,C3_New)
-    # ap6,c6a = mdf.spectro(AP6,C6_New)
-    # rc3,c3_R = mdf.spectro(RC3,C6_New)
-    # rc6,c6_R = mdf.spectro(RC6,C6_New)
-    # l3, c3_l = mdf.spectro(L3,C3_New)
-    # l6, c6_l = mdf.spectro(L6,C6_New)
-    # GR3,RG3 = mdf.spectro(GES,RC3)
-    # AR6,RA6 = mdf.spectro(AP6,RC6)
-    # RL6,LR6 = mdf.spectro(RC6,L6)
-    # AL6,LA6 = mdf.spectro(AP6,L6)
-    # AR3,RA3 = mdf.spectro(AP3,RC3)
-    # AG3,GA3 = mdf.spectro(AP3,GES)
-    #
-    # ''' Gaia-ESO Uncertainty Comps '''
-    # param = ['mass','rad','age']
-    # x = [['mass',0.0],['rad',0.0],['age',0.0]]
-    # err1 = mdf.uncerts(C3_New,param,x)
-    # err2 = mdf.uncerts(GES,param,x)
-    # err3 = mdf.uncerts(ges,param,x)
-    # err4 = mdf.uncerts(c3,param,x)
-    #
-    # ''' Combine all spectroscopic data for each campaign '''
-    # c_three = pd.concat([ap3,rc3,ges,l3],ignore_index=True)
-    # c_three.reset_index(drop=True)
-    # c_six = pd.concat([ap6,rc6,l6],ignore_index=True)
-    # c_six.reset_index(drop=True)
-    # AS = pd.concat([c_three,c_six],ignore_index=True)
-    # AS.reset_index(drop=True)
-    # # c_three.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_spec')
-    #
-    #
-    # # K2 = pd.concat([C3,C6],ignore_index=True)
-    # # K2.reset_index(drop=True)
-    # # K2.reset_index(drop=True)
-    # K2_New = pd.concat([C3_New,C6_New],ignore_index=True)
-    # K2_New.reset_index(drop=True)
-    # TRI = pd.concat([TRI3,TRI6],ignore_index=True)
-    # TRI.reset_index(drop=True)
-    #
-    # # K2['lgs'] = np.log10(27400 * (K2['nmx']/3090) * np.sqrt(K2['Teff']/5777))
-    # K2_New['lgs'] = np.log10(27400 * (K2_New['nmx']/3090) * np.sqrt(K2_New['Teff']/5777))
-    # AS['lgs'] = np.log10(27400 * (AS['nmx']/3090) * np.sqrt(AS['Teff']/5777))
-    # # mdf.vert_dist(AS)
-    # # AS['feh'] = AS['feh'] + 3
-    #
-    # ''' Photometric data for spectroscopic K2 stars '''
-    # cols_to_use = c_three.columns.difference(C_three.columns)
-    # cols_to_use = cols_to_use.union(['#Id'])
-    # C3_AS = pd.merge(C_three,c_three[cols_to_use],how='inner',on=['#Id'])
-    # C3_AS.reset_index(drop=True)
-    #
-    # cols_to_use = c_six.columns.difference(C_six.columns)
-    # cols_to_use = cols_to_use.union(['#Id'])
-    # C6_AS = pd.merge(C_six,c_six[cols_to_use],how='inner',on=['#Id'])
-    # C6_AS.reset_index(drop=True)
-    #
-    # K2_AS = pd.concat([C3_AS,C6_AS],ignore_index=True)
-    # K2_AS.reset_index(drop=True)
-    #
-    # # K2_dnu = pd.DataFrame()
-    # # K2_dnu = K2[K2['dnu'] > 0]
-    # # K2_dnu.reset_index(drop=True)
-    #
-    # AS_red = AS[AS['logAge'] < 9.8]
-    # AS_red = AS_red[AS_red['logAge'] > 9.6]
-    # AS_red.reset_index(drop=True)
-    #
-    # # print(len(C3_New),len(C6_New))
-    # # print(len(c_three),len(c_six))
-    # # print(len(RC3),len(RC6))
-    # # print(len(L3),len(L6))
-    # # print(len(GES),len(AP3),len(AP6))
-    #
-    # ''' Quality Flagging '''
-    # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
-    # # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
-    # C3_skew = pd.read_csv(ext_load+'C3_EPIC_skew')
-    # C6_skew = pd.read_csv(ext_load+'C6_EPIC_skew')
-    #
-    # C3_New['Mass_Flag'] = 0
-    # C3_New['Radius_Flag'] = 0
-    # C3_New['Age_Flag'] = 0
-    # C3_New['mass_comp'] = abs((C3_New['mass'] - C3_New['m_seismo'])/C3_New['mass'])
-    # for i in range(len(C3_New)):
-    #     if C3_New['mass_comp'].iloc[i] > 0.5:
-    #         C3_New['Mass_Flag'].iloc[i] == 1
-    #     if abs((C3_New['rad'].iloc[i] - C3_New['r_seismo'].iloc[i])/C3_New['rad'].iloc[i]) > 0.5:
-    #         C3_New['Radius_Flag'].iloc[i] == 1
-    # for i in range(len(C3_New)):
-    #     for j in range(len(C3_skew)):
-    #         if C3_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
-    #             C3_New['Age_Flag'].iloc[i] = 1
-    #
-    # C6_New['Mass_Flag'] = 0
-    # C6_New['Radius_Flag'] = 0
-    # C6_New['Age_Flag'] = 0
-    # for i in range(len(C6_New)):
-    #     if abs((C6_New['mass'].iloc[i] - C6_New['m_seismo'].iloc[i])/C6_New['mass'].iloc[i]) > 0.5:
-    #         C6_New['Mass_Flag'].iloc[i] == 1
-    #     if abs((C6_New['rad'].iloc[i] - C6_New['r_seismo'].iloc[i])/C6_New['rad'].iloc[i]) > 0.5:
-    #         C6_New['Radius_Flag'].iloc[i] == 1
-    # for i in range(len(C6_New)):
-    #     for j in range(len(C6_skew)):
-    #         if C6_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
-    #             C6_New['Age_Flag'].iloc[i] = 1
-    #
-    # K2_New['Mass_Flag'] = 0
-    # K2_New['Radius_Flag'] = 0
-    # K2_New['Age_Flag'] = 0
-    # for i in range(len(K2_New)):
-    #     if abs((K2_New['mass'].iloc[i] - K2_New['m_seismo'].iloc[i])/K2_New['mass'].iloc[i]) > 0.5:
-    #         K2_New['Mass_Flag'].iloc[i] == 1
-    #     if abs((K2_New['rad'].iloc[i] - K2_New['r_seismo'].iloc[i])/K2_New['rad'].iloc[i]) > 0.5:
-    #         K2_New['Radius_Flag'].iloc[i] == 1
-    # for i in range(len(K2_New)):
-    #     for j in range(len(C3_skew)):
-    #         if K2_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
-    #             K2_New['Age_Flag'].iloc[i] = 1
-    #     for j in range(len(C3_skew)):
-    #         if K2_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
-    #             K2_New['Age_Flag'].iloc[i] = 1
-    #
-    # ''' Save out updated files for quick read in - only process file updates
-    #     once to save computation time later '''
-    # ext_save = '/home/bmr135/K2_Poles/Mass_Distr_In/'
-    # # ext_save = '/home/ben/K2_Poles/Mass_Distr_In/'
-    # C3_New.to_csv(ext_save+'C3_'+time.strftime("%d%m%Y"),index=False)
-    # C6_New.to_csv(ext_save+'C6_'+time.strftime("%d%m%Y"),index=False)
-    # K2_New.to_csv(ext_save+'K2_'+time.strftime("%d%m%Y"),index=False)
-    # K2_AS.to_csv(ext_save+'K2_AS_'+time.strftime("%d%m%Y"),index=False)
-    # AS.to_csv(ext_save+'AS_'+time.strftime("%d%m%Y"),index=False)
-    # APK2.to_csv(ext_save+'APPKASC_'+time.strftime("%d%m%Y"),index=False)
-    # c_three.to_csv(ext_save+'Spec_C3_'+time.strftime("%d%m%Y"),index=False)
-    # c_six.to_csv(ext_save+'Spec_C6_'+time.strftime("%d%m%Y"),index=False)
-    # RC3.to_csv(ext_save+'RC3_'+time.strftime("%d%m%Y"),index=False)
-    # RC6.to_csv(ext_save+'RC6_'+time.strftime("%d%m%Y"),index=False)
-    # L3.to_csv(ext_save+'L3_'+time.strftime("%d%m%Y"),index=False)
-    # L6.to_csv(ext_save+'L6_'+time.strftime("%d%m%Y"),index=False)
-    # GES.to_csv(ext_save+'GES_'+time.strftime("%d%m%Y"),index=False)
-    # AP3.to_csv(ext_save+'AP3_'+time.strftime("%d%m%Y"),index=False)
-    # AP6.to_csv(ext_save+'AP6_'+time.strftime("%d%m%Y"),index=False)
-    # TRI3.to_csv(ext_save+'TRI3_'+time.strftime("%d%m%Y"),index=False)
-    # TRI6.to_csv(ext_save+'TRI6_'+time.strftime("%d%m%Y"),index=False)
-    # sys.exit()
+    ''' [Fe/H] correct PARAM runs '''
+    # C3 = pd.read_csv(ext+'C3_080218.in.mo',delimiter=r'\s+')
+    # C6 = pd.read_csv(ext+'C6_080218.in.mo',delimiter=r'\s+')
+    # GES_T = pd.read_csv(ext+'GES_080218.in.mo',delimiter=r'\s+')
+    # RC3_T = pd.read_csv(ext+'RC3_080218.in.mo',delimiter=r'\s+')
+    # RC6_T = pd.read_csv(ext+'RC6_080218.in.mo',delimiter=r'\s+')
+    L3_T = pd.read_csv(ext+'L3_080218.in.mo',delimiter=r'\s+')
+    L6_T = pd.read_csv(ext+'L6_080218.in.mo',delimiter=r'\s+')
+    # APO_T = pd.read_csv(ext+'APO_080218.in.mo',delimiter=r'\s+')
+
+    ''' All spectroscopic parameter values run at once with PARAM '''
+    C_three = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C3AS_040718.in.mo',delimiter=r'\s+')
+    C_six = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C6AS_040718.in.mo',delimiter=r'\s+')
+    C3_New = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C3_050718.in.mo',delimiter=r'\s+')
+    C6_New = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C6_050718.in.mo',delimiter=r'\s+')
+
+    ''' Additional PARAM inputs that aren't output values '''
+    # C3 = mdf.p_in('C3_080218',C3,'C3')
+    C6_New = mdf.p_in('K2_270618',C6_New,'C6')
+    C3_New = mdf.p_in('K2_270618',C3_New,'C3')
+    GES = mdf.p_in('GES_080218',GES_T,'C3')
+    RC3 = mdf.p_in('RAVE_C3_25042018',RC3_T,'C3')
+    RC3 = RC3.drop_duplicates(subset=['#Id'])
+    RC3 = RC3.dropna(subset=['#Id'])
+    L3 = mdf.p_in('L3_080218',L3_T,'C3')
+    # C6_1 = mdf.p_in('C6_080218_1',C6_1,'C6')
+    # C6_2 = mdf.p_in('C6_080218_2',C6_2,'C6')
+    AP3 = mdf.p_in('AP3_270618',APO3_T,'C3')
+    AP6 = mdf.p_in('AP6_270618',APO6_T,'C6')
+    RC6 = mdf.p_in('RAVE_C6_25042018',RC6_T,'C6')
+    L6 = mdf.p_in('L6_080218',L6_T,'C6')
+    C_three = mdf.p_in('All_Spec_280618',C_three,'C3')
+    C_three = C_three.drop_duplicates(subset=['#Id'])
+    C_six = mdf.p_in('All_Spec_280618',C_six,'C6')
+    C_six = C_six.drop_duplicates(subset=['#Id'])
+
+    ''' Addition of RAVE [alpha/Fe] '''
+    R3alp = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/matlab_in/RC3_25042018_154829.csv')
+    R6alp = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/matlab_in/RC6_25042018_154829.csv')
+    # print(R3alp.columns.values)
+    RC3 = pd.merge(RC3,R3alp[['#Id','ALPHA']],how='inner',on=['#Id'])
+    RC6 = pd.merge(RC6,R6alp[['#Id','ALPHA']],how='inner',on=['#Id'])
+
+    # C6 = pd.concat([C6_1,C6_2],ignore_index=True)
+
+    TRI3['age'] = (10**TRI3['logAge'])/1e9
+    TRI3['Vcut'] = TRI3['Kmag'] + 2*(TRI3['JK']+0.14) + 0.382*np.exp(2*(TRI3['JK']-0.2))
+    TRI6['age'] = (10**TRI6['logAge'])/1e9
+
+    cols_to_use = APK.columns.difference(APK2.columns)
+    cols_to_use = cols_to_use.union(['KIC'])
+    APK2 = pd.merge(APK2,APK[cols_to_use],how='inner',on=['KIC'])
+    APK2['dist'] = APK['dist']
+    APK2['Z'] = APK['Z']
+    APK2 = APK2[APK2['dist'] > -99.9]
+
+
+
+    ''' Adding coordinates to K2 simulations '''
+    mdf.sim_coords(TRI3,3)
+    mdf.sim_coords(TRI6,6)
+    mdf.sim_coords(Kep_Sim,'K')
+    mdf.sim_dist(TRI3)
+    mdf.sim_dist(TRI6)
+    mdf.sim_dist(Kep_Sim)
+    Kep_Sim = Kep_Sim[Kep_Sim['dist'] < 2e4]
+    mdf.vert_dist(TRI3)
+    mdf.vert_dist(TRI6)
+    mdf.vert_dist(Kep_Sim)
+    # mdf.vert_dist(C3)
+    mdf.vert_dist(C3_New)
+    # mdf.vert_dist(C6)
+    mdf.vert_dist(C6_New)
+    mdf.vert_dist(APK2)
+    mdf.vert_dist(GES)
+    mdf.vert_dist(AP3)
+    mdf.vert_dist(AP6)
+    mdf.vert_dist(RC3)
+    mdf.vert_dist(RC6)
+    mdf.vert_dist(L3)
+    mdf.vert_dist(L6)
+    mdf.vert_dist(C_three)
+    mdf.vert_dist(C_six)
+
+    ''' Spectro tests '''
+    ges,c3 = mdf.spectro(GES,C3_New)
+    ap3,c3a = mdf.spectro(AP3,C3_New)
+    ap6,c6a = mdf.spectro(AP6,C6_New)
+    rc3,c3_R = mdf.spectro(RC3,C6_New)
+    rc6,c6_R = mdf.spectro(RC6,C6_New)
+    l3, c3_l = mdf.spectro(L3,C3_New)
+    l6, c6_l = mdf.spectro(L6,C6_New)
+    GR3,RG3 = mdf.spectro(GES,RC3)
+    AR6,RA6 = mdf.spectro(AP6,RC6)
+    RL6,LR6 = mdf.spectro(RC6,L6)
+    AL6,LA6 = mdf.spectro(AP6,L6)
+    AR3,RA3 = mdf.spectro(AP3,RC3)
+    AG3,GA3 = mdf.spectro(AP3,GES)
+
+    ''' Gaia-ESO Uncertainty Comps '''
+    param = ['mass','rad','age']
+    x = [['mass',0.0],['rad',0.0],['age',0.0]]
+    err1 = mdf.uncerts(C3_New,param,x)
+    err2 = mdf.uncerts(GES,param,x)
+    err3 = mdf.uncerts(ges,param,x)
+    err4 = mdf.uncerts(c3,param,x)
+
+    ''' Combine all spectroscopic data for each campaign '''
+    c_three = pd.concat([ap3,rc3,ges,l3],ignore_index=True)
+    c_three = c_three.drop_duplicates(subset=['#Id'],keep='first')
+    c_three.reset_index(drop=True)
+    c_six = pd.concat([ap6,rc6,l6],ignore_index=True)
+    c_six = c_six.drop_duplicates(subset=['#Id'],keep='first')
+    c_six.reset_index(drop=True)
+    AS = pd.concat([c_three,c_six],ignore_index=True)
+    AS.reset_index(drop=True)
+    # c_three.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_spec')
+
+
+    # K2 = pd.concat([C3,C6],ignore_index=True)
+    # K2.reset_index(drop=True)
+    # K2.reset_index(drop=True)
+    K2_New = pd.concat([C3_New,C6_New],ignore_index=True)
+    K2_New.reset_index(drop=True)
+    TRI = pd.concat([TRI3,TRI6],ignore_index=True)
+    TRI.reset_index(drop=True)
+
+    # K2['lgs'] = np.log10(27400 * (K2['nmx']/3090) * np.sqrt(K2['Teff']/5777))
+    K2_New['lgs'] = np.log10(27400 * (K2_New['nmx']/3090) * np.sqrt(K2_New['Teff']/5777))
+    AS['lgs'] = np.log10(27400 * (AS['nmx']/3090) * np.sqrt(AS['Teff']/5777))
+    # mdf.vert_dist(AS)
+    # AS['feh'] = AS['feh'] + 3
+
+    ''' Photometric data for spectroscopic K2 stars '''
+    cols_to_use = c_three.columns.difference(C_three.columns)
+    cols_to_use = cols_to_use.union(['#Id'])
+    C3_AS = pd.merge(C_three,c_three[cols_to_use],how='inner',on=['#Id'])
+    C3_AS = C3_AS.drop_duplicates(subset=['#Id'],keep='first')
+    C3_AS.reset_index(drop=True)
+
+    cols_to_use = c_six.columns.difference(C_six.columns)
+    cols_to_use = cols_to_use.union(['#Id'])
+    C6_AS = pd.merge(C_six,c_six[cols_to_use],how='inner',on=['#Id'])
+    C6_AS = C6_AS.drop_duplicates(subset=['#Id'],keep='first')
+    C6_AS.reset_index(drop=True)
+
+    K2_AS = pd.concat([C3_AS,C6_AS],ignore_index=True)
+    K2_AS.reset_index(drop=True)
+
+    # K2_dnu = pd.DataFrame()
+    # K2_dnu = K2[K2['dnu'] > 0]
+    # K2_dnu.reset_index(drop=True)
+
+    AS_red = AS[AS['logAge'] < 9.8]
+    AS_red = AS_red[AS_red['logAge'] > 9.6]
+    AS_red.reset_index(drop=True)
+
+    print(len(C3_New),len(C6_New))
+    print(len(c_three),len(c_six))
+    print(len(C_three),len(C_six))
+    print(len(AS), len(C3_AS), len(C6_AS))
+    print(len(RC3),len(RC6))
+    print(len(L3),len(L6))
+    print(len(GES),len(AP3),len(AP6))
+
+    ''' Quality Flagging '''
+    ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+    # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
+    C3_skew = pd.read_csv(ext_load+'C3_EPIC_skew')
+    C6_skew = pd.read_csv(ext_load+'C6_EPIC_skew')
+
+    C3_New['Mass_Flag'] = 0
+    C3_New['Radius_Flag'] = 0
+    C3_New['Age_Flag'] = 0
+    C3_New['mass_comp'] = abs((C3_New['mass'] - C3_New['m_seismo'])/C3_New['mass'])
+    for i in range(len(C3_New)):
+        if C3_New['mass_comp'].iloc[i] > 0.5:
+            C3_New['Mass_Flag'].iloc[i] == 1
+        if abs((C3_New['rad'].iloc[i] - C3_New['r_seismo'].iloc[i])/C3_New['rad'].iloc[i]) > 0.5:
+            C3_New['Radius_Flag'].iloc[i] == 1
+    for i in range(len(C3_New)):
+        for j in range(len(C3_skew)):
+            if C3_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
+                C3_New['Age_Flag'].iloc[i] = 1
+
+    C6_New['Mass_Flag'] = 0
+    C6_New['Radius_Flag'] = 0
+    C6_New['Age_Flag'] = 0
+    for i in range(len(C6_New)):
+        if abs((C6_New['mass'].iloc[i] - C6_New['m_seismo'].iloc[i])/C6_New['mass'].iloc[i]) > 0.5:
+            C6_New['Mass_Flag'].iloc[i] == 1
+        if abs((C6_New['rad'].iloc[i] - C6_New['r_seismo'].iloc[i])/C6_New['rad'].iloc[i]) > 0.5:
+            C6_New['Radius_Flag'].iloc[i] == 1
+    for i in range(len(C6_New)):
+        for j in range(len(C6_skew)):
+            if C6_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
+                C6_New['Age_Flag'].iloc[i] = 1
+
+    K2_New['Mass_Flag'] = 0
+    K2_New['Radius_Flag'] = 0
+    K2_New['Age_Flag'] = 0
+    for i in range(len(K2_New)):
+        if abs((K2_New['mass'].iloc[i] - K2_New['m_seismo'].iloc[i])/K2_New['mass'].iloc[i]) > 0.5:
+            K2_New['Mass_Flag'].iloc[i] == 1
+        if abs((K2_New['rad'].iloc[i] - K2_New['r_seismo'].iloc[i])/K2_New['rad'].iloc[i]) > 0.5:
+            K2_New['Radius_Flag'].iloc[i] == 1
+    for i in range(len(K2_New)):
+        for j in range(len(C3_skew)):
+            if K2_New['#Id'].iloc[i] == C3_skew['#ID'].iloc[j]:
+                K2_New['Age_Flag'].iloc[i] = 1
+        for j in range(len(C3_skew)):
+            if K2_New['#Id'].iloc[i] == C6_skew['#ID'].iloc[j]:
+                K2_New['Age_Flag'].iloc[i] = 1
+
+    ''' Save out updated files for quick read in - only process file updates
+        once to save computation time later '''
+    ext_save = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+    # ext_save = '/home/ben/K2_Poles/Mass_Distr_In/'
+    C3_New.to_csv(ext_save+'C3_'+time.strftime("%d%m%Y"),index=False)
+    C6_New.to_csv(ext_save+'C6_'+time.strftime("%d%m%Y"),index=False)
+    K2_New.to_csv(ext_save+'K2_'+time.strftime("%d%m%Y"),index=False)
+    K2_AS.to_csv(ext_save+'K2_AS_'+time.strftime("%d%m%Y"),index=False)
+    AS.to_csv(ext_save+'AS_'+time.strftime("%d%m%Y"),index=False)
+    APK2.to_csv(ext_save+'APPKASC_'+time.strftime("%d%m%Y"),index=False)
+    c_three.to_csv(ext_save+'Spec_C3_'+time.strftime("%d%m%Y"),index=False)
+    c_six.to_csv(ext_save+'Spec_C6_'+time.strftime("%d%m%Y"),index=False)
+    RC3.to_csv(ext_save+'RC3_'+time.strftime("%d%m%Y"),index=False)
+    RC6.to_csv(ext_save+'RC6_'+time.strftime("%d%m%Y"),index=False)
+    L3.to_csv(ext_save+'L3_'+time.strftime("%d%m%Y"),index=False)
+    L6.to_csv(ext_save+'L6_'+time.strftime("%d%m%Y"),index=False)
+    GES.to_csv(ext_save+'GES_'+time.strftime("%d%m%Y"),index=False)
+    AP3.to_csv(ext_save+'AP3_'+time.strftime("%d%m%Y"),index=False)
+    AP6.to_csv(ext_save+'AP6_'+time.strftime("%d%m%Y"),index=False)
+    TRI3.to_csv(ext_save+'TRI3_'+time.strftime("%d%m%Y"),index=False)
+    TRI6.to_csv(ext_save+'TRI6_'+time.strftime("%d%m%Y"),index=False)
+    sys.exit()
 
     '''
     Load input files <- Need to update date string after each iteration
@@ -343,23 +353,23 @@ if __name__ == '__main__':
 
     ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
-    C3_New = pd.read_csv(ext_load+'C3_03072018')
-    C6_New = pd.read_csv(ext_load+'C6_03072018')
-    K2_New = pd.read_csv(ext_load+'K2_03072018')
-    K2_AS = pd.read_csv(ext_load+'K2_AS_03072018')
+    C3_New = pd.read_csv(ext_load+'C3_06072018')
+    C6_New = pd.read_csv(ext_load+'C6_06072018')
+    K2_New = pd.read_csv(ext_load+'K2_06072018')
+    K2_AS = pd.read_csv(ext_load+'K2_AS_06072018')
     AS = pd.read_csv(ext_load+'AS_03072018')
-    APK2 = pd.read_csv(ext_load+'APPKASC_03072018')
-    c_three = pd.read_csv(ext_load+'Spec_C3_03072018')
-    c_six = pd.read_csv(ext_load+'Spec_C6_03072018')
-    RC3 = pd.read_csv(ext_load+'RC3_03072018')
-    RC6 = pd.read_csv(ext_load+'RC6_03072018')
-    L3 = pd.read_csv(ext_load+'L3_03072018')
-    L6 = pd.read_csv(ext_load+'L6_03072018')
-    GES = pd.read_csv(ext_load+'GES_03072018')
-    AP3 = pd.read_csv(ext_load+'AP3_03072018')
-    AP6 = pd.read_csv(ext_load+'AP6_03072018')
-    TRI3 = pd.read_csv(ext_load+'TRI3_03072018')
-    TRI6 = pd.read_csv(ext_load+'TRI6_03072018')
+    APK2 = pd.read_csv(ext_load+'APPKASC_06072018')
+    c_three = pd.read_csv(ext_load+'Spec_C3_06072018')
+    c_six = pd.read_csv(ext_load+'Spec_C6_06072018')
+    RC3 = pd.read_csv(ext_load+'RC3_06072018')
+    RC6 = pd.read_csv(ext_load+'RC6_06072018')
+    L3 = pd.read_csv(ext_load+'L3_06072018')
+    L6 = pd.read_csv(ext_load+'L6_06072018')
+    GES = pd.read_csv(ext_load+'GES_06072018')
+    AP3 = pd.read_csv(ext_load+'AP3_06072018')
+    AP6 = pd.read_csv(ext_load+'AP6_06072018')
+    TRI3 = pd.read_csv(ext_load+'TRI3_06072018')
+    TRI6 = pd.read_csv(ext_load+'TRI6_06072018')
 
 
     ''' Photometric C3/C6 values with Spectroscopic Coverage '''
@@ -588,7 +598,7 @@ if __name__ == '__main__':
     GES['sig_age'] = (GES['age_68U']-GES['age_68L'])/2
     L6['sig_age'] = (L6['age_68U']-L6['age_68L'])/2
 
-    cut = .35
+    cut = 1.0
     C3_New = C3_New[(C3_New['sig_age']/C3_New['age']) < cut]
     C6_New = C6_New[(C6_New['sig_age']/C6_New['age']) < cut]
     K2_New = K2_New[(K2_New['sig_age']/K2_New['age']) < cut]
@@ -602,7 +612,8 @@ if __name__ == '__main__':
     RC6 = RC6[(RC6['sig_age']/RC6['age']) < cut]
     GES = GES[(GES['sig_age']/GES['age']) < cut]
     L6 = L6[(L6['sig_age']/L6['age']) < cut]
-    print(len(AS),len(c_three))
+    print(len(AS),len(c_three), len(AP3), len(L3), len(GES), len(RC3))
+    print(len(AS),len(c_six), len(AP6), len(L6), len(RC6))
     C3_New_c = C3_New[(C3_New['rad'] > 10.0) & (C3_New['rad'] < 12.0)]
     C6_New_c = C6_New[(C6_New['rad'] > 10.0) & (C6_New['rad'] < 12.0)]
 
@@ -706,12 +717,12 @@ if __name__ == '__main__':
     - LAMOST: alpha
     - RAVE: ALPHA
     '''
-    AP3 = AP3[AP3['alpha'] > -99.9]
-    AP6 = AP6[AP6['alpha'] > -99.9]
-    GES = GES[GES['alpha'] > -99.9]
-    RC3 = RC3[RC3['ALPHA'] > -99.9]
-    RC6 = RC6[RC6['ALPHA'] > -99.9]
-    L6 = L6[L6['alpha'] > -99.9]
+    # AP3 = AP3[AP3['alpha'] > -99.9]
+    # AP6 = AP6[AP6['alpha'] > -99.9]
+    # GES = GES[GES['alpha'] > -99.9]
+    # RC3 = RC3[RC3['ALPHA'] > -99.9]
+    # RC6 = RC6[RC6['ALPHA'] > -99.9]
+    # L6 = L6[L6['alpha'] > -99.9]
     fig, ax = plt.subplots(1)
     ax.scatter(AP3['age'],AP3['alpha'],label=r'APOGEE3')
     ax.scatter(AP6['age'],AP6['alpha'],label=r'APOGEE6')
@@ -723,6 +734,7 @@ if __name__ == '__main__':
     ax.set_ylabel(r'[$\alpha$/Fe]')
     ax.legend()
     plt.show()
+
 
     # fig, ax = plt.subplots(1)
     # hist2, xb2, yb2, im2 = plt.hist2d(AS['age'],AS['alpha'],bins=[np.linspace(0,20,41),np.linspace(-0.3,0.7,11)],cmap=colormaps.parula)#,normed=True)
@@ -802,225 +814,227 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Spectro tests '''
-    # ges,c3 = mdf.spectro(GES,C3_New)
-    # ap3,c3a = mdf.spectro(AP3,C3_New)
-    # ap6,c6a = mdf.spectro(AP6,C6_New)
-    # rc3,c3_R = mdf.spectro(RC3,C3_New)
-    # rc6,c6_R = mdf.spectro(RC6,C6_New)
-    # l3, c3_l = mdf.spectro(L3,C3_New)
-    # l6, c6_l = mdf.spectro(L6,C6_New)
-    # GR3,RG3 = mdf.spectro(GES,RC3)
-    # AR6,RA6 = mdf.spectro(AP6,RC6)
-    # RL6,LR6 = mdf.spectro(RC6,L6)
-    # AL6,LA6 = mdf.spectro(AP6,L6)
-    # AR3,RA3 = mdf.spectro(AP3,RC3)
-    # AG3,GA3 = mdf.spectro(AP3,GES)
-    #
-    # ''' Teff/Met comparisons '''
-    # # [Fe/H]
+    ges,c3 = mdf.spectro(GES,C3_New)
+    ap3,c3a = mdf.spectro(AP3,C3_New)
+    ap6,c6a = mdf.spectro(AP6,C6_New)
+    rc3,c3_R = mdf.spectro(RC3,C3_New)
+    rc6,c6_R = mdf.spectro(RC6,C6_New)
+    l3, c3_l = mdf.spectro(L3,C3_New)
+    l6, c6_l = mdf.spectro(L6,C6_New)
+    GR3,RG3 = mdf.spectro(GES,RC3)
+    AR6,RA6 = mdf.spectro(AP6,RC6)
+    RL6,LR6 = mdf.spectro(RC6,L6)
+    AL6,LA6 = mdf.spectro(AP6,L6)
+    AR3,RA3 = mdf.spectro(AP3,RC3)
+    AG3,GA3 = mdf.spectro(AP3,GES)
+    print(len(AR3),len(GR3), len(AG3))
+    print(len(AR6),len(RL6),len(AL6))
+
+    ''' Teff/Met comparisons '''
+    # [Fe/H]
     # ds = mdf.least_squares(c3,ges)
     # ds1 = mdf.least_squares(c3_R,rc3)
     # ds2 = mdf.least_squares(c6_R,rc6)
     # ds3 = mdf.least_squares(c6a,ap6)
     # ds3a = mdf.least_squares(c3a,ap3)
     # ds4 = mdf.least_squares(c6_l,l6)
-    #
-    # df = mdf.least_squares(GR3,RG3)
-    # df1 = mdf.least_squares(AR6,RA6)
-    # df2 = mdf.least_squares(AR3,RA3)
-    # df3 = mdf.least_squares(AG3,GA3)
-    # df4 = mdf.least_squares(AL6,LA6)
-    # df5 = mdf.least_squares(RL6,LR6)
-    #
-    # # Teff
+
+    df = mdf.least_squares(GR3,RG3)
+    df1 = mdf.least_squares(AR6,RA6)
+    df2 = mdf.least_squares(AR3,RA3)
+    df3 = mdf.least_squares(AG3,GA3)
+    df4 = mdf.least_squares(AL6,LA6)
+    df5 = mdf.least_squares(RL6,LR6)
+
+    # Teff
     # dsT = mdf.least_squares2(c3,ges)
     # ds1T = mdf.least_squares2(c3_R,rc3)
     # ds2T = mdf.least_squares2(c6_R,rc6)
     # ds3T = mdf.least_squares2(c6a,ap6)
     # ds3Ta = mdf.least_squares2(c3a,ap3)
     # ds4T = mdf.least_squares2(c6_l,l6)
+
+    dfT = mdf.least_squares2(GR3,RG3)
+    df1T = mdf.least_squares2(AR6,RA6)
+    df2T = mdf.least_squares2(AR3,RA3)
+    df3T = mdf.least_squares2(AG3,GA3)
+    df4T = mdf.least_squares2(AL6,LA6)
+    df5T = mdf.least_squares2(RL6,LR6)
+
+    # x = np.linspace(4100,5500,100)
+    # plt.figure()
+    # plt.scatter(c3['Teff'],ges['Teff'],label=r'GES C3')
+    # plt.scatter(c3_R['Teff'],rc3['Teff'],label=r'RAVE C3',color='g')
+    # plt.scatter(c6_R['Teff'],rc6['Teff'],label=r'RAVE C6',color='r')
+    # plt.scatter(c6['Teff'],apo['Teff'],label=r'APOGEE C6',color='m')
+    # plt.xlabel(r'MAST T$_{\rm{eff}}$')
+    # plt.ylabel(r'Spectroscopic T$_{\rm{eff}}$')
+    # plt.plot([4100,5500],[4100,5500],c='k')
+    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    # plt.xlim(4100,5500)
+    # plt.ylim(4100,5500)
+    # plt.legend(loc=4)
+    # plt.show()
     #
-    # dfT = mdf.least_squares2(GR3,RG3)
-    # df1T = mdf.least_squares2(AR6,RA6)
-    # df2T = mdf.least_squares2(AR3,RA3)
-    # df3T = mdf.least_squares2(AG3,GA3)
-    # df4T = mdf.least_squares2(AL6,LA6)
-    # df5T = mdf.least_squares2(RL6,LR6)
-    # #
-    # # x = np.linspace(4100,5500,100)
-    # # plt.figure()
-    # # plt.scatter(c3['Teff'],ges['Teff'],label=r'GES C3')
-    # # plt.scatter(c3_R['Teff'],rc3['Teff'],label=r'RAVE C3',color='g')
-    # # plt.scatter(c6_R['Teff'],rc6['Teff'],label=r'RAVE C6',color='r')
-    # # plt.scatter(c6['Teff'],apo['Teff'],label=r'APOGEE C6',color='m')
-    # # plt.xlabel(r'MAST T$_{\rm{eff}}$')
-    # # plt.ylabel(r'Spectroscopic T$_{\rm{eff}}$')
-    # # plt.plot([4100,5500],[4100,5500],c='k')
-    # # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # # plt.xlim(4100,5500)
-    # # plt.ylim(4100,5500)
-    # # plt.legend(loc=4)
-    # # plt.show()
-    # #
-    # # plt.figure()
-    # # plt.subplot(2,2,1)
-    # # plt.scatter(c3['feh'],ges['feh'],label=r'GES C3')
-    # # plt.scatter(c3_R['feh'],rc3['feh'],label=r'RAVE C3',color='g')
-    # # plt.scatter(c6_R['feh'],rc6['feh'],label=r'RAVE C6',color='r')
-    # # plt.scatter(c6['feh'],apo['feh'],label=r'APOGEE C6',color='m')
-    # # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # # plt.xlim(-3.0,1.0)
-    # # plt.ylim(-3.0,1.0)
-    # # plt.tick_params(labelsize=15)
-    # # plt.title(r'All Pipelines',fontsize=20)
-    # #
-    # # plt.subplot(2,2,2)
-    # # plt.scatter(c3['feh'],ges['feh'],label=r'C3')
-    # # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
-    # # plt.xlim(-3.0,1.0)
-    # # plt.ylim(-3.0,1.0)
-    # # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds[0][0],ds[1][0]), ha='center', va='center',fontsize=15)
-    # # plt.tick_params(labelsize=15)
-    # # plt.title(r'Gaia-ESO',fontsize=20)
-    # #
-    # # plt.subplot(2,2,3)
-    # # plt.scatter(c3_R['feh'],rc3['feh'],label=r'C3',color='g')
-    # # plt.scatter(c6_R['feh'],rc6['feh'],label=r'C6',color='r')
-    # # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
-    # # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
-    # # plt.xlim(-3.0,1.0)
-    # # plt.ylim(-3.0,1.0)
-    # # plt.text(-.1, -2.5,r'Fit RC3: %.6sx $+$ %.6s' %(ds1[0][0],ds1[1][0]), ha='center', va='center',fontsize=15)
-    # # plt.text(-.1, -2.75,r'Fit RC6: %.6sx $+$ %.6s' %(ds2[0][0],ds2[1][0]), ha='center', va='center',fontsize=15)
-    # # plt.tick_params(labelsize=15)
-    # # plt.title(r'RAVE',fontsize=20)
-    # # plt.legend()
-    # #
-    # # plt.subplot(2,2,4)
-    # # plt.scatter(c6['feh'],apo['feh'],label=r'C6',color='m')
-    # # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
-    # # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
-    # # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
-    # # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
-    # # plt.xlim(-3.0,1.0)
-    # # plt.ylim(-3.0,1.0)
-    # # plt.tick_params(labelsize=15)
-    # # plt.title(r'APOGEE',fontsize=20)
-    # # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds3[0][0],ds3[1][0]), ha='center', va='center',fontsize=15)
-    # #
-    # # plt.tight_layout()
-    # # plt.show()
-    # #
-    # # plt.figure()
-    # # plt.subplot(2,1,1)
-    # # plt.scatter(GR3['Teff'],RG3['Teff'])
-    # # plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
-    # # plt.ylabel(r'RAVE T$_{\rm{eff}}$')
-    # # plt.plot([4100,5500],[4100,5500],c='k')
-    # # # plt.plot(x,(x*df2[0])+df2[1],linewidth=2)
-    # # plt.xlim(4100,5500)
-    # # plt.title(r'C3')
-    # # plt.subplot(2,1,2)
-    # # plt.scatter(AR6['Teff'],RA6['Teff'])
-    # # plt.xlabel(r'APOGEE T$_{\rm{eff}}$')
-    # # plt.ylabel(r'RAVE T$_{\rm{eff}}$')
-    # # plt.plot([4100,5500],[4100,5500],c='k')
-    # # # plt.plot(x,(x*df3[0])+df3[1],linewidth=2)
-    # # plt.xlim(4100,5500)
-    # # plt.title(r'C6')
-    # #
-    # # plt.tight_layout()
-    # # plt.show()
+    # plt.figure()
+    # plt.subplot(2,2,1)
+    # plt.scatter(c3['feh'],ges['feh'],label=r'GES C3')
+    # plt.scatter(c3_R['feh'],rc3['feh'],label=r'RAVE C3',color='g')
+    # plt.scatter(c6_R['feh'],rc6['feh'],label=r'RAVE C6',color='r')
+    # plt.scatter(c6['feh'],apo['feh'],label=r'APOGEE C6',color='m')
+    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    # plt.xlim(-3.0,1.0)
+    # plt.ylim(-3.0,1.0)
+    # plt.tick_params(labelsize=15)
+    # plt.title(r'All Pipelines',fontsize=20)
+    #
+    # plt.subplot(2,2,2)
+    # plt.scatter(c3['feh'],ges['feh'],label=r'C3')
+    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    # plt.plot(x,(x*ds[0])+ds[1],linewidth=2,c='b')
+    # plt.xlim(-3.0,1.0)
+    # plt.ylim(-3.0,1.0)
+    # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds[0][0],ds[1][0]), ha='center', va='center',fontsize=15)
+    # plt.tick_params(labelsize=15)
+    # plt.title(r'Gaia-ESO',fontsize=20)
+    #
+    # plt.subplot(2,2,3)
+    # plt.scatter(c3_R['feh'],rc3['feh'],label=r'C3',color='g')
+    # plt.scatter(c6_R['feh'],rc6['feh'],label=r'C6',color='r')
+    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    # plt.plot(x,(x*ds1[0])+ds1[1],linewidth=2,c='g')
+    # plt.plot(x,(x*ds2[0])+ds2[1],linewidth=2,c='r')
+    # plt.xlim(-3.0,1.0)
+    # plt.ylim(-3.0,1.0)
+    # plt.text(-.1, -2.5,r'Fit RC3: %.6sx $+$ %.6s' %(ds1[0][0],ds1[1][0]), ha='center', va='center',fontsize=15)
+    # plt.text(-.1, -2.75,r'Fit RC6: %.6sx $+$ %.6s' %(ds2[0][0],ds2[1][0]), ha='center', va='center',fontsize=15)
+    # plt.tick_params(labelsize=15)
+    # plt.title(r'RAVE',fontsize=20)
+    # plt.legend()
+    #
+    # plt.subplot(2,2,4)
+    # plt.scatter(c6['feh'],apo['feh'],label=r'C6',color='m')
+    # plt.xlabel(r'MAST [Fe/H]',fontsize=20)
+    # plt.ylabel(r'Spectroscopic [Fe/H]',fontsize=20)
+    # plt.plot([-3.0,1.0],[-3.0,1.0],c='k')
+    # plt.plot(x,(x*ds3[0])+ds3[1],linewidth=2,c='m')
+    # plt.xlim(-3.0,1.0)
+    # plt.ylim(-3.0,1.0)
+    # plt.tick_params(labelsize=15)
+    # plt.title(r'APOGEE',fontsize=20)
+    # plt.text(-.1, -2.75,r'Fit: %.6sx $+$ %.6s' %(ds3[0][0],ds3[1][0]), ha='center', va='center',fontsize=15)
+    #
+    # plt.tight_layout()
+    # plt.show()
+
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(GR3['Teff'],RG3['Teff'])
+    plt.xlabel(r'Gaia-ESO T$_{\rm{eff}}$')
+    plt.ylabel(r'RAVE T$_{\rm{eff}}$')
+    plt.plot([4100,5500],[4100,5500],c='k')
+    # plt.plot(x,(x*df2[0])+df2[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C3')
+    plt.subplot(2,1,2)
+    plt.scatter(AR6['Teff'],RA6['Teff'])
+    plt.xlabel(r'APOGEE T$_{\rm{eff}}$')
+    plt.ylabel(r'RAVE T$_{\rm{eff}}$')
+    plt.plot([4100,5500],[4100,5500],c='k')
+    # plt.plot(x,(x*df3[0])+df3[1],linewidth=2)
+    plt.xlim(4100,5500)
+    plt.title(r'C6')
+
+    plt.tight_layout()
+    plt.show()
 
 
     ''' Spectroscopic and Photometric Parameter Comparison Plots - FeH/Teff '''
-    # x = np.linspace(4100,5500,1000)
-    # plt.figure()
-    # plt.subplot(3,1,1)
-    # plt.scatter(AR3['Teff'],RA3['Teff']-AR3['Teff'])
+    x = np.linspace(4100,5500,1000)
+    plt.figure()
+    plt.subplot(3,1,1)
+    plt.scatter(AR3['Teff'],RA3['Teff']-AR3['Teff'])
+    plt.xlabel(r'T$_{\rm{eff}}$')
+    plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - APOGEE)')
+    plt.plot([4100,5500],[0,0],c='k')
+    plt.plot(x,(x*df2T[0])+df2T[1],linewidth=2,color='r',linestyle='--')
+    plt.xlim(4100,5500)
+    plt.xticks([])
+    plt.title(r'C3')
+    plt.text(5300, -100,r'Offset: %.4sK' %(df2T[1][0]), ha='center', va='center')
+
+    plt.subplot(3,1,2)
+    plt.scatter(GA3['Teff'],GA3['Teff']-AG3['Teff'])
     # plt.xlabel(r'T$_{\rm{eff}}$')
-    # plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - APOGEE)')
-    # plt.plot([4100,5500],[0,0],c='k')
-    # plt.plot(x,(x*df2T[0])+df2T[1],linewidth=2,color='r',linestyle='--')
-    # plt.xlim(4100,5500)
-    # plt.xticks([])
+    plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (Gaia-ESO - APOGEE)')
+    plt.plot([4100,5500],[0,0],c='k')
+    plt.plot(x,(x*df3T[0])+df3T[1],linewidth=2,color='r',linestyle='--')
+    plt.xlim(4100,5500)
+    plt.xticks([])
+    plt.text(5300, -200,r'Offset: %.4sK' %(df3T[1][0]), ha='center', va='center')
+
+    plt.subplot(3,1,3)
+    plt.scatter(RG3['Teff'],RG3['Teff']-GR3['Teff'])
+    plt.xlabel(r'T$_{\rm{eff}}$')
+    plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - Gaia-ESO)')
+    plt.plot([4100,5500],[0,0],c='k')
+    plt.plot(x,(x*dfT[0])+dfT[1],linewidth=2,color='r',linestyle='--')
+    plt.xlim(4100,5500)
+    plt.text(5300, -200,r'Offset: %.4sK' %(dfT[1][0]), ha='center', va='center')
+
+    # plt.tight_layout()
+    plt.show()
+
+
+    x = np.linspace(-1.5,.5,100)
+    plt.figure()
+    plt.subplot(3,1,1)
+    plt.scatter(RA3['feh'],RA3['feh']-AR3['feh'])
+    plt.xlabel(r'[Fe/H]')
+    plt.ylabel(r'$\Delta$[Fe/H] (RAVE - APOGEE)')
+    plt.plot([-1.5,0.5],[0,0],c='k')
+    plt.plot(x,(x*df2[0])+df2[1],linewidth=2,color='r',linestyle='--')
+    plt.xlim(-1.5,0.5)
+    plt.xticks([])
+    plt.title(r'C6')
+    plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df2[1][0]), ha='center', va='center')
+
+    plt.subplot(3,1,2)
+    plt.scatter(GA3['feh'],GA3['feh']-AG3['feh'])
+    plt.xlabel(r'[Fe/H]')
+    plt.ylabel(r'$\Delta$[Fe/H] (Gaia-ESO - APOGEE)')
+    plt.plot([-1.5,0.5],[0,0],c='k')
+    plt.plot(x,(x*df3[0])+df3[1],linewidth=2,color='r',linestyle='--')
+    plt.xticks([])
+    plt.xlim(-1.5,0.5)
     # plt.title(r'C3')
-    # plt.text(5300, -100,r'Offset: %.4sK' %(df2T[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(3,1,2)
-    # plt.scatter(GA3['Teff'],GA3['Teff']-AG3['Teff'])
-    # # plt.xlabel(r'T$_{\rm{eff}}$')
-    # plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (Gaia-ESO - APOGEE)')
-    # plt.plot([4100,5500],[0,0],c='k')
-    # plt.plot(x,(x*df3T[0])+df3T[1],linewidth=2,color='r',linestyle='--')
-    # plt.xlim(4100,5500)
-    # plt.xticks([])
-    # plt.text(5300, -200,r'Offset: %.4sK' %(df3T[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(3,1,3)
-    # plt.scatter(RG3['Teff'],RG3['Teff']-GR3['Teff'])
-    # plt.xlabel(r'T$_{\rm{eff}}$')
-    # plt.ylabel(r'$\Delta$T$_{\rm{eff}}$ (RAVE - Gaia-ESO)')
-    # plt.plot([4100,5500],[0,0],c='k')
-    # plt.plot(x,(x*dfT[0])+dfT[1],linewidth=2,color='r',linestyle='--')
-    # plt.xlim(4100,5500)
-    # plt.text(5300, -200,r'Offset: %.4sK' %(dfT[1][0]), ha='center', va='center')
-    #
-    # # plt.tight_layout()
-    # plt.show()
-    #
-    #
-    # x = np.linspace(-1.5,.5,100)
-    # plt.figure()
-    # plt.subplot(3,1,1)
-    # plt.scatter(RA3['feh'],RA3['feh']-AR3['feh'])
-    # plt.xlabel(r'[Fe/H]')
-    # plt.ylabel(r'$\Delta$[Fe/H] (RAVE - APOGEE)')
-    # plt.plot([-1.5,0.5],[0,0],c='k')
-    # plt.plot(x,(x*df2[0])+df2[1],linewidth=2,color='r',linestyle='--')
-    # plt.xlim(-1.5,0.5)
-    # plt.xticks([])
-    # plt.title(r'C6')
-    # plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df2[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(3,1,2)
-    # plt.scatter(GA3['feh'],GA3['feh']-AG3['feh'])
-    # plt.xlabel(r'[Fe/H]')
-    # plt.ylabel(r'$\Delta$[Fe/H] (Gaia-ESO - APOGEE)')
-    # plt.plot([-1.5,0.5],[0,0],c='k')
-    # plt.plot(x,(x*df3[0])+df3[1],linewidth=2,color='r',linestyle='--')
-    # plt.xticks([])
-    # plt.xlim(-1.5,0.5)
-    # # plt.title(r'C3')
-    # plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df3[1][0]), ha='center', va='center')
-    #
-    # plt.subplot(3,1,3)
-    # plt.scatter(RG3['feh'],RG3['feh']-GR3['feh'])
-    # plt.xlabel(r'[Fe/H]')
-    # plt.ylabel(r'$\Delta$[Fe/H] (RAVE - Gaia-ESO)')
-    # plt.plot([-1.5,0.5],[0,0],c='k')
-    # plt.plot(x,(x*df[0])+df[1],linewidth=2,color='r',linestyle='--')
-    # plt.xlim(-1.5,0.5)
-    # # plt.title(r'C3')
-    # plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df[1][0]), ha='center', va='center')
-    #
-    # # plt.tight_layout()
-    # plt.show()
+    plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df3[1][0]), ha='center', va='center')
+
+    plt.subplot(3,1,3)
+    plt.scatter(RG3['feh'],RG3['feh']-GR3['feh'])
+    plt.xlabel(r'[Fe/H]')
+    plt.ylabel(r'$\Delta$[Fe/H] (RAVE - Gaia-ESO)')
+    plt.plot([-1.5,0.5],[0,0],c='k')
+    plt.plot(x,(x*df[0])+df[1],linewidth=2,color='r',linestyle='--')
+    plt.xlim(-1.5,0.5)
+    # plt.title(r'C3')
+    plt.text(-1.25, -0.5,r'Offset: %.5sdex' %(df[1][0]), ha='center', va='center')
+
+    # plt.tight_layout()
+    plt.show()
 
     ''' Specroscopic and Photometric Mass and Age Comparisons: C3 & C6 '''
     # data = [c_three,c3]
