@@ -31,11 +31,10 @@ matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
 ''' Dropbox Path '''
-# ext_DB = '/home/bmr135/' # Work
-ext_DB = '/home/ben/'   # Laptop
+ext_DB = '/home/bmr135/' # Work
+# ext_DB = '/home/ben/'   # Laptop
 ''' GA directory '''
-# ext_GA = '/home/bmr135/' # Work
-ext_GA = '/media/ben/SAMSUNG1/' # Hard-Drive
+ext_GA = '/media/bmr135/SAMSUNG/' # Hard-Drive
 
 ''' Read in simulated and real data '''
 besa3, besa6 = dat.BESANCON()
@@ -257,6 +256,24 @@ print('Trilegal saved out')
 
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
 
+''' Yvonne Detects and Benoit doesn't '''
+YC3['Benoit'] = 0.0
+YC6['Benoit'] = 0.0
+for i in range(len(BC3['EPIC'])):
+    for j in range(len(YC3['EPIC'])):
+        if BC3['EPIC'].iloc[i] == YC3['EPIC'].iloc[j]:
+            YC3['Benoit'].iloc[j] == 1.0
+
+for i in range(len(BC6['EPIC'])):
+    for j in range(len(YC6['EPIC'])):
+        if BC6['EPIC'].iloc[i] == YC6['EPIC'].iloc[j]:
+            YC6['Benoit'].iloc[j] == 1.0
+
+miss3 = YC3[YC3['Benoit'] == 0.0]
+miss3.to_csv(ext_GA+'GA/C3_Yvonne_diff',index=False,columns=['EPIC'])
+miss6 = YC6[YC6['Benoit'] == 0.0]
+miss6.to_csv(ext_GA+'GA/C6_Yvonne_diff',index=False,columns=['EPIC'])
+
 ''' Add detection flags to data/save out values for comparisons '''
 # YC3,BC3,SC3 = prop.individ(YC3,BC3,SC3,'K2P2_C3')
 # YC6,BC6,SC6 = prop.individ(YC6,BC6,SC6,'K2P2_C6')
@@ -334,36 +351,44 @@ cols = ['EPIC','RA','Dec','Teff','[Fe/H]','logg']
 print(len(GAP3),len(GAP6))
 K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
 K2_camp = K2_camp.reset_index(drop=True)
-K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
+# K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
 # camp3_0.to_csv('/home/ben/Desktop/C3_Gaia',columns=cols,index=False)
 # camp6_0.to_csv('/home/ben/Desktop/C6_Gaia',columns=cols,index=False)
 
 print(len(camp3_0),len(camp6_0))
-sys.exit()
+# sys.exit()
 
 # YC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/YC3_TL',index=False)
 # BC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/BC3_TL',index=False)
 # SC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/SC3_TL',index=False)
 
-''' Merging of multiple fields for comparison '''
+''' Merging of multiple fields for comparison -> K2P2 '''
+# Yvonne + Savita C3
 cols_to_use = YC3.columns.difference(SC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YS_C3 = pd.merge(SC3,YC3[cols_to_use],how='inner',on=['EPIC'])
+# Yvonne + Savita C6
 cols_to_use = YC6.columns.difference(SC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YS_C6 = pd.merge(SC6,YC6[cols_to_use],how='inner',on=['EPIC'])
+# Yvonne + Benoit C3
 cols_to_use = YC3.columns.difference(BC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YB_C3 = pd.merge(BC3,YC3[cols_to_use],how='inner',on=['EPIC'])
+# Yvonne + Benoit C6
 cols_to_use = YC6.columns.difference(BC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YB_C6 = pd.merge(BC6,YC6[cols_to_use],how='inner',on=['EPIC'])
+# Savita + Benoit C3
 cols_to_use = SC3.columns.difference(BC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 BS_C3 = pd.merge(BC3,SC3[cols_to_use],how='inner',on=['EPIC'])
+# Savita + Benoit C6
 cols_to_use = SC6.columns.difference(BC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 BS_C6 = pd.merge(BC6,SC6[cols_to_use],how='inner',on=['EPIC'])
+
+'''  Merging of multiple fields for comparison -> K2P2/EVEREST cross-match '''
 cols_to_use = EC6.columns.difference(BC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 EB_C6 = pd.merge(BC6,EC6[cols_to_use],how='inner',on=['EPIC'])
@@ -383,20 +408,19 @@ cols_to_use = YEC6.columns.difference(YC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YY_C6 = pd.merge(YC6,YEC6[cols_to_use],how='inner',on=['EPIC'])
 
+''' Merging of multiple fields for comparison -> EVERST '''
 cols_to_use = SEC3.columns.difference(SC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 SS_C3 = pd.merge(SC3,SEC3[cols_to_use],how='inner',on=['EPIC'])
 cols_to_use = SEC6.columns.difference(SC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 SS_C6 = pd.merge(SC6,SEC6[cols_to_use],how='inner',on=['EPIC'])
-
 cols_to_use = SEC3.columns.difference(YEC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YSE_C3 = pd.merge(YEC3,SEC3[cols_to_use],how='inner',on=['EPIC'])
 cols_to_use = SEC6.columns.difference(YEC6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 YSE_C6 = pd.merge(YEC6,SEC6[cols_to_use],how='inner',on=['EPIC'])
-
 cols_to_use = SEC3.columns.difference(EC3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 SE_C3 = pd.merge(EC3,SEC3[cols_to_use],how='inner',on=['EPIC'])
@@ -477,7 +501,8 @@ Z17 = merged[17][1]
 
 print( "Sigma clip complete")
 
-''' Merging RAVE data with asteroseismic '''
+''' Merging RAVE data with individual asteroseismic data sets for full RAVE
+    spectro-seismic data list '''
 RAVE_list = [RAVE3,RAVE6,RAVE3,RAVE6,RAVE3,RAVE6,RAVE6,RAVE6,RAVE3,RAVE3]
 YSR3,YSR6,BSR3,BSR6,YBR3,YBR6 = dat.RAVE_merge([YS_C3,YS_C6,BS_C3,BS_C6,YB_C3,YB_C6], \
                                 RAVE_list,['YSR3','YSR6','BSR3','BSR6','YBR3','YBR6'])
@@ -500,7 +525,7 @@ RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE_C6.csv',index=False,na_rep='Inf')
 APORAVE = pd.merge(AP6,RAVE6,how='inner',on=['EPIC'])
 # print( len(APORAVE))
 
-''' Concatenated lists of stars in each campaign, K2P2 and Everest.
+''' Concatenated lists of stars in each campaign -> K2P2.
     Merging code similar to this and flag generation still required '''
 camp3 = pd.concat([YB_C3,YS_C3,BS_C3],ignore_index=True)
 camp3 = camp3.drop_duplicates(subset=['EPIC'])
@@ -512,7 +537,7 @@ camp3 = prop.single_seismo(camp3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp3 = prop.single_seismo(camp3,['BDnu','dnu','SDnu'],'DNU')
 camp3 = prop.single_seismo(camp3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp3 = prop.met_filter(camp3)
-# camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
+camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y")+'.csv',index=False)
 
 camp6 = pd.concat([YB_C6,YS_C6,BS_C6],ignore_index=True)
 camp6 = camp6.drop_duplicates(subset=['EPIC'])
@@ -524,7 +549,7 @@ camp6 = prop.single_seismo(camp6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp6 = prop.single_seismo(camp6,['BDnu','dnu','SDnu'],'DNU')
 camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp6 = prop.met_filter(camp6)
-# camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False)
+camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',index=False)
 
 print(len(camp3),len(camp6))
 
@@ -539,26 +564,16 @@ GAP_camp3 = pd.merge(GAP3_v2,camp3,how='inner',on=['EPIC'])
 GAP_camp6 = pd.merge(GAP6_v2,camp6,how='inner',on=['EPIC'])
 print(len(GAP_camp3),len(GAP_camp6))
 
-# fig,ax = plt.subplots(2)
-# ax[0].hist(GAP3_v2['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'GAP')
-# ax[0].hist(camp3['Hmag'],bins=np.linspace(7,12,50),histtype='step',label=r'Seismic')
-# ax[0].hist(GAP_camp3['Hmag_x'],bins=np.linspace(7,12,50),histtype='step',label=r'Combined')
-# ax[0].legend()
-# ax[0].set_xlabel(r'H')
-# ax[1].hist(GAP6_v2['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'GAP')
-# ax[1].hist(camp6['Vcut'],bins=np.linspace(9,15,50),histtype='step',label=r'Seismic')
-# ax[1].hist(GAP_camp6['Vcut_x'],bins=np.linspace(9,15,50),histtype='step',label=r'Combined')
-# ax[1].set_xlabel(r'V')
-# plt.tight_layout()
 
+''' Merging of RAVE and full asteroseismic data '''
 cols_to_use = camp3.columns.difference(RAVE3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC3 = pd.merge(RAVE3,camp3[cols_to_use],how='inner',on=['EPIC'])
-RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 cols_to_use = camp6.columns.difference(RAVE6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
-RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
 sys.exit()
@@ -567,16 +582,17 @@ sys.exit()
 cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 
+''' Alteration of alpha abundances in Gaia-ESO '''
 # GES['ALPHA'] = GES['ALPHA'] + 0.1
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.1_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # GES['ALPHA'] = GES['ALPHA'] + 0.15
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_p0.25_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # GES['ALPHA'] = GES['ALPHA'] - 0.35
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # GES['ALPHA'] = GES['ALPHA'] -0.15
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''
@@ -601,28 +617,28 @@ print( "Gaia-ESO saved out", len(GES))
 cols_to_use = camp3.columns.difference(LAMOST3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L3 = pd.merge(LAMOST3,camp3[cols_to_use],how='inner',on=['EPIC'])
-L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "LAMOST3 saved out ", len(LAMOST3))
 cols_to_use = camp6.columns.difference(LAMOST6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L6 = pd.merge(LAMOST6,camp6[cols_to_use],how='inner',on=['EPIC'])
-L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "LAMOST6 saved out ", len(LAMOST6))
 
 ''' Merging of APOGEE data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(APO3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP3 = pd.merge(APO3,camp3[cols_to_use],how='inner',on=['EPIC'])
-AP3.to_csv(ext_GA+'GA/K2Poles/APOGEE_C3_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+AP3.to_csv(ext_GA+'GA/K2Poles/APOGEE_C3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 
 print(len(APO3),len(APO6))
 cols_to_use = camp6.columns.difference(APO6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP6 = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
-AP6.to_csv(ext_GA+'GA/K2Poles/APOGEE_C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+AP6.to_csv(ext_GA+'GA/K2Poles/APOGEE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "APOGEE saved out", len(AP3), len(AP6))
 
-print('APOGEE overlaps')
+''' Spectroscopic Sample Overlaps '''
 print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
 print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
 print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
@@ -634,35 +650,36 @@ print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
 print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
 print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
 
-
+''' Merge of LAMOST and RAVE '''
 cols_to_use = RC6.columns.difference(L6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 LR6 = pd.merge(L6,RC6[cols_to_use],how='inner',on=['EPIC'])
-LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6_'+time.strftime("%d%m%Y_%H%M%S")+'.csv',index=False,na_rep='Inf')
+LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print('LAMOST/RAVE C6 saved out')
 
-E3 = pd.concat([EE_C3,SE_C3,YSE_C3],ignore_index=True)
-E3 = E3.drop_duplicates(subset=['EPIC'])
-E3 = E3.reset_index(drop=True)
-E_camp3 = pd.merge(camp3,EC3,how='inner',on=['EPIC'])
-
-E6 = pd.concat([EE_C6,SE_C6,YSE_C6],ignore_index=True)
-E6 = E6.drop_duplicates(subset=['EPIC'])
-E6 = E6.reset_index(drop=True)
-E_camp6 = pd.merge(camp6,EC6,how='inner',on=['EPIC'])
-
-E_camp6 = dat.n_epics(E_camp6,oc)
-
-K2PEV = n1 = n2 = n3 = x = pd.DataFrame()
-x = camp6[camp6['occ'] == 2.0]
-K2PEV = camp6[~camp6['EPIC'].isin(E_camp6['EPIC'])].dropna()
-n1 = K2PEV[K2PEV['occ'] == 1.0]
-n2 = K2PEV[K2PEV['occ'] == 2.0]
-n3 = K2PEV[K2PEV['occ'] == 3.0]
-print( len(K2PEV), len(n1), len(n2), len(n3))
-print( 'Percentage Single = ', 100*len(n1)/len(K2PEV))
-print( 'Percentage Double = ', 100*len(n2)/len(K2PEV))
-print( 'Percentage Triple = ', 100*len(n3)/len(K2PEV))
+''' Working wiht Everest data '''
+# E3 = pd.concat([EE_C3,SE_C3,YSE_C3],ignore_index=True)
+# E3 = E3.drop_duplicates(subset=['EPIC'])
+# E3 = E3.reset_index(drop=True)
+# E_camp3 = pd.merge(camp3,EC3,how='inner',on=['EPIC'])
+#
+# E6 = pd.concat([EE_C6,SE_C6,YSE_C6],ignore_index=True)
+# E6 = E6.drop_duplicates(subset=['EPIC'])
+# E6 = E6.reset_index(drop=True)
+# E_camp6 = pd.merge(camp6,EC6,how='inner',on=['EPIC'])
+#
+# E_camp6 = dat.n_epics(E_camp6,oc)
+#
+# K2PEV = n1 = n2 = n3 = x = pd.DataFrame()
+# x = camp6[camp6['occ'] == 2.0]
+# K2PEV = camp6[~camp6['EPIC'].isin(E_camp6['EPIC'])].dropna()
+# n1 = K2PEV[K2PEV['occ'] == 1.0]
+# n2 = K2PEV[K2PEV['occ'] == 2.0]
+# n3 = K2PEV[K2PEV['occ'] == 3.0]
+# print( len(K2PEV), len(n1), len(n2), len(n3))
+# print( 'Percentage Single = ', 100*len(n1)/len(K2PEV))
+# print( 'Percentage Double = ', 100*len(n2)/len(K2PEV))
+# print( 'Percentage Triple = ', 100*len(n3)/len(K2PEV))
 
 print( "Processing Complete")
 

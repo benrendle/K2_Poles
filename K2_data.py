@@ -119,20 +119,24 @@ def K2_GAP():
     # GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     # GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
     # # GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)
+    # ''' [Fe/H] uncertainty threshold using std. dev. of population '''
+    # sig3 = np.std(GAP3['[Fe/H]'])
+    # sig6 = np.std(GAP6['[Fe/H]'])
+    #
     #
     # ''' Minimum threshold uncertainty based on distribution width '''
     # for i in range(len(GAP3['sig_Teff'])):
     #     if GAP3['sig_Teff'][i] < 100:
     #         GAP3['sig_Teff'][i] = 100
-    #     if GAP3['sig_feh'][i] < 0.25:
-    #         GAP3['sig_feh'][i] = 0.25
+    #     if GAP3['sig_feh'][i] < sig3:
+    #         GAP3['sig_feh'][i] = sig3
     # GAP6['sig_logg'] = (abs(GAP6['ep_logg'])+abs(GAP6['em_logg']))/2
     # GAP6['sig_feh'] = (abs(GAP6['ep_[Fe/H]'])+abs(GAP6['em_[Fe/H]']))/2
     # for i in range(len(GAP6['sig_Teff'])):
     #     if GAP6['sig_Teff'][i] < 100:
     #         GAP6['sig_Teff'][i] = 100
-    #     if GAP6['sig_feh'][i] < 0.25:
-    #         GAP6['sig_feh'][i] = 0.25
+    #     if GAP6['sig_feh'][i] < sig6:
+    #         GAP6['sig_feh'][i] = sig6
     #
     # GAP3 = pd.merge(GAP3,C3_flag,how='inner',on=['EPIC'])
     # GAP3 = GAP3.reset_index(drop=True)
