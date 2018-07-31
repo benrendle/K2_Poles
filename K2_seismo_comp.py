@@ -67,8 +67,8 @@ print( "Occurrence in")
 ''' Add K2P2 occurrence to GAP Target Lists '''
 GAP6 = dat.n_epics(GAP6,oc)
 
-''' Preparing GAP for propbability detections '''
-GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+''' Preparing GAP for probability detections '''
+GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
 GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
 GAP3_v2 = GAP3[GAP3['foma'] < 280]
 GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
@@ -78,7 +78,7 @@ GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
 GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
 # GAP3_v2.to_csv('/home/bmr135/GA/K2Poles/GAP3')
 
-GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
 GAP6_v2 = GAP6[GAP6['foma'] < 280]
 GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
@@ -256,23 +256,20 @@ print('Trilegal saved out')
 
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
 
-''' Yvonne Detects and Benoit doesn't '''
-YC3['Benoit'] = 0.0
-YC6['Benoit'] = 0.0
-for i in range(len(BC3['EPIC'])):
-    for j in range(len(YC3['EPIC'])):
-        if BC3['EPIC'].iloc[i] == YC3['EPIC'].iloc[j]:
-            YC3['Benoit'].iloc[j] == 1.0
 
-for i in range(len(BC6['EPIC'])):
-    for j in range(len(YC6['EPIC'])):
-        if BC6['EPIC'].iloc[i] == YC6['EPIC'].iloc[j]:
-            YC6['Benoit'].iloc[j] == 1.0
+''' Yvonne Detects and Benoit doesn't
+    - Merge, concatenate, delete duplicates '''
+YB3 = pd.merge(YC3,BC3[['EPIC']],how='inner',on=['EPIC'])
+YB6 = pd.merge(YC6,BC6[['EPIC']],how='inner',on=['EPIC'])
+Y3 = pd.concat([YC3,YB3]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
+Y6 = pd.concat([YC6,YB6]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
+print(len(YB3),len(YB6))
+print(len(Y3),len(Y6))
+print(len(YC3),len(YC6))
 
-miss3 = YC3[YC3['Benoit'] == 0.0]
-miss3.to_csv(ext_GA+'GA/C3_Yvonne_diff',index=False,columns=['EPIC'])
-miss6 = YC6[YC6['Benoit'] == 0.0]
-miss6.to_csv(ext_GA+'GA/C6_Yvonne_diff',index=False,columns=['EPIC'])
+Y3.to_csv(ext_GA+'GA/C3_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
+Y6.to_csv(ext_GA+'GA/C6_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
+sys.exit()
 
 ''' Add detection flags to data/save out values for comparisons '''
 # YC3,BC3,SC3 = prop.individ(YC3,BC3,SC3,'K2P2_C3')
@@ -554,11 +551,11 @@ camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',in
 print(len(camp3),len(camp6))
 
 ''' Data Flag for EPIC parametric values - which [Fe/H] to use? '''
-spectro_EPICS_3 = camp3[camp3['stpropflag'] != 'rpm']
-spectro_EPICS_6 = camp6[camp6['stpropflag'] != 'rpm']
-spectro_EPICS_3 = spectro_EPICS_3[spectro_EPICS_3['stpropflag'] != 'rav']
-spectro_EPICS_6 = spectro_EPICS_6[spectro_EPICS_6['stpropflag'] != 'rav']
-print(len(spectro_EPICS_6['stpropflag']))
+# spectro_EPICS_3 = camp3[camp3['stpropflag'] != 'rpm']
+# spectro_EPICS_6 = camp6[camp6['stpropflag'] != 'rpm']
+# spectro_EPICS_3 = spectro_EPICS_3[spectro_EPICS_3['stpropflag'] != 'rav']
+# spectro_EPICS_6 = spectro_EPICS_6[spectro_EPICS_6['stpropflag'] != 'rav']
+# print(len(spectro_EPICS_6['stpropflag']))
 
 GAP_camp3 = pd.merge(GAP3_v2,camp3,how='inner',on=['EPIC'])
 GAP_camp6 = pd.merge(GAP6_v2,camp6,how='inner',on=['EPIC'])
@@ -576,13 +573,13 @@ RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
 RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print("RAVE saved out", len(RC3), len(RC6))
 
-sys.exit()
+# sys.exit()
 
 ''' Merging of GES data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
-# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 
 ''' Alteration of alpha abundances in Gaia-ESO '''
 # GES['ALPHA'] = GES['ALPHA'] + 0.1
@@ -592,7 +589,7 @@ GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
 # GES['ALPHA'] = GES['ALPHA'] - 0.35
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_m0.1_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # GES['ALPHA'] = GES['ALPHA'] -0.15
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+# GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_0.m25_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "Gaia-ESO saved out", len(GES))
 
 ''' Stars in C3 with no spectra --> Using for WHT-ISIS proposal '''
@@ -629,13 +626,13 @@ print( "LAMOST6 saved out ", len(LAMOST6))
 cols_to_use = camp3.columns.difference(APO3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP3 = pd.merge(APO3,camp3[cols_to_use],how='inner',on=['EPIC'])
-AP3.to_csv(ext_GA+'GA/K2Poles/APOGEE_C3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 
 print(len(APO3),len(APO6))
 cols_to_use = camp6.columns.difference(APO6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP6 = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
-AP6.to_csv(ext_GA+'GA/K2Poles/APOGEE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 print( "APOGEE saved out", len(AP3), len(AP6))
 
 ''' Spectroscopic Sample Overlaps '''
