@@ -259,17 +259,17 @@ YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection
 
 ''' Yvonne Detects and Benoit doesn't
     - Merge, concatenate, delete duplicates '''
-YB3 = pd.merge(YC3,BC3[['EPIC']],how='inner',on=['EPIC'])
-YB6 = pd.merge(YC6,BC6[['EPIC']],how='inner',on=['EPIC'])
-Y3 = pd.concat([YC3,YB3]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
-Y6 = pd.concat([YC6,YB6]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
-print(len(YB3),len(YB6))
-print(len(Y3),len(Y6))
-print(len(YC3),len(YC6))
-
-Y3.to_csv(ext_GA+'GA/C3_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
-Y6.to_csv(ext_GA+'GA/C6_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
-sys.exit()
+# YB3 = pd.merge(YC3,BC3[['EPIC']],how='inner',on=['EPIC'])
+# YB6 = pd.merge(YC6,BC6[['EPIC']],how='inner',on=['EPIC'])
+# Y3 = pd.concat([YC3,YB3]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
+# Y6 = pd.concat([YC6,YB6]).drop_duplicates(subset=['EPIC'],keep=False).reset_index(drop=True)
+# print(len(YB3),len(YB6))
+# print(len(Y3),len(Y6))
+# print(len(YC3),len(YC6))
+#
+# Y3.to_csv(ext_GA+'GA/C3_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
+# Y6.to_csv(ext_GA+'GA/C6_Yvonne_det',index=False,columns=['EPIC','nmx','nmx_err','dnu','dnu_err'])
+# sys.exit()
 
 ''' Add detection flags to data/save out values for comparisons '''
 # YC3,BC3,SC3 = prop.individ(YC3,BC3,SC3,'K2P2_C3')
@@ -353,7 +353,6 @@ K2_camp = K2_camp.reset_index(drop=True)
 # camp6_0.to_csv('/home/ben/Desktop/C6_Gaia',columns=cols,index=False)
 
 print(len(camp3_0),len(camp6_0))
-# sys.exit()
 
 # YC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/YC3_TL',index=False)
 # BC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/BC3_TL',index=False)
@@ -518,6 +517,24 @@ RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE_C6.csv',index=False,na_rep='Inf')
 # RAVEGES = pd.concat([RAVE3,GES],ignore_index=True)
 # RAVEGES = RAVEGES.drop_duplicates(subset=['EPIC'])
 # print( len(RAVEGES))
+
+RAVE3 = RAVE3[RAVE3['[Fe/H]_RAVE'] > -900]
+RAVE6 = RAVE6[RAVE6['[Fe/H]_RAVE'] > -900]
+
+plt.figure()
+plt.hist(camp3_0['[Fe/H]'],bins=50,normed=True,label=r'K2 C3')
+plt.hist(camp6_0['[Fe/H]'],bins=50,normed=True,label=r'K2 C6')
+plt.hist(RAVE3['[Fe/H]_RAVE'],bins=50,normed=True,label=r'RAVE 3')
+plt.hist(RAVE6['[Fe/H]_RAVE'],bins=50,normed=True,label=r'RAVE 6')
+plt.xlabel(r'[Fe/H]')
+yt = plt.gca()
+yt.axes.yaxis.set_ticks([])
+yt.axes.yaxis.set_ticklabels([])
+plt.legend()
+plt.show()
+
+sys.exit()
+
 
 APORAVE = pd.merge(AP6,RAVE6,how='inner',on=['EPIC'])
 # print( len(APORAVE))

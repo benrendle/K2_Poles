@@ -8,7 +8,7 @@ from shapely.geometry import Polygon, Point, LinearRing
 import sys
 import colormaps
 
-footprint_dictionary = json.load(open("/home/bmr135/GA/K2Poles/k2-footprint.json"))
+footprint_dictionary = json.load(open("/media/bmr135/SAMSUNG/GA/K2Poles/k2-footprint.json"))
 df = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL')
 df1 = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_New')
 df2 = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Ages/APK2')
