@@ -36,14 +36,14 @@ mpl.rcParams['ytick.direction'] = 'out'
 if __name__ == '__main__':
 
     ''' Set up of star/sampling type to be analysed from user input '''
-    itrs, samp, clump, folder_loc = mdf.spec(sys.argv[1])
-    print('Iterations = ',itrs)
-    if clump == 0:
-        print('Running with clump included')
-    else: print('Running with clump cut (R < 9.0)')
-    if samp == 0:
-        print('Running without sampling')
-    else: print('Running with sampling')
+    # itrs, samp, clump, folder_loc = mdf.spec(sys.argv[1])
+    # print('Iterations = ',itrs)
+    # if clump == 0:
+    #     print('Running with clump included')
+    # else: print('Running with clump cut (R < 9.0)')
+    # if samp == 0:
+    #     print('Running without sampling')
+    # else: print('Running with sampling')
 
     ext = '/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/'
     ext_fig = '/home/bmr135/Dropbox/K2Poles/pop_trends/051017/'
@@ -371,7 +371,10 @@ if __name__ == '__main__':
     AP6 = pd.read_csv(ext_load+'AP6_03082018')
     TRI3 = pd.read_csv(ext_load+'TRI3_03082018')
     TRI6 = pd.read_csv(ext_load+'TRI6_03082018')
-
+    # Gaia_IDs = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv')
+    # Gaia_IDs = pd.merge(Gaia_IDs, K2_New[['#Id']], how='inner', on=['#Id'])
+    # Gaia_IDs.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv',index=False)
+    # sys.exit()
     ''' Photometric C3/C6 values with Spectroscopic Coverage '''
     # C3_pa = pd.merge(C3_New,c_three[['#Id']],time("%d%m%Y"),index=False)
     C3_pa = pd.read_csv(ext_load+'C3_AS_21062018')
@@ -884,8 +887,8 @@ if __name__ == '__main__':
     AL6,LA6 = mdf.spectro(AP6,L6)
     AR3,RA3 = mdf.spectro(AP3,RC3)
     AG3,GA3 = mdf.spectro(AP3,GES)
-    print(len(AR3),len(GR3), len(AG3))
-    print(len(AR6),len(RL6),len(AL6))
+    # print(len(AR3),len(GR3), len(AG3))
+    # print(len(AR6),len(RL6),len(AL6))
 
     ''' Teff/Met comparisons '''
     # # [Fe/H]
@@ -1131,23 +1134,35 @@ if __name__ == '__main__':
     import scipy.interpolate as interp
     x = K2_AS['J']-K2_AS['Ks']
     y = K2_AS['mbol']
-    xi, yi = np.linspace(x.min(),x.max(),200), np.linspace(y.min(),y.max(),200)
+    xi, yi = np.linspace(x.min(),x.max(),850), np.linspace(y.min(),y.max(),850)
     xi, yi = np.meshgrid(xi,yi)
     rbf = interp.Rbf(x,y,K2_AS['delta_met'],function='linear')
     zi = rbf(xi,yi)
-    print((np.abs(xi[0][:] - 0.5)).argmin(),xi[0][19])
-    print((np.abs(yi[:,0] - 0.)).argmin(),yi[56][0])
-    print(zi[56][19])
-    fig = plt.figure()
-    cont = plt.contourf(xi,yi,zi,100,cmap=plt.cm.RdGy)
-    plt.gca().invert_yaxis()
-    cbar = plt.colorbar()
-    cbar.set_label(r'$\Delta$ [Fe/H]', rotation=270, fontsize=15, labelpad=25)
-    plt.scatter(K2_New['J']-K2_New['Ks'],K2_New['mbol'],alpha=0.05)
-    plt.xlabel(r'J - K',fontsize=15)
-    plt.ylabel(r'M$\_{\rm{bol}}$',fontsize=15)
-    plt.show()
+    # fig = plt.figure()
+    # cont = plt.contourf(xi,yi,zi,100,cmap=plt.cm.RdGy)
+    # plt.gca().invert_yaxis()
+    # cbar = plt.colorbar()
+    # cbar.set_label(r'$\Delta$ [Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    # plt.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],alpha=0.05)
+    # plt.xlabel(r'J - K',fontsize=15)
+    # plt.ylabel(r'M$\_{\rm{bol}}$',fontsize=15)
 
+    K2_New['feh_corr'] = 0
+    for j in range(len(K2_New)):
+        JK = K2_New['J'].iloc[j] - K2_New['Ks'].iloc[j]
+        Mbol = K2_New['mbol'].iloc[j]
+        a = (np.abs(yi[:,0] - Mbol)).argmin()
+        b = (np.abs(xi[0][:] - JK)).argmin()
+        # print(b,(np.abs(xi[0][:] - JK)).argmin(),xi[0][b])
+        # print(a,(np.abs(yi[:,0] - Mbol)).argmin(),yi[a][0])
+        # print(zi[a][b])
+        K2_New['feh_corr'].iloc[j] = zi[a][b]
+
+    K2_New['corrected_feh'] = K2_New['feh'] - K2_New['feh_corr']
+
+    # print(np.median(abs(K2_AS['corrected_feh'] - AS['feh'])))
+    K2_New['corrected_feh'].to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/K2_Photo_FeH_Corr',index=False)
+    # plt.show()
     sys.exit()
 
 
