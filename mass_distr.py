@@ -354,6 +354,7 @@ if __name__ == '__main__':
 
     ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
+    ''' Read in processed results files '''
     C3_New = pd.read_csv(ext_load+'C3_03082018')
     C6_New = pd.read_csv(ext_load+'C6_03082018')
     K2_New = pd.read_csv(ext_load+'K2_03082018')
@@ -371,10 +372,46 @@ if __name__ == '__main__':
     AP6 = pd.read_csv(ext_load+'AP6_03082018')
     TRI3 = pd.read_csv(ext_load+'TRI3_03082018')
     TRI6 = pd.read_csv(ext_load+'TRI6_03082018')
+    C3_Sky = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/matched_GAP_SkyMapper.csv')
+    C3_Sky = pd.merge(C3_Sky,C3_New[['#Id']],how='inner',on=['#Id'])
     # Gaia_IDs = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv')
     # Gaia_IDs = pd.merge(Gaia_IDs, K2_New[['#Id']], how='inner', on=['#Id'])
     # Gaia_IDs.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv',index=False)
-    # sys.exit()
+
+    ''' Read in files used with a Y enriched grid '''
+    # C3en = pd.read_csv('',delimiter=r'\s+')
+    # C6en = pd.read_csv('',delimiter=r'\s+')
+    RC3en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R2/RC3_Andrea_27072018.in.mo',delimiter=r'\s+')
+    RC6en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R5/RC6_Andrea_27072018.in.mo',delimiter=r'\s+')
+    GESen = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R6/GES_Andrea_27072018.in.mo',delimiter=r'\s+')
+    AP3en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R9/AP3_Andrea_27072018.in.mo',delimiter=r'\s+')
+    AP6en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R1/AP6_Andrea_27072018.in.mo',delimiter=r'\s+')
+    L3en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R4/L3_Andrea_27072018.in.mo',delimiter=r'\s+')
+    L6en = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/K2.R8/L6_Andrea_27072018.in.mo',delimiter=r'\s+')
+
+    ''' [Fe/H] corrected files '''
+    C3_feh = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C3_FeH_200818/C3_FeH_20082018.in.mo',delimiter=r'\s+')
+    C6_feh = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/C6_FeH_200818/C6_FeH_20082018.in.mo',delimiter=r'\s+')
+
+    # print(len(RC3),len(RC3en))
+    # print(len(RC6),len(RC6en))
+    # print(len(GES),len(GESen))
+    # print(len(AP3),len(AP3en))
+    # print(len(AP6),len(AP6en))
+    # print(len(L3),len(L3en))
+    # print(len(L6),len(L6en))
+    ind1, ind2 = pd.DataFrame(),pd.DataFrame()
+    ind1['#Id'] = RC3['#Id']
+    RC3en = pd.merge(RC3en,ind1,how='inner',on=['#Id'])
+    RC3en.reset_index(drop=True)
+    ind2['#Id'] = RC6['#Id']
+    RC6en = pd.merge(RC6en,ind2,how='inner',on=['#Id'])
+    RC6en.reset_index(drop=True)
+
+    ASen = pd.concat([RC3en,RC6en,AP3en,AP6en,GESen,L3en,L6en],ignore_index=True)
+    ASen = ASen.drop_duplicates(subset=['#Id'],keep='first')
+    ASen = ASen.reset_index(drop=True)
+
     ''' Photometric C3/C6 values with Spectroscopic Coverage '''
     # C3_pa = pd.merge(C3_New,c_three[['#Id']],time("%d%m%Y"),index=False)
     C3_pa = pd.read_csv(ext_load+'C3_AS_21062018')
@@ -588,8 +625,10 @@ if __name__ == '__main__':
 
     ''' PARAMETER CUTS '''
     C3_New['sig_age'] = (C3_New['age_68U']-C3_New['age_68L'])/2
+    C3_feh['sig_age'] = (C3_feh['age_68U']-C3_feh['age_68L'])/2
     c_three['sig_age'] = (c_three['age_68U']-c_three['age_68L'])/2
     C6_New['sig_age'] = (C6_New['age_68U']-C6_New['age_68L'])/2
+    C6_feh['sig_age'] = (C6_feh['age_68U']-C6_feh['age_68L'])/2
     c_six['sig_age'] = (c_six['age_68U']-c_six['age_68L'])/2
     K2_New['sig_age'] = (K2_New['age_68U']-K2_New['age_68L'])/2
     K2_AS['sig_age'] = (K2_AS['age_68U']-K2_AS['age_68L'])/2
@@ -600,10 +639,19 @@ if __name__ == '__main__':
     RC6['sig_age'] = (RC6['age_68U']-RC6['age_68L'])/2
     GES['sig_age'] = (GES['age_68U']-GES['age_68L'])/2
     L6['sig_age'] = (L6['age_68U']-L6['age_68L'])/2
+    ASen['sig_age'] = (ASen['age_68U']-ASen['age_68L'])/2
+    AP3en['sig_age'] = (AP3en['age_68U']-AP3en['age_68L'])/2
+    AP6en['sig_age'] = (AP6en['age_68U']-AP6en['age_68L'])/2
+    RC3en['sig_age'] = (RC3en['age_68U']-RC3en['age_68L'])/2
+    RC6en['sig_age'] = (RC6en['age_68U']-RC6en['age_68L'])/2
+    GESen['sig_age'] = (GESen['age_68U']-GESen['age_68L'])/2
+    L6en['sig_age'] = (L6en['age_68U']-L6en['age_68L'])/2
 
     cut = 1.35
     C3_New = C3_New[(C3_New['sig_age']/C3_New['age']) < cut]
+    C3_feh = C3_feh[(C3_feh['sig_age']/C3_feh['age']) < cut]
     C6_New = C6_New[(C6_New['sig_age']/C6_New['age']) < cut]
+    C6_feh = C6_feh[(C6_feh['sig_age']/C6_feh['age']) < cut]
     K2_New = K2_New[(K2_New['sig_age']/K2_New['age']) < cut]
     AS = AS[(AS['sig_age']/AS['age']) < cut]
     K2_AS = K2_AS[(K2_AS['sig_age']/K2_AS['age']) < cut]
@@ -615,6 +663,14 @@ if __name__ == '__main__':
     RC6 = RC6[(RC6['sig_age']/RC6['age']) < cut]
     GES = GES[(GES['sig_age']/GES['age']) < cut]
     L6 = L6[(L6['sig_age']/L6['age']) < cut]
+
+    ASen = ASen[(ASen['sig_age']/ASen['age']) < cut]
+    AP3en = AP3en[(AP3en['sig_age']/AP3en['age']) < cut]
+    AP6en = AP6en[(AP6en['sig_age']/AP6en['age']) < cut]
+    RC3en = RC3en[(RC3en['sig_age']/RC3en['age']) < cut]
+    RC6en = RC6en[(RC6en['sig_age']/RC6en['age']) < cut]
+    GESen = GESen[(GESen['sig_age']/GESen['age']) < cut]
+    L6en = L6en[(L6en['sig_age']/L6en['age']) < cut]
     # print(len(C3_New),len(C6_New))
     # print(len(c_three),len(c_six))
     # print(len(RC3),len(RC6))
@@ -626,7 +682,9 @@ if __name__ == '__main__':
 
     max_age = 19.9
     C3_New = C3_New[C3_New['age'] < max_age]
+    C3_feh = C3_feh[C3_feh['age'] < max_age]
     C6_New = C6_New[C6_New['age'] < max_age]
+    C6_feh = C6_feh[C6_feh['age'] < max_age]
     c_three = c_three[c_three['age'] < max_age]
     c_six = c_six[c_six['age'] < max_age]
     K2_New = K2_New[K2_New['age'] < max_age]
@@ -638,13 +696,22 @@ if __name__ == '__main__':
     RC6 = RC6[RC6['age'] < max_age]
     GES = GES[GES['age'] < max_age]
     L6 = L6[L6['age'] < max_age]
+    ASen = ASen[ASen['age'] < max_age]
+    AP3en = AP3en[AP3en['age'] < max_age]
+    AP6en = AP6en[AP6en['age'] < max_age]
+    RC3en = RC3en[RC3en['age'] < max_age]
+    RC6en = RC6en[RC6en['age'] < max_age]
+    GESen = GESen[GESen['age'] < max_age]
+    L6en = L6en[L6en['age'] < max_age]
 
     C3_New_c = C3_New[(C3_New['rad'] > 10.0) & (C3_New['rad'] < 12.0)]
     C6_New_c = C6_New[(C6_New['rad'] > 10.0) & (C6_New['rad'] < 12.0)]
 
     ''' Reset Indicies '''
     C3_New.reset_index(drop=True)
+    C3_feh.reset_index(drop=True)
     C6_New.reset_index(drop=True)
+    C6_feh.reset_index(drop=True)
     c_three.reset_index(drop=True)
     c_six.reset_index(drop=True)
     K2_New.reset_index(drop=True)
@@ -656,6 +723,13 @@ if __name__ == '__main__':
     RC6.reset_index(drop=True)
     GES.reset_index(drop=True)
     L6.reset_index(drop=True)
+    ASen.reset_index(drop=True)
+    AP3en.reset_index(drop=True)
+    AP6en.reset_index(drop=True)
+    RC3en.reset_index(drop=True)
+    RC6en.reset_index(drop=True)
+    GESen.reset_index(drop=True)
+    L6en.reset_index(drop=True)
 
     ''' Binning Campaign fields by Z '''
     z31 = c_three[abs(c_three['Z']) < 0.5]
@@ -671,6 +745,85 @@ if __name__ == '__main__':
     z64 = c_six[(c_six['Z'] >= 1.5) & (c_six['Z'] < 2.0)]
     z65 = c_six[(c_six['Z'] >= 2.0) & (c_six['Z'] < 2.5)]
     z66 = c_six[c_six['Z'] > 2.5]
+
+    ''' Quick fire comps with Y enhanced grid results '''
+    # ins = [C3_New, C6_New, C3_feh, C6_feh]
+    # label = ['C3-orig', 'C6-orig', 'C3-feh', 'C6-feh']
+    #
+    # for i in range(2):
+    #     # p = 'age'
+    #     # p1 = p+'_x'
+    #     # p2 = p+'_y'
+    #     # p3 = p+'_xy'
+    #     # xtit1 = r'Age [Gyr], '
+    #     # xtit2 = r'Original Age [Gyr]'
+    #     # xtit3 = r'Original Age [Gyr]'
+    #     # ytit2 = r'[Fe/H] Corr. Age [Gyr]'
+    #     # ytit3 = r'$\Delta$A [(A$_{\rm{O}}$-A$_{\rm{Y}}$)/A$_{\rm{O}}$]'
+    #     # upper = 20
+    #     # save = 'Age_'
+    #
+    #     # p = 'mass'
+    #     # p1 = p+'_x'
+    #     # p2 = p+'_y'
+    #     # p3 = p+'_xy'
+    #     # xtit1 = r'Mass [M$_{\odot}$], '
+    #     # xtit2 = r'Original Mass [M$_{\odot}$]'
+    #     # xtit3 = r'Original Mass [M$_{\odot}$]'
+    #     # ytit2 = r'[Fe/H] Corr. Mass [M$_{\odot}$]'
+    #     # ytit3 = r'$\Delta$A [(M$_{\rm{O}}$-M$_{\rm{Y}}$)/M$_{\rm{O}}$]'
+    #     # upper = 2.75
+    #     # save = 'Mass_'
+    #
+    #     # p = 'rad'
+    #     # p1 = p+'_x'
+    #     # p2 = p+'_y'
+    #     # p3 = p+'_xy'
+    #     # xtit1 = r'Radius [R$_{\odot}$], '
+    #     # xtit2 = r'Original Radius [R$_{\odot}$]'
+    #     # xtit3 = r'Original Radius [R$_{\odot}$]'
+    #     # ytit2 = r'[Fe/H] Corr. Radius [R$_{\odot}$]'
+    #     # ytit3 = r'$\Delta$A [(R$_{\rm{O}}$-R$_{\rm{Y}}$)/R$_{\rm{O}}$]'
+    #     # upper = 20
+    #     # save = 'Radius_'
+    #
+    #     a = int(len(ins)/2.)
+    #
+    #     fig, ax = plt.subplots()
+    #     d1 = kde.KDE1D(ins[i][p])
+    #     d2 = kde.KDE1D(ins[i+a][p])
+    #     x1 = np.r_[min(ins[i][p]):max(ins[i][p]):1024j]
+    #     x2 = np.r_[min(ins[i+a][p]):max(ins[i+a][p]):1024j]
+    #     ax.plot(x1,d1(x1),linewidth=2,label=r'Original')
+    #     ax.plot(x2,d2(x2),linewidth=2,label=r'[Fe/H] corr')
+    #     ax.set_yticks([])
+    #     ax.set_xlim(0,upper)
+    #     ax.set_xlabel(xtit1+label[i])
+    #     ax.legend()
+    #     plt.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/FeH_corr/Full/KDE/'+save+label[i]+'.png')
+    #
+    #     param = pd.merge(ins[i][['#Id',p]],ins[i+a][['#Id',p]],how='inner',on=['#Id'])
+    #     plt.figure()
+    #     plt.plot([0,upper],[0,upper],color='k',linestyle='--')
+    #     plt.scatter(param[p1],param[p2],label=label[i])
+    #     plt.xlabel(xtit2)
+    #     plt.ylabel(ytit2)
+    #     plt.legend()
+    #     plt.xlim(0,upper)
+    #     plt.ylim(0,upper)
+    #     plt.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/FeH_corr/Full/1to1/'+save+label[i]+'.png')
+    #
+    #     plt.figure()
+    #     param[p3] = (param[p1] - param[p2])/param[p1]
+    #     plt.plot([0,upper],[0,0],color='k',linestyle='--')
+    #     plt.scatter(param[p1],param[p3],label=label[i])
+    #     plt.xlabel(xtit3)
+    #     plt.ylabel(ytit3)
+    #     plt.legend()
+    #     plt.xlim(0,upper)
+    #     plt.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/FeH_corr/Full/delta_param/'+save+label[i]+'.png')
+    #
+    # sys.exit()
 
     ''' Age Distribution '''
 
@@ -1097,74 +1250,98 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Metallicity offsets: EPIC to Spec. '''
-    EPIC = pd.DataFrame()
-    EPIC['#Id'] = K2_AS['#Id']
-    EPIC = pd.merge(EPIC,AS[['#Id']],how='inner',on=['#Id'])
-    AS = pd.merge(AS,EPIC,how='inner',on=['#Id'])
-    AS = AS.reset_index(drop=True)
-    K2_AS = pd.merge(K2_AS,EPIC,how='inner',on=['#Id'])
-    K2_AS = K2_AS.reset_index(drop=True)
-
-    K2_AS['delta_met'] = K2_AS['feh'] - AS['feh']
-    K2_AS['delta_teff'] = K2_AS['Teff'] - AS['Teff']
-    bins = np.linspace(-4.,4.5,18)
-    dfeh, edges, number = scipy.stats.binned_statistic(K2_AS['Z'],K2_AS['delta_met'],statistic='median',bins=bins)
-    stdFeh, stdEdges, stdNumber = scipy.stats.binned_statistic(K2_AS['Z'],K2_AS['delta_met'],statistic=lambda x: np.std(x),bins=bins)
-    # print(dfeh,edges)
-    # print(stdFeh,stdEdges)
-    # print(np.std(K2_AS['delta_met']),np.mean(K2_AS['delta_met']))
-    fig, ax = plt.subplots()
-    # ax.fill_between(edges[1:]-.25,dfeh-stdFeh,dfeh+stdFeh,color='orange',alpha=0.2)
-    a = ax.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],c=K2_AS['delta_met'])
-    ax.plot(K2_AS['J']-K2_AS['Ks'],-13*(K2_AS['J']-K2_AS['Ks'])+9.,'g')
-    plt.gca().invert_yaxis()
-    plt.xlim(0.4,0.8)
-    plt.ylim(3,-1)
-    # ax.plot(edges[1:]-0.25,dfeh,color='orange',linewidth=2.)
-    cbar = fig.colorbar(a)
-    # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
-
-    # from scipy.optimize import curve_fit
-    # K2_AS = K2_AS[K2_AS['Z'] < 0.]
-    # def func(x,a,c):
-    #     return a/x + c
-    # popt, pcov = curve_fit(func, K2_AS['Z'], K2_AS['delta_met'],sigma=K2_AS['feh_err'])
-    # print(popt)
-    # ax.plot(K2_AS['Z'],func(K2_AS['Z'],*popt),'g--')
-    import scipy.interpolate as interp
-    x = K2_AS['J']-K2_AS['Ks']
-    y = K2_AS['mbol']
-    xi, yi = np.linspace(x.min(),x.max(),850), np.linspace(y.min(),y.max(),850)
-    xi, yi = np.meshgrid(xi,yi)
-    rbf = interp.Rbf(x,y,K2_AS['delta_met'],function='linear')
-    zi = rbf(xi,yi)
-    # fig = plt.figure()
-    # cont = plt.contourf(xi,yi,zi,100,cmap=plt.cm.RdGy)
+    # EPIC = pd.DataFrame()
+    # EPIC['#Id'] = K2_AS['#Id']
+    # EPIC = pd.merge(EPIC,AS[['#Id']],how='inner',on=['#Id'])
+    # AS1 = pd.merge(AS,EPIC,how='inner',on=['#Id'])
+    # AS1 = AS1.reset_index(drop=True)
+    # K2_AS = pd.merge(K2_AS,EPIC,how='inner',on=['#Id'])
+    # K2_AS = K2_AS.reset_index(drop=True)
+    #
+    # K2_AS['delta_met'] = K2_AS['feh'] - AS1['feh']
+    # K2_AS['delta_teff'] = K2_AS['Teff'] - AS1['Teff']
+    #
+    # EPIC1 = pd.DataFrame()
+    # EPIC1['#Id'] = C3_Sky['#Id']
+    # EPIC1 = pd.merge(EPIC1,AS[['#Id']],how='inner',on=['#Id'])
+    # AS_Sky = pd.merge(AS,EPIC1,how='inner',on=['#Id'])
+    # AS_Sky = AS_Sky.reset_index(drop=True)
+    # C3_Sky = pd.merge(C3_Sky,AS_Sky[['#Id','feh']],how='inner',on=['#Id'])
+    # C3_Sky = C3_Sky.reset_index(drop=True)
+    #
+    # C3_Sky['delta_met'] = C3_Sky['[Fe/H]'] - C3_Sky['feh']
+    #
+    # bins = np.linspace(-4.,4.5,18)
+    # dfeh, edges, number = scipy.stats.binned_statistic(K2_AS['Z'],K2_AS['delta_met'],statistic='median',bins=bins)
+    # stdFeh, stdEdges, stdNumber = scipy.stats.binned_statistic(K2_AS['Z'],K2_AS['delta_met'],statistic=lambda x: np.std(x),bins=bins)
+    # # print(dfeh,edges)
+    # # print(stdFeh,stdEdges)
+    # # print(np.std(K2_AS['delta_met']),np.mean(K2_AS['delta_met']))
+    # fig, ax = plt.subplots()
+    # # ax.fill_between(edges[1:]-.25,dfeh-stdFeh,dfeh+stdFeh,color='orange',alpha=0.2)
+    # a = ax.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],c=K2_AS['delta_met'])
+    # ax.plot(K2_AS['J']-K2_AS['Ks'],-13*(K2_AS['J']-K2_AS['Ks'])+9.,'g')
     # plt.gca().invert_yaxis()
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'$\Delta$ [Fe/H]', rotation=270, fontsize=15, labelpad=25)
-    # plt.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],alpha=0.05)
-    # plt.xlabel(r'J - K',fontsize=15)
-    # plt.ylabel(r'M$\_{\rm{bol}}$',fontsize=15)
-
-    K2_New['feh_corr'] = 0
-    for j in range(len(K2_New)):
-        JK = K2_New['J'].iloc[j] - K2_New['Ks'].iloc[j]
-        Mbol = K2_New['mbol'].iloc[j]
-        a = (np.abs(yi[:,0] - Mbol)).argmin()
-        b = (np.abs(xi[0][:] - JK)).argmin()
-        # print(b,(np.abs(xi[0][:] - JK)).argmin(),xi[0][b])
-        # print(a,(np.abs(yi[:,0] - Mbol)).argmin(),yi[a][0])
-        # print(zi[a][b])
-        K2_New['feh_corr'].iloc[j] = zi[a][b]
-
-    K2_New['corrected_feh'] = K2_New['feh'] - K2_New['feh_corr']
-
-    # print(np.median(abs(K2_AS['corrected_feh'] - AS['feh'])))
-    K2_New['corrected_feh'].to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/K2_Photo_FeH_Corr',index=False)
+    # plt.xlim(0.4,0.8)
+    # plt.ylim(3,-1)
+    # # ax.plot(edges[1:]-0.25,dfeh,color='orange',linewidth=2.)
+    # cbar = fig.colorbar(a)
+    # # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
+    #
+    # # from scipy.optimize import curve_fit
+    # # K2_AS = K2_AS[K2_AS['Z'] < 0.]
+    # # def func(x,a,c):
+    # #     return a/x + c
+    # # popt, pcov = curve_fit(func, K2_AS['Z'], K2_AS['delta_met'],sigma=K2_AS['feh_err'])
+    # # print(popt)
+    # # ax.plot(K2_AS['Z'],func(K2_AS['Z'],*popt),'g--')
+    # import scipy.interpolate as interp
+    # x = K2_AS['J']-K2_AS['Ks']
+    # y = K2_AS['mbol']
+    # xi, yi = np.linspace(x.min(),x.max(),500), np.linspace(y.min(),y.max(),500)
+    # xi, yi = np.meshgrid(xi,yi)
+    # rbf = interp.Rbf(x,y,K2_AS['delta_met'],function='linear')
+    # zi = rbf(xi,yi)
+    # # fig = plt.figure()
+    # # cont = plt.contourf(xi,yi,zi,100,cmap=plt.cm.RdGy)
+    # # plt.gca().invert_yaxis()
+    # # cbar = plt.colorbar()
+    # # cbar.set_label(r'$\Delta$ [Fe/H]', rotation=270, fontsize=15, labelpad=25)
+    # # plt.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],alpha=0.05)
+    # # plt.xlabel(r'J - K',fontsize=15)
+    # # plt.ylabel(r'M$\_{\rm{bol}}$',fontsize=15)
+    #
+    # K2_New['feh_corr'] = 0
+    # for j in range(len(K2_New)):
+    #     JK = K2_New['J'].iloc[j] - K2_New['Ks'].iloc[j]
+    #     Mbol = K2_New['mbol'].iloc[j]
+    #     a = (np.abs(yi[:,0] - Mbol)).argmin()
+    #     b = (np.abs(xi[0][:] - JK)).argmin()
+    #     # print(b,(np.abs(xi[0][:] - JK)).argmin(),xi[0][b])
+    #     # print(a,(np.abs(yi[:,0] - Mbol)).argmin(),yi[a][0])
+    #     # print(zi[a][b])
+    #     K2_New['feh_corr'].iloc[j] = zi[a][b]
+    #
+    # K2_New['corrected_feh'] = K2_New['feh'] - K2_New['feh_corr']
+    #
+    # # print(K2_New.columns.values)
+    # plt.figure()
+    # plt.scatter(K2_AS['feh'],K2_AS['delta_met'])
+    # # cbar = plt.colorbar()
+    # # plt.show()
+    #
+    # # plt.figure()
+    # # plt.scatter(AS['Glon'],AS['Glat'],c=K2_AS['feh'],vmin=-3, vmax=1.1)
+    # # cbar = plt.colorbar()
+    #
+    # plt.figure()
+    # plt.scatter(C3_Sky['feh'],C3_Sky['delta_met'])#,c=C3_Sky['delta_met'],vmin=-1, vmax=1)
+    # # cbar = plt.colorbar()
     # plt.show()
-    sys.exit()
-
+    # # print(np.median(abs(K2_AS['corrected_feh'] - AS['feh'])))
+    # # K2_New[['#Id','corrected_feh']].to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/K2_Photo_FeH_Corr',index=False)
+    # # plt.show()
+    # # sys.exit()
 
     ''' Specroscopic and Photometric Mass and Age Comparisons: C3 & C6 '''
     # data = [c_three,c3]
@@ -1266,8 +1443,8 @@ if __name__ == '__main__':
     ''' Kiel Diagram '''
     plt.figure()
     APK2=APK2[APK2['alpha']>0.1]
-    plt.scatter(APK2['Teff'],APK2['logg'],alpha=0.4,label=r'APOKASC')
-    plt.scatter(AS['Teff'],AS['logg'],alpha=0.4,label=r'K2 (Full)')
+    plt.scatter(APK2['Teff'],APK2['Av'],alpha=0.4,label=r'APOKASC')
+    plt.scatter(AS['Teff'],AS['Av'],alpha=0.4,label=r'K2 (Full)')
     # plt.scatter(AS['Teff'],AS['lgs'],color='k')
     # cbar = plt.colorbar()
     # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=25)
@@ -1634,17 +1811,17 @@ if __name__ == '__main__':
     # AS = AS[AS['alpha'] < -10]
     plt.figure()
     # print(K2_New['feh'])
-    plt.plot([min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
+    plt.plot([min(K2_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
     plt.scatter(APK2['Gal_Rad'],APK2['Z'],color='grey',alpha='0.3',label=r'APOKASC')#,c=AS['age'],cmap=colormaps.parula)
-    plt.scatter(C6_New['Gal_Rad'],C6_New['Z'],label=r'C6',alpha='0.4')
-    plt.scatter(C3_New['Gal_Rad'],C3_New['Z'],label=r'C3',alpha='0.4')
-    # plt.scatter(AS_clump['Gal_Rad'],AS_clump['Z'],label=r'Clump Spectr.',alpha=0.7)#,c=K2_New['feh'],cmap=colormaps.parula)
+    # plt.scatter(C6_New['Gal_Rad'],C6_New['Z'],label=r'C6',alpha='0.4')
+    # plt.scatter(C3_New['Gal_Rad'],C3_New['Z'],label=r'C3',alpha='0.4')
+    plt.scatter(AS['Gal_Rad'],AS['Z'],c=AS['age'],cmap=colormaps.parula)
     plt.plot([9,9],[-2-mu_Z,-2+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
     plt.plot([9-mu_GR,9+mu_GR],[-2,-2],color='k',linewidth=2,alpha=0.7,label=None)
-    # cbar = plt.colorbar()
-    # cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
+    cbar = plt.colorbar()
+    cbar.set_label(r'Age [Gyr]', rotation=270, fontsize=15, labelpad=25)
     plt.xlabel(r'Galactic Radius [kpc]',fontsize=20)
-    plt.xlim(min(C6_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2)
+    plt.xlim(min(K2_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2)
     plt.ylabel(r'Z [kpc]',fontsize=20)
     plt.tick_params(labelsize=15)
     plt.legend()
