@@ -59,6 +59,48 @@ def p_in(name,df1,field):
 
     return df1
 
+def uncert(parameter, data):
+    '''
+    parameter: string of parameter to determine uncertainty of
+    data: array of dataframes for which uncertainties require calculating
+    '''
+    for k in range(len(parameter)):
+        param = parameter[k]
+        for j in range(len(data)):
+            df = data[j]
+            up = param + '_68U'
+            lo = param + '_68L'
+            rat1 = abs(df[param]-df[lo])/abs(df[up]-df[param]) # Lower/Upper
+            rat2 = abs(df[param]-df[up])/abs(df[lo]-df[param]) # Upper/Lower
+            U = abs(df[param]-df[up])
+            L = abs(df[param]-df[lo])
+            sig = 'sig_'+param
+            df[sig] = 0
+            for i in range(len(df)):
+                if (rat1.iloc[i] < 0.5) | (rat2.iloc[i] < 0.5):
+                    df[sig].iloc[i] = max(U.iloc[i],L.iloc[i])
+                else:
+                    df[sig].iloc[i] = (df[up].iloc[i]-df[lo].iloc[i])/2
+            data[j] = df
+
+    return data
+
+
+def sig_cut(data, param, cut, upper_lim):
+    '''
+    data: data for cut to be applied to.
+    param: parameter to be cut on.
+    cut: fractional uncertainty threshold.
+    upper_lim: set to max age to be included.
+    '''
+    for i in range(len(data)):
+        df = data[i]
+        df = df[df[param] < upper_lim]
+        df = df[(df['sig_'+param]/df[param]) < cut]
+        df.reset_index(drop=True)
+        data[i] = df
+    return data
+
 def Nseismo_link(field,df):
     ''' Match number of seismic detections to EPIC numbers '''
     a = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_K2P2_'+field)
@@ -356,22 +398,6 @@ def vert_dist(i):
     i['Z'] = (f.z*u.pc)*1e-3
     i['Gal_Rad'] = np.sqrt(i['X']**2 + i['Y']**2)
     return i
-
-def spec(i):
-    ''' Specification of code to run depending upon input '''
-    itrs=0
-    samp=0
-    clump=0
-    # With Clump, no sampling
-    if i == '0': itrs = 1; samp = 0; clump = 0; folder_loc = 'Clump_No_Samp/'
-    # Without Clump, no sampling
-    if i == '1': itrs = 1; samp = 0; clump = 1; folder_loc = 'No_Clump_No_Samp/'
-    # With Clump, sampled
-    if i == '2': itrs = 1; samp = 1; clump = 0; folder_loc = 'Clump_Samp/'
-    # Without Clump, sampled
-    if i == '3': itrs = 1; samp = 1; clump = 1; folder_loc = 'No_Clump_Samp/'
-
-    return itrs, samp, clump, folder_loc
 
 def Z_subplots(df1,df2,param,ran,xtag,z):
     ''' Plots of distributions of mass and age at different heights above the plane '''
