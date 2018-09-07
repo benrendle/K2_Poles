@@ -29,6 +29,7 @@ import K2_properties as prop
 import K2_data as dat
 import TAR as tt
 import time
+import matplotlib.backends.backend_pdf
 
 mpl.rcParams['xtick.direction'] = 'out'
 mpl.rcParams['ytick.direction'] = 'out'
@@ -39,9 +40,9 @@ if __name__ == '__main__':
     PHASE 1: READ IN PRELIMINARY PARAM RUNS AND CROSS MATCH WITH INPUT DATA
     '''
 
-    # ext = '/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/'
-    #
-    # ''' Read any results from tar files '''
+    ext = '/media/bmr135/SAMSUNG/GA/K2Poles/param_outputs/Poles/'
+
+    ''' Read any results from tar files '''
     # # a = [\
     # #     ['.tgz', 'folder/', 'file.in.mo'], \
     # #     ]
@@ -57,9 +58,9 @@ if __name__ == '__main__':
     # APK = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/APOKASC4BEN.txt')
     # APK2 = pd.read_csv(ext+'APOKASC/param_in_June222017_150813.in.mo',delimiter=r'\s+')
     # #
-    # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_self')
-    # # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars.csv')
-    # TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0405/TRILEGAL_C6_self')
+    # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0407/TRILEGAL_C3_self')
+    # # TRI3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0407/TRILEGAL_C3_old_stars.csv')
+    # TRI6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/Data0407/TRILEGAL_C6_self')
     #
     # ''' Read in files used with a Y enriched grid '''
     # C3en = pd.read_csv(ext+'K2.R3/C3_Andrea_27072018.in.mo',delimiter=r'\s+')
@@ -77,9 +78,9 @@ if __name__ == '__main__':
     # C6_feh = pd.read_csv(ext+'C6_FeH_200818/C6_FeH_20082018.in.mo',delimiter=r'\s+')
     #
     # ''' Skymapper (Luca Casagrande) [Fe/H] and Teff input results '''
-    # C3_Luca = pd.read_csv(ext+'C3_Luca.in.mo',delimiter=r'\s+')
+    # C3_Luca = pd.read_csv(ext+'C3_Luca_mhigh/C3_Luca.in.mo',delimiter=r'\s+')
     # Luca3 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C3_Luca.in',delimiter=r'\s+')
-    # C6_Luca = pd.read_csv(ext+'C6_Luca.in.mo',delimiter=r'\s+')
+    # C6_Luca = pd.read_csv(ext+'C6_Luca_mhigh/C6_Luca.in.mo',delimiter=r'\s+')
     # Luca6 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C6_Luca.in',delimiter=r'\s+')
     # Luca3en = pd.read_csv(ext+'/K2.R10/C3_Luca.in.mo',delimiter=r'\s+')
     # # Luca6en = pd.read_csv(ext+'K2.R11/C6_Luca.in.mo',delimiter=r'\s+')
@@ -113,8 +114,8 @@ if __name__ == '__main__':
     # ''' All spectroscopic parameter values run at once with PARAM '''
     # C_three = pd.read_csv(ext+'C3AS_040718.in.mo',delimiter=r'\s+')
     # C_six = pd.read_csv(ext+'C6AS_040718.in.mo',delimiter=r'\s+')
-    # # C3_New = pd.read_csv(ext+'C3_050718.in.mo',delimiter=r'\s+')
-    # # C6_New = pd.read_csv(ext+'C6_050718.in.mo',delimiter=r'\s+')
+    # # C3_New = pd.read_csv(ext+'C3_070718.in.mo',delimiter=r'\s+')
+    # # C6_New = pd.read_csv(ext+'C6_070718.in.mo',delimiter=r'\s+')
     #
     #
     # ''' Additional PARAM inputs that aren't output values '''
@@ -517,23 +518,23 @@ if __name__ == '__main__':
     ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
     # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
     ''' Read in processed results files '''
-    C3_New = pd.read_csv(ext_load+'Normal/Sep_2018/C3_05092018')
-    C6_New = pd.read_csv(ext_load+'Normal/Sep_2018/C6_050918')
-    K2_New = pd.read_csv(ext_load+'Normal/Sep_2018/K2_050918')
-    K2_AS = pd.read_csv(ext_load+'Normal/Sep_2018/K2_AS_050918')
-    AS = pd.read_csv(ext_load+'Normal/Sep_2018/AS_050918')
-    APK2 = pd.read_csv(ext_load+'Normal/Sep_2018/APOKASC_050918')
-    c_three = pd.read_csv(ext_load+'Normal/Sep_2018/Spec_C3_050918')
-    c_six = pd.read_csv(ext_load+'Normal/Sep_2018/Spec_C6_050918')
-    RC3 = pd.read_csv(ext_load+'Normal/Sep_2018/RC3_050918')
-    RC6 = pd.read_csv(ext_load+'Normal/Sep_2018/RC6_050918')
-    L3 = pd.read_csv(ext_load+'Normal/Sep_2018/L3_050918')
-    L6 = pd.read_csv(ext_load+'Normal/Sep_2018/L6_050918')
-    GES = pd.read_csv(ext_load+'Normal/Sep_2018/GES_050918')
-    AP3 = pd.read_csv(ext_load+'Normal/Sep_2018/AP3_050918')
-    AP6 = pd.read_csv(ext_load+'Normal/Sep_2018/AP6_050918')
-    TRI3 = pd.read_csv(ext_load+'Normal/Sep_2018/TRI3_050918')
-    TRI6 = pd.read_csv(ext_load+'Normal/Sep_2018/TRI6_050918')
+    C3_New = pd.read_csv(ext_load+'Normal/Sep_2018/C3_07092018')
+    C6_New = pd.read_csv(ext_load+'Normal/Sep_2018/C6_070918')
+    K2_New = pd.read_csv(ext_load+'Normal/Sep_2018/K2_070918')
+    K2_AS = pd.read_csv(ext_load+'Normal/Sep_2018/K2_AS_070918')
+    AS = pd.read_csv(ext_load+'Normal/Sep_2018/AS_070918')
+    APK2 = pd.read_csv(ext_load+'Normal/Sep_2018/APOKASC_070918')
+    c_three = pd.read_csv(ext_load+'Normal/Sep_2018/Spec_C3_070918')
+    c_six = pd.read_csv(ext_load+'Normal/Sep_2018/Spec_C6_070918')
+    RC3 = pd.read_csv(ext_load+'Normal/Sep_2018/RC3_070918')
+    RC6 = pd.read_csv(ext_load+'Normal/Sep_2018/RC6_070918')
+    L3 = pd.read_csv(ext_load+'Normal/Sep_2018/L3_070918')
+    L6 = pd.read_csv(ext_load+'Normal/Sep_2018/L6_070918')
+    GES = pd.read_csv(ext_load+'Normal/Sep_2018/GES_070918')
+    AP3 = pd.read_csv(ext_load+'Normal/Sep_2018/AP3_070918')
+    AP6 = pd.read_csv(ext_load+'Normal/Sep_2018/AP6_070918')
+    TRI3 = pd.read_csv(ext_load+'Normal/Sep_2018/TRI3_070918')
+    TRI6 = pd.read_csv(ext_load+'Normal/Sep_2018/TRI6_070918')
 
     C3_Sky = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/matched_GAP_SkyMapper.csv')
     C3_Sky = pd.merge(C3_Sky,C3_New[['#Id']],how='inner',on=['#Id'])
@@ -542,25 +543,25 @@ if __name__ == '__main__':
     # Gaia_IDs.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv',index=False)
 
     ''' Read in files used with a Y enriched grid '''
-    C3en = pd.read_csv(ext_load+'Y_enhanced_grid/C3_050918')
-    C6en = pd.read_csv(ext_load+'Y_enhanced_grid/C6_050918')
-    RC3en = pd.read_csv(ext_load+'Y_enhanced_grid/RC3_050918')
-    RC6en = pd.read_csv(ext_load+'Y_enhanced_grid/RC6_050918')
-    GESen = pd.read_csv(ext_load+'Y_enhanced_grid/GES_050918')
-    AP3en = pd.read_csv(ext_load+'Y_enhanced_grid/AP3_050918')
-    AP6en = pd.read_csv(ext_load+'Y_enhanced_grid/AP6_050918')
-    L3en = pd.read_csv(ext_load+'Y_enhanced_grid/L3_050918')
-    L6en = pd.read_csv(ext_load+'Y_enhanced_grid/L6_050918')
+    C3en = pd.read_csv(ext_load+'Y_enhanced_grid/C3_070918')
+    C6en = pd.read_csv(ext_load+'Y_enhanced_grid/C6_070918')
+    RC3en = pd.read_csv(ext_load+'Y_enhanced_grid/RC3_070918')
+    RC6en = pd.read_csv(ext_load+'Y_enhanced_grid/RC6_070918')
+    GESen = pd.read_csv(ext_load+'Y_enhanced_grid/GES_070918')
+    AP3en = pd.read_csv(ext_load+'Y_enhanced_grid/AP3_070918')
+    AP6en = pd.read_csv(ext_load+'Y_enhanced_grid/AP6_070918')
+    L3en = pd.read_csv(ext_load+'Y_enhanced_grid/L3_070918')
+    L6en = pd.read_csv(ext_load+'Y_enhanced_grid/L6_070918')
 
     ''' [Fe/H] corrected files '''
-    C3_feh = pd.read_csv(ext_load+'Additional_Tests/C3_FeH_050918')
-    C6_feh = pd.read_csv(ext_load+'Additional_Tests/C6_FeH_050918')
+    C3_feh = pd.read_csv(ext_load+'Additional_Tests/C3_FeH_070918')
+    C6_feh = pd.read_csv(ext_load+'Additional_Tests/C6_FeH_070918')
 
     ''' Skymapper (Luca Casagrande) [Fe/H] and Teff input results '''
-    C3_Luca = pd.read_csv(ext_load+'Luca_photom/C3_050918')
-    C6_Luca = pd.read_csv(ext_load+'Luca_photom/C6_050918')
-    Luca3en = pd.read_csv(ext_load+'Luca_photom/C3en050918')
-    # Luca6en = pd.read_csv(ext_load+'Luca_photom/C6en050918')
+    C3_Luca = pd.read_csv(ext_load+'Luca_photom/C3_070918')
+    C6_Luca = pd.read_csv(ext_load+'Luca_photom/C6_070918')
+    Luca3en = pd.read_csv(ext_load+'Luca_photom/C3en070918')
+    # Luca6en = pd.read_csv(ext_load+'Luca_photom/C6en070918')
     # Luca3 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C3_Luca.in')
     # Luca6 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C6_Luca.in')
 
@@ -772,6 +773,7 @@ if __name__ == '__main__':
     # #         bins=np.linspace(0,20,40),stacked=True,label=[r'RAVE',r'APOGEE',r'LAMOST'])
     # # ax1.hist(APK2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'APOKASC',normed=True,linewidth=2)
     #
+
     ''' Age KDEs '''
 #     d3 = kde.KDE1D(c_three['age'])
 #     # d6 = kde.KDE1D(c_six['age'])
@@ -1344,7 +1346,7 @@ if __name__ == '__main__':
     # # plt.gca().invert_yaxis()
     # # cbar = plt.colorbar()
     # # cbar.set_label(r'$\Delta$ [Fe/H]', rotation=270, fontsize=15, labelpad=25)
-    # # plt.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],alpha=0.05)
+    # # plt.scatter(K2_AS['J']-K2_AS['Ks'],K2_AS['mbol'],alpha=0.07)
     # # plt.xlabel(r'J - K',fontsize=15)
     # # plt.ylabel(r'M$\_{\rm{bol}}$',fontsize=15)
     #
@@ -1422,16 +1424,45 @@ if __name__ == '__main__':
     # plt.show()
     # sys.exit()
 
+    ''' Save out figures to a single pdf '''
+    # pdf = matplotlib.backends.backend_pdf.PdfPages("Sig_Age_25per.pdf")
+
     ''' Mass vs logg scatter '''
     Luca = pd.concat([C3_Luca, C6_Luca],ignore_index=True)
     Luca = Luca[Luca['age'] > 0.]
-    # L1 = Luca[abs(Luca['Z']) < 0.5]
-    # L2 = Luca[(abs(Luca['Z']) >= 0.5) & (abs(Luca['Z']) < 1.0)]
-    # L3 = Luca[(abs(Luca['Z']) >= 1.0) & (abs(Luca['Z']) < 1.5)]
-    # L4 = Luca[(abs(Luca['Z']) >= 1.5) & (abs(Luca['Z']) < 2.0)]
-    # L5 = Luca[(abs(Luca['Z']) >= 2.0) & (abs(Luca['Z']) < 2.5)]
-    # L6 = Luca[abs(Luca['Z']) >= 2.5]
-    # Luca = Luca.reset_index(drop=True)
+    Luca = Luca[Luca['age'] < 19.9]
+    Luca = Luca[Luca['sig_age']/Luca['age'] < 0.25]
+    Luca = Luca.reset_index(drop=True)
+    L1 = Luca[abs(Luca['Z']) < 0.5]
+    L2 = Luca[(abs(Luca['Z']) >= 0.5) & (abs(Luca['Z']) < 1.0)]
+    L3 = Luca[(abs(Luca['Z']) >= 1.0) & (abs(Luca['Z']) < 1.5)]
+    L4 = Luca[(abs(Luca['Z']) >= 1.5) & (abs(Luca['Z']) < 2.0)]
+    L5 = Luca[(abs(Luca['Z']) >= 2.0) & (abs(Luca['Z']) < 2.5)]
+    L6 = Luca[abs(Luca['Z']) >= 2.5]
+
+    fig, ((ax,ax1),(ax2,ax3),(ax4,ax5)) = plt.subplots(3,2,sharex='col',sharey=True)
+    ax.hist(L1['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $<$ 0.5',linewidth=2)
+    ax.set_yticks([])
+    ax.legend()
+    ax1.hist(L2['age'],bins=np.linspace(0,20,40),histtype='step',label=r'0.5 $<$ Z $<$ 1.0',linewidth=2)
+    ax1.legend()
+    ax2.hist(L3['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.0 $<$ Z $<$ 1.5',linewidth=2)
+    ax2.set_yticks([])
+    ax2.legend()
+    ax3.hist(L4['age'],bins=np.linspace(0,20,40),histtype='step',label=r'1.5 $<$ Z $<$ 2.0',linewidth=2)
+    ax3.legend()
+    ax4.hist(L5['age'],bins=np.linspace(0,20,40),histtype='step',label=r'2.0 $<$ Z $<$ 2.5',linewidth=2)
+    ax4.set_yticks([])
+    ax4.legend()
+    ax5.hist(L6['age'],bins=np.linspace(0,20,40),histtype='step',label=r'Z $>$ 2.5',linewidth=2)
+    ax5.legend()
+    ax4.set_xlabel(r'Age [Gyr]')
+    ax5.set_xlabel(r'Age [Gyr]')
+    plt.tight_layout()
+    # pdf.savefig(fig)
+    # plt.show()
+    #
+    #
     # plt.figure()
     # plt.scatter(L1['mass'],L1['logg'],label=r'Z $< 0.5$',alpha=0.5)
     # plt.scatter(L2['mass'],L2['logg'],label=r'$0.5 <=$ Z $< 1.0$',alpha=0.5)
@@ -1449,7 +1480,7 @@ if __name__ == '__main__':
     # # plt.scatter(Luca['mass'],Luca['logg'],c=abs(Luca['Z']),label=r'Luca',alpha=0.75,cmap=colormaps.parula)
     # # cbar = plt.colorbar()
     # # cbar.set_label(r'Z$_{\rm{abs}}$ [Kpc]', rotation=270, fontsize=15, labelpad=15)
-    # plt.xlim(-0.05+min(Luca['mass']),max(Luca['mass'])+0.1)
+    # plt.xlim(-0.07+min(Luca['mass']),max(Luca['mass'])+0.1)
     # plt.ylim(-0.1+min(Luca['logg']),max(Luca['logg'])+0.1)
     # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     # plt.ylabel(r'logg', fontsize=15)
@@ -1505,30 +1536,32 @@ if __name__ == '__main__':
     # plt.show()
 
     ''' Kiel Diagram '''
-    APK2=APK2[APK2['alpha']>0.1]
+    APK2=APK2[APK2['mass']>0.]
+    a, b = 0.22, 0.79893 # Mosser(?)
+    # a, b = 0.263, 0.772 # Stello et al. 2009
     mesa = pd.read_csv('MESA_track_example',delimiter=r'\s+',skiprows=1,names=['age','logL','logTe','dnu','pi','mod','mod1'])
-    mesa['logg'] = np.log10(27400 * (((mesa['dnu']/0.22)**(1/0.79893))/3090) * np.sqrt(10**(mesa['logTe']/5777)))
+    mesa['logg'] = np.log10(27400 * (((mesa['dnu']/a)**(1/b))/3090) * np.sqrt(10**(mesa['logTe']/5777)))
     mesa2 = pd.read_csv('MESA_track_example2',delimiter=r'\s+',skiprows=1,names=['age','logL','logTe','dnu','pi','mod','mod1'])
-    mesa2['logg'] = np.log10(27400 * (((mesa2['dnu']/0.22)**(1/0.79893))/3090) * np.sqrt(10**(mesa2['logTe']/5777)))
+    mesa2['logg'] = np.log10(27400 * (((mesa2['dnu']/a)**(1/b))/3090) * np.sqrt(10**(mesa2['logTe']/5777)))
     mesa3 = pd.read_csv('MESA_track_example3',delimiter=r'\s+',skiprows=1,names=['age','logL','logTe','dnu','pi','mod','mod1'])
-    mesa3['logg'] = np.log10(27400 * (((mesa3['dnu']/0.22)**(1/0.79893))/3090) * np.sqrt(10**(mesa3['logTe']/5777)))
+    mesa3['logg'] = np.log10(27400 * (((mesa3['dnu']/a)**(1/b))/3090) * np.sqrt(10**(mesa3['logTe']/5777)))
     mesa4 = pd.read_csv('MESA_track_example4',delimiter=r'\s+',skiprows=1,names=['age','logL','logTe','dnu','pi','mod','mod1'])
-    mesa4['logg'] = np.log10(27400 * (((mesa4['dnu']/0.22)**(1/0.79893))/3090) * np.sqrt(10**(mesa4['logTe']/5777)))
+    mesa4['logg'] = np.log10(27400 * (((mesa4['dnu']/a)**(1/b))/3090) * np.sqrt(10**(mesa4['logTe']/5777)))
     mesa5 = pd.read_csv('MESA_track_example5',delimiter=r'\s+',skiprows=1,names=['age','logL','logTe','dnu','pi','mod','mod1'])
-    mesa5['logg'] = np.log10(27400 * (((mesa5['dnu']/0.22)**(1/0.79893))/3090) * np.sqrt(10**(mesa5['logTe']/5777)))
+    mesa5['logg'] = np.log10(27400 * (((mesa5['dnu']/a)**(1/b))/3090) * np.sqrt(10**(mesa5['logTe']/5777)))
 
-    plt.figure()
+    f = plt.figure()
+    Luca = Luca[(Luca['age'] < 19.9)]
     young = C3_Luca[(C3_Luca['age'] < 2.0)]
     # plt.scatter(APK2['Teff'],APK2['Av'],alpha=0.4,label=r'APOKASC')
-    plt.scatter(Luca['teff'],Luca['logg'],c=Luca['m_seismo'],cmap=colormaps.parula,alpha=0.84,label=r'K2 (Luca)')
-    plt.plot(10**mesa4['logTe'],mesa4['logg'],color='r',label=r'-0.75')
-    plt.plot(10**mesa['logTe'],mesa['logg'],color='k',label=r'-0.5')
-    plt.plot(10**mesa5['logTe'],mesa5['logg'],color='k',label=r'-0.5',linestyle='--')
-    plt.plot(10**mesa2['logTe'],mesa2['logg'],color='m',label=r'-0.25')
-    plt.plot(10**mesa3['logTe'],mesa3['logg'],color='orange',label=r'0.0')
-    # plt.scatter(young['teff'],young['logg'],color='k')
+    plt.scatter(Luca['teff'],Luca['logg'],c=Luca['mass'],cmap=colormaps.parula,alpha=0.84,label='Luca Extended Mass')
+    plt.plot(10**mesa5['logTe'],mesa5['logg'],color='k',label=r'0.8 M$_{\odot}$; -0.5 dex',linestyle='--')
+    plt.plot(10**mesa['logTe'],mesa['logg'],color='k',label=r'1.0 M$_{\odot}$; -0.5 dex')
+    plt.plot(10**mesa4['logTe'],mesa4['logg'],color='orange',label=r'0.8 M$_{\odot}$; -0.25 dex',linestyle='--')
+    plt.plot(10**mesa2['logTe'],mesa2['logg'],color='orange',label=r'1.0 M$_{\odot}$; -0.25 dex')
+
     cbar = plt.colorbar()
-    cbar.set_label(r'Mass$_{scaling}$ [M$_{\odot}$]', rotation=270, fontsize=15, labelpad=25)
+    cbar.set_label(r'Mass [M$_{\odot}$]', rotation=270, fontsize=15, labelpad=25)
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
     plt.xlabel(r'T$_{\rm{eff}}$ [K]', fontsize=15)
@@ -1537,7 +1570,24 @@ if __name__ == '__main__':
     plt.xlim(5500,4200)
     plt.ylim(3.5,1.8)
     plt.tight_layout()
+    # pdf.savefig(f)
+    # f.savefig('Extended_mass_Mcbar.pdf', bbox_inches='tight')
+
+    f1 = plt.figure()
+    d1 = kde.KDE1D(Luca['age'])
+    x1 = np.r_[min(Luca['age']):max(Luca['age']):1024j]
+    plt.plot(x1,d1(x1),linewidth=2,label=r'Phot.')
+    plt.yticks([])
+    plt.xlim(0,20)
+    plt.xlabel(r'Age [Gyr]')
+    # pdf.savefig(f1)
+    # pdf.close()
+
     plt.show()
+
+
+
+    pdf.close()
     sys.exit()
 
     # plt.figure()
@@ -1721,7 +1771,7 @@ if __name__ == '__main__':
     # #
     # f = plt.figure()
     # # plt.scatter(C6_New['mass'],C6_New['Z'],label=r'Full Sample')
-    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # x = np.linspace(0,max(C6_New['mass'])+0.07)
     # plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
     # plt.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None)
     # # plt.errorbar(2.25, -3, xerr=m_err, yerr=z_err*1e-3,color='k')
@@ -1731,7 +1781,7 @@ if __name__ == '__main__':
     # # plt.plot(edges6[:-1],abs(mass_Z6),color='k',linewidth=2)
     # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     # plt.ylabel(r'Z [kpc]', fontsize=15)
-    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     # # f.set_rasterized(True)
     # # plt.title(r'Exploring Spectroscopic Peak Age Properties')
     # plt.legend()
@@ -1742,7 +1792,7 @@ if __name__ == '__main__':
     # mu_m = C3_New['sig_mass'].mean()
     # mu_Z = C3_New['sig_Z'].mean()
     # plt.figure()
-    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # x = np.linspace(0,max(C6_New['mass'])+0.07)
     # # plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
     # plt.scatter(APK2['mass'],APK2['Z'],c=APK2['feh'],cmap=colormaps.parula,label=None,vmin=-2.5,vmax=0.5)
     # plt.scatter(C3_New['mass'],C3_New['Z'],c=C3_New['[Fe/H]'],cmap=colormaps.parula,label=None,vmin=-2.5,vmax=0.5)
@@ -1755,7 +1805,7 @@ if __name__ == '__main__':
     # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
     # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     # plt.ylabel(r'Z [kpc]', fontsize=15)
-    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     # # plt.ylim(-6,8)
     # # plt.legend()
     # plt.tight_layout()
@@ -1765,7 +1815,7 @@ if __name__ == '__main__':
     # mu_m = AS['sig_mass'].mean()
     # mu_Z = AS['sig_Z'].mean()
     # plt.figure()
-    # x = np.linspace(0,max(C6_New['mass'])+0.05)
+    # x = np.linspace(0,max(C6_New['mass'])+0.07)
     # plt.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
     # plt.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None)
     # cbar = plt.colorbar(spacing='uniform')
@@ -1778,7 +1828,7 @@ if __name__ == '__main__':
     # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
     # plt.xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     # plt.ylabel(r'Z [kpc]', fontsize=15)
-    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     # plt.ylim(-6,8)
     # plt.legend()
     # plt.tight_layout()
@@ -1788,27 +1838,27 @@ if __name__ == '__main__':
     mu_m = K2_New['sig_mass'].mean()
     mu_Z = K2_New['sig_Z'].mean()
     fig, (ax1,ax2,cax) = plt.subplots(ncols=3, gridspec_kw={"width_ratios" : [5,5,0.2]})
-    x = np.linspace(0,max(C6_New['mass'])+0.05)
+    x = np.linspace(0,max(C6_New['mass'])+0.07)
     ax1.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
     one = ax1.scatter(K2_New['mass'],K2_New['Z'],c=K2_New['[Fe/H]'],cmap=colormaps.parula,label=None,vmin=-2.5, vmax=0.5)
     ax1.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
     ax1.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
     ax1.set_xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     ax1.set_ylabel(r'Z [kpc]', fontsize=15)
-    ax1.set_xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    ax1.set_xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     ax1.set_ylim(-6,8)
     ax1.legend()
 
     mu_m = AS['sig_mass'].mean()
     mu_Z = AS['sig_Z'].mean()
-    x = np.linspace(0,max(C6_New['mass'])+0.05)
+    x = np.linspace(0,max(C6_New['mass'])+0.07)
     ax2.fill_between(x, 0.1, 1.5, facecolor='gray', alpha=0.2, interpolate=True,label=r'Kepler Z range')
     two = ax2.scatter(AS['mass'],AS['Z'],c=AS['feh'],cmap=colormaps.parula,label=None,vmin=-2.5, vmax=0.5)
     ax2.plot([2.1,2.1],[-4.25-mu_Z,-4.25+mu_Z],color='k',linewidth=2,alpha=0.7,label=None)
     ax2.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
     ax2.set_xlabel(r'Mass [M$_{\odot}$]', fontsize=15)
     # ax2.set_ylabel(r'Z [kpc]', fontsize=15)
-    ax2.set_xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    ax2.set_xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     ax2.set_ylim(-6,8)
     ax2.set_yticklabels([])
     ax2.legend()
@@ -1837,7 +1887,7 @@ if __name__ == '__main__':
     # plt.plot([2.1-mu_m,2.1+mu_m],[-4.25,-4.25],color='k',linewidth=2,alpha=0.7,label=None)
     # plt.xlabel(r'Mass [M$_{\odot}$]')
     # plt.ylabel(r'Z [kpc]')
-    # plt.xlim(min(C6_New['mass'])-0.05,max(C6_New['mass'])+0.05)
+    # plt.xlim(min(C6_New['mass'])-0.07,max(C6_New['mass'])+0.07)
     # plt.legend()
     # plt.tight_layout()
     # plt.show()
