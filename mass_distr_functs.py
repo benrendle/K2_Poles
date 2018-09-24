@@ -15,7 +15,7 @@ from astropy.coordinates import SkyCoord
 import seaborn as sns
 import colormaps
 # from path import path
-from pyqt_fit import kde
+# from pyqt_fit import kde
 import sim_pert as sp
 from decimal import Decimal
 # import pystan

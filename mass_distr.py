@@ -33,6 +33,7 @@ import matplotlib.backends.backend_pdf
 
 mpl.rcParams['xtick.direction'] = 'out'
 mpl.rcParams['ytick.direction'] = 'out'
+mpl.rcParams["font.family"] = "Times New Roman"
 
 if __name__ == '__main__':
 
@@ -623,7 +624,7 @@ if __name__ == '__main__':
     # sys.exit()
 
     ''' Save out figures to a single pdf '''
-    pdf = matplotlib.backends.backend_pdf.PdfPages("K2_Gold1_KielMass.pdf")
+    # pdf = matplotlib.backends.backend_pdf.PdfPages("K2_Gold1_KielMass.pdf")
 
     # print(len(C3_New),len(C6_New))
     # print(len(c_three),len(c_six))
@@ -950,7 +951,7 @@ if __name__ == '__main__':
     ax1.tick_params(labelsize=15)
     ax1.legend()
     plt.tight_layout()
-    pdf.savefig(fig)
+    # pdf.savefig(fig)
     #
     # fig, ax1 = plt.subplots(1)
     # ax1.hist(AS['feh'],bins=np.linspace(-2,0.75,30),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
@@ -1475,7 +1476,7 @@ if __name__ == '__main__':
     mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Photom.')
     mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'Photom., Gold')
     plt.legend(prop={'size':15})
-    pdf.savefig(f)
+    # pdf.savefig(f)
     # plt.show()
     # sys.exit()
 
@@ -1559,7 +1560,7 @@ if __name__ == '__main__':
     ax.set_xlabel(r'Age [Gyr]')
     ax1.set_xlabel(r'Age [Gyr]')
     plt.tight_layout()
-    pdf.savefig(fig)
+    # pdf.savefig(fig)
     # pdf.close()
     # plt.show()
     # sys.exit()
@@ -1680,7 +1681,7 @@ if __name__ == '__main__':
     plt.xlim(5500,4200)
     plt.ylim(3.5,1.8)
     plt.tight_layout()
-    pdf.savefig(f)
+    # pdf.savefig(f)
 
     ### Spectroscopic K2 sample ###
     f = plt.figure()
@@ -1699,7 +1700,7 @@ if __name__ == '__main__':
     plt.xlim(5500,4200)
     plt.ylim(3.5,1.8)
     plt.tight_layout()
-    pdf.savefig(f)
+    # pdf.savefig(f)
     # f.savefig('All_Spec.pdf', bbox_inches='tight')
 
     ### Luca photom, Z < 1. ###
@@ -1760,7 +1761,7 @@ if __name__ == '__main__':
     plt.ylim(3.5,1.8)
     plt.tight_layout()
     # f.savefig('K2_age.pdf', bbox_inches='tight')
-    pdf.savefig(f)
+    # pdf.savefig(f)
 
     f1 = plt.figure()
     d1 = kde.KDE1D(APK2['age'])
@@ -1781,7 +1782,7 @@ if __name__ == '__main__':
     plt.legend()
     # f1.savefig('Age_KDE_all.pdf', bbox_inches='tight')
     # plt.show()
-    pdf.savefig(f1)
+    # pdf.savefig(f1)
     # sys.exit()
 
     ''' Replication of Andrea's plot (10/09/2018) using spectroscopic K2 data (mass/age vs Z with [Fe/H] colour bar - date split by alpha) '''
@@ -2114,7 +2115,7 @@ if __name__ == '__main__':
     # cbar.update_ticks()
     # plt.tight_layout()
     # plt.show()
-    pdf.savefig(fig)
+    # pdf.savefig(fig)
 
     ''' M vs Z - no colourbar '''
     # mu_m = (C3_New['sig_mass'].mean() + C6_New['sig_mass'].mean())/2
@@ -2233,7 +2234,7 @@ if __name__ == '__main__':
     # AS = AS[AS['alpha'] < -10]
     f = plt.figure()
     # print(K2_New['feh'])
-    plt.plot([min(Luca['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--')
+    plt.plot([min(Luca['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2],[0,0],color='r',linewidth=2,alpha=0.7,linestyle='--',label=None)
     plt.scatter(APK2['Gal_Rad'],APK2['Z'],color='grey',alpha='0.3',label=r'APOKASC')#,c=AS['age'],cmap=colormaps.parula)
     plt.scatter(C6_Luca['Gal_Rad'],C6_Luca['Z'],label=r'C6',alpha='0.4')
     plt.scatter(C3_Luca['Gal_Rad'],C3_Luca['Z'],label=r'C3',alpha='0.4')
@@ -2248,10 +2249,11 @@ if __name__ == '__main__':
     plt.xlim(min(K2_New['Gal_Rad'])-0.2,max(APK2['Gal_Rad'])+0.2)
     plt.ylabel(r'Z [kpc]',fontsize=20)
     plt.tick_params(labelsize=15)
+    plt.subplots_adjust(left=0.13,top=0.93,bottom=0.15)
     plt.legend()
-    # plt.show()
-    pdf.savefig(f)
-    pdf.close()
+    plt.show()
+    # pdf.savefig(f)
+    # pdf.close()
 
     # plt.figure()
     # plt.scatter(APK2['dist']*1e-3,APK2['Gal_Rad'])

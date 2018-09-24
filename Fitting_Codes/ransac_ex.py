@@ -21,7 +21,7 @@ n_outliers = 50
 # y[:n_outliers] = -3 + 10 * np.random.normal(size=n_outliers)
 
 ''' Data in '''
-df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/AS_03082018')
+df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Normal/Aug_2018/AS_03082018')
 df['Av_sig'] = (df['Av_68U']-df['Av_68L'])/2.
 df['L'] = df['rad']**2 * (df['Teff']/5777)**4
 X = (df['L'])
