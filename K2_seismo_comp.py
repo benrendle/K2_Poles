@@ -76,7 +76,7 @@ GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
 GAP3_v2 = GAP3_v2.reset_index(drop=True)
 GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
 GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
-# GAP3_v2.to_csv('/home/bmr135/GA/K2Poles/GAP3')
+# GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob',index=False)
 
 GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
@@ -86,8 +86,9 @@ GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
 GAP6_v2 = GAP6_v2.reset_index(drop=True)
 GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
 GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
-# GAP6_v2.to_csv('/home/bmr135/GA/K2Poles/GAP6')
+# GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob',index=False)
 
+# sys.exit()
 # cols = ['EPIC','2MASS','RA','Dec']#,'Teff','[Fe/H]','logg']
 # GAP3_v2.to_csv('/home/ben/Desktop/C3_GAP_Gaia',columns=cols,index=False)
 # GAP6_v2.to_csv('/home/ben/Desktop/C6_GAP_Gaia',columns=cols,index=False)
@@ -218,15 +219,15 @@ def hist_orig(df,df1,cut,bins,ext,n):
     return hist, b
 
 ''' TRILEGAL selection cuts '''
-TRILEGAL_C3 = prop.det_prob(TRILEGAL_C3,'numax',3090.0,135.1)
-TRILEGAL_C6 = prop.det_prob(TRILEGAL_C6,'numax',3090.0,135.1)
-
-TRILEGAL_C3 = TRILEGAL_C3[ (TRILEGAL_C3['numax'] > 10) & (TRILEGAL_C3['numax'] < 280) & \
-(TRILEGAL_C3['Hmag'] > 7) & (TRILEGAL_C3['Hmag'] < 12) & (TRILEGAL_C3['JK'] > 0.5) & \
-(TRILEGAL_C3['prob_s'] > 0.95)]
-TRILEGAL_C6 = TRILEGAL_C6[ (TRILEGAL_C6['numax'] > 10) & (TRILEGAL_C6['numax'] < 280) & \
-(TRILEGAL_C6['Vcut'] > 9) & (TRILEGAL_C6['Vcut'] < 15) & (TRILEGAL_C6['JK'] > 0.5) & \
-(TRILEGAL_C6['prob_s'] > 0.95)]
+# TRILEGAL_C3 = prop.det_prob(TRILEGAL_C3,'numax',3090.0,135.1)
+# TRILEGAL_C6 = prop.det_prob(TRILEGAL_C6,'numax',3090.0,135.1)
+#
+# TRILEGAL_C3 = TRILEGAL_C3[ (TRILEGAL_C3['numax'] > 10) & (TRILEGAL_C3['numax'] < 280) & \
+# (TRILEGAL_C3['Hmag'] > 7) & (TRILEGAL_C3['Hmag'] < 12) & (TRILEGAL_C3['JK'] > 0.5) & \
+# (TRILEGAL_C3['prob_s'] > 0.95)]
+# TRILEGAL_C6 = TRILEGAL_C6[ (TRILEGAL_C6['numax'] > 10) & (TRILEGAL_C6['numax'] < 280) & \
+# (TRILEGAL_C6['Vcut'] > 9) & (TRILEGAL_C6['Vcut'] < 15) & (TRILEGAL_C6['JK'] > 0.5) & \
+# (TRILEGAL_C6['prob_s'] > 0.95)]
 
 # C3orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
 # C6orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
@@ -250,12 +251,16 @@ TRILEGAL_C6 = TRILEGAL_C6[ (TRILEGAL_C6['numax'] > 10) & (TRILEGAL_C6['numax'] <
 # TRI6 = TRILEGAL_C6[TRILEGAL_C6['logAge'] > np.log10(9e9)]
 # TRI3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_old_stars',index=False)
 # TRI6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_old_stars',index=False)
-TRILEGAL_C3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_self',index=False)
-TRILEGAL_C6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_self',index=False)
-print('Trilegal saved out')
+# TRILEGAL_C3.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C3_self',index=False)
+# TRILEGAL_C6.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/TRILEGAL_C6_self',index=False)
+# print('Trilegal saved out')
 
+# print(len(YC3),len(SC3),len(BC3))
+# print(len(YC6),len(SC6),len(BC6))
 YC3,SC3,BC3,EC3,YEC3,SEC3,besa3,YC6,SC6,BC6,EC6,besa6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
-
+# print(len(YC3),len(SC3),len(BC3))
+# print(len(YC6),len(SC6),len(BC6))
+# sys.exit()
 
 ''' Yvonne Detects and Benoit doesn't
     - Merge, concatenate, delete duplicates '''
@@ -332,6 +337,25 @@ LAMOST = LAMOST.reset_index(drop=True)
 # LAMOST.to_csv(ext_GA+'GA/K2Poles/APO_LAMOST/LAMOST_full_C6.csv',index=False,na_rep='Inf')
 print( "LAMOST C6 saved out ", len(LAMOST))
 
+''' Merging RAVE data with individual asteroseismic data sets for full RAVE
+    spectro-seismic data list '''
+RAVE_list = [RAVE3,RAVE6,RAVE3,RAVE6,RAVE3,RAVE6]
+YR3,YR6,BR3,BR6,SR3,SR6 = dat.RAVE_merge([YC3,YC6,BC3,BC6,SC3,SC6], \
+                                RAVE_list,['YR3','YR6','BR3','BR6','SR3','SR6'])
+
+RAVE3 = pd.concat([YR3,BR3,SR3],ignore_index=True)
+RAVE3 = RAVE3.drop_duplicates(subset=['EPIC'])
+RAVE3 = RAVE3.fillna(value='NaN',method=None)
+RAVE3 = RAVE3.reset_index(drop=True)
+# RAVE3.to_csv(ext_GA+'GA/K2Poles/RAVE_C3.csv',index=False,na_rep='Inf')
+RAVE6 = pd.concat([YR6,BR6,SR6],ignore_index=True)
+RAVE6 = RAVE6.drop_duplicates(subset=['EPIC'])
+RAVE6 = RAVE6.fillna(value='NaN',method=None)
+RAVE6 = RAVE6.reset_index(drop=True)
+# RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE_C6.csv',index=False,na_rep='Inf')
+RAVE3 = RAVE3[RAVE3['[Fe/H]_RAVE'] > -900]
+RAVE6 = RAVE6[RAVE6['[Fe/H]_RAVE'] > -900]
+
 
 ''' Complete asteroseismic lists '''
 camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
@@ -344,15 +368,34 @@ camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
 camp6_0 = camp6_0.reset_index(drop=True)
 camp6_0 = camp6_0.fillna(value='NaN',method=None)
 
-cols = ['EPIC','RA','Dec','Teff','[Fe/H]','logg']
+cols = ['EPIC','RA','Dec','Teff','[Fe/H]','slogg','logg','radius','Radius']
 print(len(GAP3),len(GAP6))
 K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
 K2_camp = K2_camp.reset_index(drop=True)
 # K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
-# camp3_0.to_csv('/home/ben/Desktop/C3_Gaia',columns=cols,index=False)
-# camp6_0.to_csv('/home/ben/Desktop/C6_Gaia',columns=cols,index=False)
+# camp3_0.to_csv('/home/bmr135/Desktop/C3',columns=cols,index=False)
+# camp6_0.to_csv('/home/bmr135/Desktop/C6',columns=cols,index=False)
 
 print(len(camp3_0),len(camp6_0))
+
+''' Complete spectroscopic lists '''
+spec3_0 = pd.concat([AP3,RAVE3,GES],ignore_index=True)
+spec3_0 = spec3_0.drop_duplicates(subset=['EPIC'])
+spec3_0 = spec3_0.reset_index(drop=True)
+spec3_0 = spec3_0.fillna(value='NaN',method=None)
+
+spec6_0 = pd.concat([AP6,RAVE6,LAMOST],ignore_index=True)
+spec6_0 = spec6_0.drop_duplicates(subset=['EPIC'])
+spec6_0 = spec6_0.reset_index(drop=True)
+spec6_0 = spec6_0.fillna(value='NaN',method=None)
+
+cols = ['EPIC','RA','Dec','Teff','[Fe/H]','slogg','logg','radius','Radius','TEFF','LOGG']
+
+# spec3_0.to_csv('/home/bmr135/Desktop/C3_spec_gaia',columns=cols,index=False)
+# spec6_0.to_csv('/home/bmr135/Desktop/C6_spec_gaia',columns=cols,index=False)
+# print(spec3_0.columns.values)
+print(len(spec3_0),len(spec6_0))
+# sys.exit()
 
 # YC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/YC3_TL',index=False)
 # BC3.to_csv('/media/ben/SAMSUNG1/GA/K2Poles/BC3_TL',index=False)
@@ -497,29 +540,7 @@ Z17 = merged[17][1]
 
 print( "Sigma clip complete")
 
-''' Merging RAVE data with individual asteroseismic data sets for full RAVE
-    spectro-seismic data list '''
-RAVE_list = [RAVE3,RAVE6,RAVE3,RAVE6,RAVE3,RAVE6,RAVE6,RAVE6,RAVE3,RAVE3]
-YSR3,YSR6,BSR3,BSR6,YBR3,YBR6 = dat.RAVE_merge([YS_C3,YS_C6,BS_C3,BS_C6,YB_C3,YB_C6], \
-                                RAVE_list,['YSR3','YSR6','BSR3','BSR6','YBR3','YBR6'])
 
-RAVE3 = pd.concat([YBR3,YSR3,BSR3],ignore_index=True)
-RAVE3 = RAVE3.drop_duplicates(subset=['EPIC'])
-RAVE3 = RAVE3.fillna(value='NaN',method=None)
-RAVE3 = RAVE3.reset_index(drop=True)
-RAVE3.to_csv(ext_GA+'GA/K2Poles/RAVE_C3.csv',index=False,na_rep='Inf')
-RAVE6 = pd.concat([YBR6,YSR6,BSR6],ignore_index=True)
-RAVE6 = RAVE6.drop_duplicates(subset=['EPIC'])
-RAVE6 = RAVE6.fillna(value='NaN',method=None)
-RAVE6 = RAVE6.reset_index(drop=True)
-RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE_C6.csv',index=False,na_rep='Inf')
-# GR = pd.merge(RAVE3,GES,how='inner',on=['EPIC'])
-# RAVEGES = pd.concat([RAVE3,GES],ignore_index=True)
-# RAVEGES = RAVEGES.drop_duplicates(subset=['EPIC'])
-# print( len(RAVEGES))
-
-RAVE3 = RAVE3[RAVE3['[Fe/H]_RAVE'] > -900]
-RAVE6 = RAVE6[RAVE6['[Fe/H]_RAVE'] > -900]
 
 plt.figure()
 plt.hist(camp3_0['[Fe/H]'],bins=50,normed=True,label=r'K2 C3')
@@ -531,9 +552,9 @@ yt = plt.gca()
 yt.axes.yaxis.set_ticks([])
 yt.axes.yaxis.set_ticklabels([])
 plt.legend()
-plt.show()
+# plt.show()
 
-sys.exit()
+# sys.exit()
 
 
 APORAVE = pd.merge(AP6,RAVE6,how='inner',on=['EPIC'])
@@ -551,7 +572,6 @@ camp3 = prop.single_seismo(camp3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp3 = prop.single_seismo(camp3,['BDnu','dnu','SDnu'],'DNU')
 camp3 = prop.single_seismo(camp3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp3 = prop.met_filter(camp3)
-camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y")+'.csv',index=False)
 
 camp6 = pd.concat([YB_C6,YS_C6,BS_C6],ignore_index=True)
 camp6 = camp6.drop_duplicates(subset=['EPIC'])
@@ -563,7 +583,7 @@ camp6 = prop.single_seismo(camp6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp6 = prop.single_seismo(camp6,['BDnu','dnu','SDnu'],'DNU')
 camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp6 = prop.met_filter(camp6)
-camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',index=False)
+
 
 print(len(camp3),len(camp6))
 
@@ -583,11 +603,11 @@ print(len(GAP_camp3),len(GAP_camp6))
 cols_to_use = camp3.columns.difference(RAVE3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC3 = pd.merge(RAVE3,camp3[cols_to_use],how='inner',on=['EPIC'])
-RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+RC3['slogg_spec'] = np.log10(const.solar_g * (RC3['NUMAX'].astype('float64')/3090) * np.sqrt(RC3['Teff_RAVE'].astype('float64')/const.solar_Teff))
 cols_to_use = camp6.columns.difference(RAVE6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 RC6 = pd.merge(RAVE6,camp6[cols_to_use],how='inner',on=['EPIC'])
-RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+RC6['slogg_spec'] = np.log10(const.solar_g * (RC6['NUMAX'].astype('float64')/3090.0) * np.sqrt(RC6['Teff_RAVE'].astype('float64')/const.solar_Teff))
 print("RAVE saved out", len(RC3), len(RC6))
 
 # sys.exit()
@@ -596,7 +616,7 @@ print("RAVE saved out", len(RC3), len(RC6))
 cols_to_use = camp3.columns.difference(GES3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 GES = pd.merge(GES3,camp3[cols_to_use],how='inner',on=['EPIC'])
-GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+GES['slogg_spec'] = np.log10(const.solar_g * (GES['NUMAX'].astype('float64')/3090.) * np.sqrt(GES['TEFF'].astype('float64')/const.solar_Teff))
 
 ''' Alteration of alpha abundances in Gaia-ESO '''
 # GES['ALPHA'] = GES['ALPHA'] + 0.1
@@ -631,78 +651,67 @@ print( "Gaia-ESO saved out", len(GES))
 cols_to_use = camp3.columns.difference(LAMOST3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L3 = pd.merge(LAMOST3,camp3[cols_to_use],how='inner',on=['EPIC'])
-L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+L3['slogg_spec'] = np.log10(const.solar_g * (L3['NUMAX'].astype('float64')/3090.) * np.sqrt(L3['teff_L'].astype('float64')/const.solar_Teff))
 print( "LAMOST3 saved out ", len(LAMOST3))
 cols_to_use = camp6.columns.difference(LAMOST6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 L6 = pd.merge(LAMOST6,camp6[cols_to_use],how='inner',on=['EPIC'])
-L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+L6['slogg_spec'] = np.log10(const.solar_g * (L6['NUMAX'].astype('float64')/3090.) * np.sqrt(L6['teff_L'].astype('float64')/const.solar_Teff))
 print( "LAMOST6 saved out ", len(LAMOST6))
 
 ''' Merging of APOGEE data with multiple asteroseismic dets '''
 cols_to_use = camp3.columns.difference(APO3.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP3 = pd.merge(APO3,camp3[cols_to_use],how='inner',on=['EPIC'])
-AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP3['slogg_spec'] = np.log10(const.solar_g * (AP3['NUMAX'].astype('float64')/3090.) * np.sqrt(AP3['TEFF'].astype('float64')/const.solar_Teff))
+# print(AP3.columns.values)
+# sys.exit()
 
 print(len(APO3),len(APO6))
 cols_to_use = camp6.columns.difference(APO6.columns)
 cols_to_use = cols_to_use.union(['EPIC'])
 AP6 = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
-AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP6['slogg_spec'] = np.log10(const.solar_g * (AP6['NUMAX'].astype('float64')/3090.) * np.sqrt(AP6['TEFF'].astype('float64')/const.solar_Teff))
 print( "APOGEE saved out", len(AP3), len(AP6))
 
 ''' Spectroscopic Sample Overlaps '''
-print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
-print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
-print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
-print(len(pd.merge(RC3,L3,how='inner',on=['EPIC'])))
-print(len(pd.merge(GES,L3,how='inner',on=['EPIC'])))
-print(len(pd.merge((pd.merge(GES,RC3,how='inner',on=['EPIC'])),AP3,how='inner',on=['EPIC'])))
-
-print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
-print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
-print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
+# print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
+# print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
+# print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
+# print(len(pd.merge(RC3,L3,how='inner',on=['EPIC'])))
+# print(len(pd.merge(GES,L3,how='inner',on=['EPIC'])))
+# print(len(pd.merge((pd.merge(GES,RC3,how='inner',on=['EPIC'])),AP3,how='inner',on=['EPIC'])))
+#
+# print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
+# print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
+# print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
 
 ''' Merge of LAMOST and RAVE '''
-cols_to_use = RC6.columns.difference(L6.columns)
-cols_to_use = cols_to_use.union(['EPIC'])
-LR6 = pd.merge(L6,RC6[cols_to_use],how='inner',on=['EPIC'])
-LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-print('LAMOST/RAVE C6 saved out')
+# cols_to_use = RC6.columns.difference(L6.columns)
+# cols_to_use = cols_to_use.union(['EPIC'])
+# LR6 = pd.merge(L6,RC6[cols_to_use],how='inner',on=['EPIC'])
+# print('LAMOST/RAVE C6 saved out')
 
-''' Working wiht Everest data '''
-# E3 = pd.concat([EE_C3,SE_C3,YSE_C3],ignore_index=True)
-# E3 = E3.drop_duplicates(subset=['EPIC'])
-# E3 = E3.reset_index(drop=True)
-# E_camp3 = pd.merge(camp3,EC3,how='inner',on=['EPIC'])
-#
-# E6 = pd.concat([EE_C6,SE_C6,YSE_C6],ignore_index=True)
-# E6 = E6.drop_duplicates(subset=['EPIC'])
-# E6 = E6.reset_index(drop=True)
-# E_camp6 = pd.merge(camp6,EC6,how='inner',on=['EPIC'])
-#
-# E_camp6 = dat.n_epics(E_camp6,oc)
-#
-# K2PEV = n1 = n2 = n3 = x = pd.DataFrame()
-# x = camp6[camp6['occ'] == 2.0]
-# K2PEV = camp6[~camp6['EPIC'].isin(E_camp6['EPIC'])].dropna()
-# n1 = K2PEV[K2PEV['occ'] == 1.0]
-# n2 = K2PEV[K2PEV['occ'] == 2.0]
-# n3 = K2PEV[K2PEV['occ'] == 3.0]
-# print( len(K2PEV), len(n1), len(n2), len(n3))
-# print( 'Percentage Single = ', 100*len(n1)/len(K2PEV))
-# print( 'Percentage Double = ', 100*len(n2)/len(K2PEV))
-# print( 'Percentage Triple = ', 100*len(n3)/len(K2PEV))
-
-print( "Processing Complete")
-
+''' Save out combined data sets to be processed for use with PARAM '''
+camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y")+'.csv',index=False)
+camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',index=False)
+RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/APOGEE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+# LR6.to_csv(ext_GA+'GA/K2Poles/LAMOST_RAVE_C6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+sys.exit()
 
 ''' Check length of data sets '''
 # print( len(BC3), len(YC3), len(SC3), len(BC6), len(YC6), len(SC6))
 # print( len(BR3), len(YR3), len(SR3), len(BR6), len(YR6), len(SR6))
 # print( len(YEC3), len(YC6), len(EE_C6))
 # print( C3.columns.values)
+
+print( "Processing Complete")
 
 ''' PLOTTING '''
 

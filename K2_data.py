@@ -148,8 +148,8 @@ def K2_GAP():
     # GAP6.to_csv(ext_DB+'Dropbox/K2Poles/GAP6',index=False)
 
     ''' GAP read in when no updates required '''
-    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
-    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
+    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3_gaia')
+    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6_gaia')
 
     return GAP3, GAP6
 
@@ -239,7 +239,7 @@ def RAVE_merge(K2,RAVE,name):
         b = K2[i]
         c = pd.merge(b,a,how='inner',on=['EPIC'])
         K2[i] = c
-        c.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/'+name[i]+'_PARAM_ready.csv',index=False,sep='\t',na_rep='Inf')
+        # c.to_csv(ext_DB+'Dropbox/K2Poles/Data0405/'+name[i]+'_PARAM_ready.csv',index=False,sep='\t',na_rep='Inf')
 
     return K2
 
@@ -353,7 +353,7 @@ def LAMOST_merge(K2,LAMOST,name):
 
 def occurrence():
     ''' Read in occurence data '''
-    oc = pd.read_csv(ext_DB+'K2P2_MNL_K2GAP_C6/EPIC_occurrence')
+    oc = pd.read_csv(ext_GA+'K2P2_MNL_K2GAP_C6/EPIC_occurrence')
 
     return oc
 

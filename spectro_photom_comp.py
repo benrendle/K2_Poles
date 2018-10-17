@@ -76,7 +76,7 @@ def comp_scat(A,B,teff,logg,feh,title,xsub,ysub,fit,save):
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
-    plt.savefig('/media/ben/SAMSUNG/GA/K2Poles/Spec_Comp/'+save+'.png')
+    plt.savefig('/media/bmr135/SAMSUNG/GA/K2Poles/Spec_Comp/'+save+'.png')
 
 def fitting(df1,df2,param,param_str):
     ''' Least squares fitting approach to calculating offsets betrween params '''
@@ -134,8 +134,8 @@ if __name__ == "__main__":
     R6 = pd.read_csv(ext+'/matlab_in/RC6.csv')
     R6 = R6.dropna(subset=['Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'])
     R6 = R6[R6['logg_RAVE'] > 0]
-    L3 = pd.read_csv(ext+'/matlab_in/LAMOST3_multidet.csv')
-    L3 = L3.dropna(subset=['teff_L','logg_L','feh_L'])
+    # L3 = pd.read_csv(ext+'/matlab_in/LAMOST3_multidet.csv')
+    # L3 = L3.dropna(subset=['teff_L','logg_L','feh_L'])
     L6 = pd.read_csv(ext+'/matlab_in/LAMOST6_multidet.csv')
     L6 = L6.dropna(subset=['teff_L','logg_L','feh_L'])
     # LR6 = pd.read_csv(ext+'/matlab_in/LAMOST_RAVE_C6.csv')
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     g, gc = truncate(G,C3)
     r3, rc3 = truncate(R3,C3)
     r6, rc6 = truncate(R6,C6)
-    l3, lc3 = truncate(L3,C3)
+    # l3, lc3 = truncate(L3,C3)
     l6, lc6 = truncate(L6,C6)
     ar, ra = truncate(APO,R6)
     gr, rg = truncate(G,R3)
@@ -172,8 +172,8 @@ if __name__ == "__main__":
     comp_scat(r6,rc6,['Teff_RAVE','Teff'],['logg_RAVE','logg'],['[Fe/H]_RAVE','[Fe/H]'], \
     r'RAVE-EPIC: C6','R','R-Ep',1,'RAVE_EPIC_C6')
 
-    comp_scat(l3,lc3,['teff_L','Teff'],['logg_L','logg'],['feh_L','[Fe/H]'], \
-    r'LAMOST-EPIC: C3','L','L-Ep',1,'LAMOST_EPIC_C3')
+    # comp_scat(l3,lc3,['teff_L','Teff'],['logg_L','logg'],['feh_L','[Fe/H]'], \
+    # r'LAMOST-EPIC: C3','L','L-Ep',1,'LAMOST_EPIC_C3')
 
     comp_scat(l6,lc6,['teff_L','Teff'],['logg_L','logg'],['feh_L','[Fe/H]'], \
     r'LAMOST-EPIC: C6','L','L-Ep',1,'LAMOST_EPIC_C6')

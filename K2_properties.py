@@ -39,7 +39,7 @@ def selection_function(data,numax):
 
 def lmrl_comps(data,numax,dnu,Numax,Dnu,GAP):#,Numax,Dnu,Teff,g):
 
-    ''' Function to calculate logg, mass, radius and luminosity
+    ''' Function to calculate logg, mass, radius and luminosity.
     Numax and Dnu are relative solar values for each pipeline '''
 
     for i in range(0,len(data),1):
@@ -63,12 +63,13 @@ def det_prob(X,numax,Numax,Dnu):
     start with and then running the global detection code with added
     noise. Output is the detection probability and SNR
 
+    X = data frame
     numax = stellar numax
     Numax = calibration numax
-    Dnu = calibration numax '''
+    Dnu = calibration delta nu '''
 
     X['Tred'] = DP.properties(X, constants_only=False)
-    X['prob_s'], X['SNR'] = DP.globalDetections(X['imag'],X['KepMag'],X['L'],X['radius'],X['Teff'],X[numax],1.0,X['Tred'], \
+    X['prob_s'], X['SNR'] = DP.globalDetections(X['imag'],X['KepMag'],X['L'],X['Radius'],X['Teff'],X[numax],1.0,X['Tred'], \
                     const.teffred_solar,const.solar_Teff,Numax,Dnu,const.sys_limit,const.dilution,const.vnyq, \
                     const.cadence, vary_beta=True)
     return X

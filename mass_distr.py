@@ -1557,93 +1557,93 @@ if __name__ == '__main__':
     # sys.exit()
 
     ''' Radius Distributions '''
-    APK2_alpha = APK2[APK2['alpha'] > 0.1]
-    K2_alpha = AS[AS['alpha'] > 0.1]
-    TRI3a = TRI3[TRI3['#Gc'] == 1]
-    TRI3b = TRI3[TRI3['#Gc'] == 2]
-    f = plt.figure()
-    plt.hist(APK2['rad'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
-    # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
-    plt.hist(APK2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'$\alpha$-rich Kepler',color='r',normed=True,linewidth=2)
-    # mdf.histo(AS,'rad',np.linspace(4,20,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
-    # plt.hist(K2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'$\alpha$-rich K2',normed=True,linewidth=2)
-    plt.hist(TRI3a['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thin',normed=True,linewidth=2)
-    plt.hist(TRI3b['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thick',normed=True,linewidth=2)
-    # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
-    # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
-    plt.xlim(3.5,18)
-    plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
-    plt.legend(prop={'size':10})
-    # f.savefig('TRI_Radius_ThinThick.pdf', bbox_inches='tight')
-    # pdf.savefig(f)
-    # plt.show()
-    # sys.exit()
-
-    f, ax = plt.subplots()
-    AS = AS[AS['alpha'] > -90]
-    APK2 = APK2[APK2['alpha'] > -90]
-    APK2 = APK2[APK2['mass'] > -90]
-    APK2 = APK2[APK2['mass'] < 1.5]
-    a = APK2[APK2['evstate'] == 1]
-    b = APK2[APK2['evstate'] == 2]
-    # APK2 = APK2[APK2['evstate'] == 2]
-    # t = ax.scatter(APK2['rad'],APK2['Teff'],c=APK2['mass'],cmap=colormaps.parula,label=r'APOKASC')
-    t = ax.scatter(b['rad'],b['Teff'],c=b['mass'],cmap=colormaps.parula,label=r'APOKASC')
-    # t = ax.scatter(TRI3['radius'],TRI3['Teff'],c=TRI3['M_H'],cmap=colormaps.parula,label=r'TRILEGAL')
-    # t = ax.scatter(AS['rad'],AS['feh'],c=AS['alpha'],cmap=colormaps.parula,label=r'K2 Spec.')
-    ax.set_xlabel(r'Radius [R$_{\odot}$]',fontsize='15')
-    ax.set_ylabel(r'$T_{\rm{eff}}$ [K]',fontsize='15')
-    # ax.legend(prop={'size':15})
-    ax.set_xlim(7,16)
-    cbar = fig.colorbar(t,ax=ax)
-    cbar.set_label(r'Mass', rotation=270, fontsize=15, labelpad=15)
-    # f.savefig('TRI_Radius_Teff_FeH.pdf', bbox_inches='tight')
-
-    # plt.show()
-    # sys.exit()
+    # APK2_alpha = APK2[APK2['alpha'] > 0.1]
+    # K2_alpha = AS[AS['alpha'] > 0.1]
+    # TRI3a = TRI3[TRI3['#Gc'] == 1]
+    # TRI3b = TRI3[TRI3['#Gc'] == 2]
+    # f = plt.figure()
+    # plt.hist(APK2['rad'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
+    # # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
+    # plt.hist(APK2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'$\alpha$-rich Kepler',color='r',normed=True,linewidth=2)
+    # # mdf.histo(AS,'rad',np.linspace(4,20,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
+    # # plt.hist(K2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'$\alpha$-rich K2',normed=True,linewidth=2)
+    # plt.hist(TRI3a['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thin',normed=True,linewidth=2)
+    # plt.hist(TRI3b['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thick',normed=True,linewidth=2)
+    # # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
+    # # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
+    # plt.xlim(3.5,18)
+    # plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
+    # plt.legend(prop={'size':10})
+    # # f.savefig('TRI_Radius_ThinThick.pdf', bbox_inches='tight')
+    # # pdf.savefig(f)
+    # # plt.show()
+    # # sys.exit()
+    #
+    # f, ax = plt.subplots()
+    # AS = AS[AS['alpha'] > -90]
+    # APK2 = APK2[APK2['alpha'] > -90]
+    # APK2 = APK2[APK2['mass'] > -90]
+    # APK2 = APK2[APK2['mass'] < 1.5]
+    # a = APK2[APK2['evstate'] == 1]
+    # b = APK2[APK2['evstate'] == 2]
+    # # APK2 = APK2[APK2['evstate'] == 2]
+    # # t = ax.scatter(APK2['rad'],APK2['Teff'],c=APK2['mass'],cmap=colormaps.parula,label=r'APOKASC')
+    # t = ax.scatter(b['rad'],b['Teff'],c=b['mass'],cmap=colormaps.parula,label=r'APOKASC')
+    # # t = ax.scatter(TRI3['radius'],TRI3['Teff'],c=TRI3['M_H'],cmap=colormaps.parula,label=r'TRILEGAL')
+    # # t = ax.scatter(AS['rad'],AS['feh'],c=AS['alpha'],cmap=colormaps.parula,label=r'K2 Spec.')
+    # ax.set_xlabel(r'Radius [R$_{\odot}$]',fontsize='15')
+    # ax.set_ylabel(r'$T_{\rm{eff}}$ [K]',fontsize='15')
+    # # ax.legend(prop={'size':15})
+    # ax.set_xlim(7,16)
+    # cbar = fig.colorbar(t,ax=ax)
+    # cbar.set_label(r'Mass', rotation=270, fontsize=15, labelpad=15)
+    # # f.savefig('TRI_Radius_Teff_FeH.pdf', bbox_inches='tight')
+    #
+    # # plt.show()
+    # # sys.exit()
 
     ''' Mass Distributions '''
-    f = plt.figure()
-    plt.hist(APK2['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
-    plt.hist(a['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC - RGB',normed=True,histtype='step')
-    plt.hist(b['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC - Clump',normed=True,histtype='step')
-    # plt.hist(TRI3['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI',color='grey',alpha=0.2,normed=True)
-    # plt.hist(TRI3a['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI - Thin',normed=True,histtype='step')
-    # plt.hist(TRI3b['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI - Thick',normed=True,histtype='step')
-    # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
-    # plt.hist(APK2_alpha['mass'],bins=np.linspace(0.5,2.5,100),histtype='step',label=r'$\alpha$-rich Kepler',color='r',normed=True,linewidth=2)
-    # mdf.histo(AS,'mass',np.linspace(0.5,3.0,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
-    # plt.hist(K2_alpha['mass'],bins=np.linspace(0.5,3.0,125),histtype='step',label=r'$\alpha$-rich K2',normed=True,linewidth=2)
-    # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
-    # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
-    # plt.xlim(3.5,18)
-    plt.xlabel(r'Mass [M$_{\odot}$]',fontsize=15)
-    plt.legend(prop={'size':10})
-    # f.savefig('TRI_Mass_Thin_Thick.pdf', bbox_inches='tight')
-    # pdf.savefig(f)
-
-
-    f, ax = plt.subplots()
-    APK2 = APK2[APK2['feh'] > -0.25]
-    # t = ax.scatter(APK2['mass'],APK2['Teff'],c=APK2['feh'],cmap=colormaps.parula,label=r'APOKASC')
-    t = ax.scatter(TRI3['Mass'],TRI3['Teff'],c=TRI3['M_H'],cmap=colormaps.parula,label=r'TRILEGAL')
-    # t = ax.scatter(AS['rad'],AS['feh'],c=AS['alpha'],cmap=colormaps.parula,label=r'K2 Spec.')
-    ax.set_xlabel(r'Mass [M$_{\odot}$]',fontsize='15')
-    ax.set_ylabel(r'$T_{\rm{eff}}$ [K]',fontsize='15')
-    # ax.legend(prop={'size':15})
-    cbar = fig.colorbar(t,ax=ax)
-    cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=15)
-    # f.savefig('TRI_Mass_Teff_FeH.pdf', bbox_inches='tight')
-    plt.show()
-    sys.exit()
+    # f = plt.figure()
+    # plt.hist(APK2['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
+    # plt.hist(a['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC - RGB',normed=True,histtype='step')
+    # plt.hist(b['mass'],bins=np.linspace(0.5,2.5,100),label=r'APOKASC - Clump',normed=True,histtype='step')
+    # # plt.hist(TRI3['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI',color='grey',alpha=0.2,normed=True)
+    # # plt.hist(TRI3a['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI - Thin',normed=True,histtype='step')
+    # # plt.hist(TRI3b['Mass'],bins=np.linspace(0.5,2.5,100),label=r'TRI - Thick',normed=True,histtype='step')
+    # # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
+    # # plt.hist(APK2_alpha['mass'],bins=np.linspace(0.5,2.5,100),histtype='step',label=r'$\alpha$-rich Kepler',color='r',normed=True,linewidth=2)
+    # # mdf.histo(AS,'mass',np.linspace(0.5,3.0,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
+    # # plt.hist(K2_alpha['mass'],bins=np.linspace(0.5,3.0,125),histtype='step',label=r'$\alpha$-rich K2',normed=True,linewidth=2)
+    # # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
+    # # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
+    # # plt.xlim(3.5,18)
+    # plt.xlabel(r'Mass [M$_{\odot}$]',fontsize=15)
+    # plt.legend(prop={'size':10})
+    # # f.savefig('TRI_Mass_Thin_Thick.pdf', bbox_inches='tight')
+    # # pdf.savefig(f)
+    #
+    #
+    # f, ax = plt.subplots()
+    # APK2 = APK2[APK2['feh'] > -0.25]
+    # # t = ax.scatter(APK2['mass'],APK2['Teff'],c=APK2['feh'],cmap=colormaps.parula,label=r'APOKASC')
+    # t = ax.scatter(TRI3['Mass'],TRI3['Teff'],c=TRI3['M_H'],cmap=colormaps.parula,label=r'TRILEGAL')
+    # # t = ax.scatter(AS['rad'],AS['feh'],c=AS['alpha'],cmap=colormaps.parula,label=r'K2 Spec.')
+    # ax.set_xlabel(r'Mass [M$_{\odot}$]',fontsize='15')
+    # ax.set_ylabel(r'$T_{\rm{eff}}$ [K]',fontsize='15')
+    # # ax.legend(prop={'size':15})
+    # cbar = fig.colorbar(t,ax=ax)
+    # cbar.set_label(r'[Fe/H]', rotation=270, fontsize=15, labelpad=15)
+    # # f.savefig('TRI_Mass_Teff_FeH.pdf', bbox_inches='tight')
+    # plt.show()
+    # sys.exit()
 
     ''' Mass vs logg scatter '''
-    L1 = gold[abs(gold['Z']) < 0.5]
-    L2 = gold[(abs(gold['Z']) >= 0.5) & (abs(gold['Z']) < 1.0)]
-    L3 = gold[(abs(gold['Z']) >= 1.0) & (abs(gold['Z']) < 1.5)]
-    L4 = gold[(abs(gold['Z']) >= 1.5) & (abs(gold['Z']) < 2.0)]
-    L5 = gold[(abs(gold['Z']) >= 2.0) & (abs(gold['Z']) < 2.5)]
-    L6 = gold[abs(gold['Z']) >= 2.5]
+    L1 = AS[abs(AS['Z']) < 0.5]
+    L2 = AS[(abs(AS['Z']) >= 0.5) & (abs(AS['Z']) < 1.0)]
+    L3 = AS[(abs(AS['Z']) >= 1.0) & (abs(AS['Z']) < 1.5)]
+    L4 = AS[(abs(AS['Z']) >= 1.5) & (abs(AS['Z']) < 2.0)]
+    L5 = AS[(abs(AS['Z']) >= 2.0) & (abs(AS['Z']) < 2.5)]
+    L6 = AS[abs(AS['Z']) >= 2.5]
 
     goldC = gold[(gold['rad'] < 9.5) | (gold['rad'] > 11.5)] # Crude clump
     L1c = goldC[abs(goldC['Z']) < 0.5]
@@ -1665,40 +1665,40 @@ if __name__ == '__main__':
     sns.despine(left=True)
     bins = np.linspace(0,20,40)
     sns.distplot(AK1['age'], color="grey", ax=ax,bins=bins,label=r'APOKASC; Z $< 0.5$ kpc')
-    sns.distplot(L1['age'], color="g", ax=ax, bins=bins,label=r'Gold; Z $< 0.5$ kpc')
+    sns.distplot(L1['age'], color="b", ax=ax, bins=bins,label=r'K2 Spec.; Z $< 0.5$ kpc')
     ax.set_yticks([])
     ax.set_xlim(0,20)
     ax.set_xlabel('')
     ax.legend()
 
     sns.distplot(AK2['age'], color="grey", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
-    sns.distplot(L2['age'], color="g", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
+    sns.distplot(L2['age'], color="b", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
     ax1.set_yticks([])
     ax1.set_xlim(0,20)
     ax1.set_xlabel('')
     ax1.legend()
 
-    sns.distplot(L3['age'], color="g", ax=ax2,bins=bins,label=r'$1.0 <$ Z $< 1.5$ kpc')
+    sns.distplot(L3['age'], color="b", ax=ax2,bins=bins,label=r'$1.0 <$ Z $< 1.5$ kpc')
     ax2.set_yticks([])
     ax2.set_xlabel('')
     ax2.legend()
 
-    sns.distplot(L4['age'], color="g", ax=ax3,bins=bins,label=r'$1.5 <$ Z $< 2.0$ kpc')
+    sns.distplot(L4['age'], color="b", ax=ax3,bins=bins,label=r'$1.5 <$ Z $< 2.0$ kpc')
     ax3.set_yticks([])
     ax3.set_xlabel('')
     ax3.legend()
 
-    sns.distplot(L5['age'], color="g", ax=ax4,bins=bins,label=r'$2.0 <$ Z $< 2.5$ kpc')
+    sns.distplot(L5['age'], color="b", ax=ax4,bins=bins,label=r'$2.0 <$ Z $< 2.5$ kpc')
     ax4.set_yticks([])
     ax4.set_xlabel(r'Age [Gyr]')
     ax4.legend()
 
-    sns.distplot(L6['age'], color="g", ax=ax5,bins=bins,label=r'Z $> 2.5$ kpc')
+    sns.distplot(L6['age'], color="b", ax=ax5,bins=bins,label=r'Z $> 2.5$ kpc')
     ax5.set_yticks([])
     ax5.set_xlabel(r'Age [Gyr]')
     ax5.legend()
     plt.tight_layout()
-    # fig.savefig('Age_Z.pdf', bbox_inches='tight')
+    fig.savefig('Age_Z_spec.pdf', bbox_inches='tight')
     # pdf.savefig(fig)
     # pdf.close()
     # plt.show()
@@ -1796,8 +1796,10 @@ if __name__ == '__main__':
 
     young = C3_Luca[(C3_Luca['age'] < 2.0)]
     APK2 = APK2[APK2['Z'] < 1.]
-    LucaZ1 = gold[abs(gold['Z']) < 1.]
-    LucaZ2 = gold[abs(gold['Z']) > 1.]
+    # LucaZ1 = gold[abs(gold['Z']) < 1.]
+    # LucaZ2 = gold[abs(gold['Z']) > 1.]
+    LucaZ1 = AS[abs(AS['Z']) < 1.]
+    LucaZ2 = AS[abs(AS['Z']) > 1.]
 
 
     vmin = 1.0
@@ -1911,29 +1913,29 @@ if __name__ == '__main__':
     d1 = kde.KDE1D(APK2['age'])
     x1 = np.r_[min(APK2['age']):max(APK2['age']):1024j]
     plt.plot(x1,d1(x1),linewidth=2,label=r'APOKASC',color='grey')
-    d1 = kde.KDE1D(APK2_alpha['age'])
-    x1 = np.r_[min(APK2_alpha['age']):max(APK2_alpha['age']):1024j]
-    plt.plot(x1,d1(x1),linewidth=2,label=r'Kepler $\alpha$-rich',color='r')
-    d1 = kde.KDE1D(ASg['age'])
-    x1 = np.r_[min(ASg['age']):max(ASg['age']):1024j]
-    plt.plot(x1,d1(x1),linewidth=2,label=r'Spec.')
-    d1 = kde.KDE1D(gold['age'])
-    x1 = np.r_[min(gold['age']):max(gold['age']):1024j]
-    plt.plot(x1,d1(x1),linewidth=2,label=r'Gold',color='g')
+    # d1 = kde.KDE1D(APK2_alpha['age'])
+    # x1 = np.r_[min(APK2_alpha['age']):max(APK2_alpha['age']):1024j]
+    # plt.plot(x1,d1(x1),linewidth=2,label=r'Kepler $\alpha$-rich',color='r')
+    d1 = kde.KDE1D(AS['age'])
+    x1 = np.r_[min(AS['age']):max(AS['age']):1024j]
+    plt.plot(x1,d1(x1),linewidth=2,label=r'K2 Spec.',color='orange')
+    # d1 = kde.KDE1D(Luca['age'])
+    # x1 = np.r_[min(Luca['age']):max(Luca['age']):1024j]
+    # plt.plot(x1,d1(x1),linewidth=2,label=r'K2 Photom.',color='b')
     d1 = kde.KDE1D(LucaZ1['age'])
     x1 = np.r_[min(LucaZ1['age']):max(LucaZ1['age']):1024j]
-    plt.plot(x1,d1(x1),linewidth=2,label=r'Gold (Z $< 1.0$)')
+    plt.plot(x1,d1(x1),linewidth=2,label=r'K2 (Z $< 1.0$)',color='g')
     d1 = kde.KDE1D(LucaZ2['age'])
     x1 = np.r_[min(LucaZ2['age']):max(LucaZ2['age']):1024j]
-    plt.plot(x1,d1(x1),linewidth=2,label=r'Gold (Z $> 1.0$)',color='m')
+    plt.plot(x1,d1(x1),linewidth=2,label=r'K2 (Z $> 1.0$)',color='m')
     plt.yticks([])
     plt.xlim(0,20)
     plt.xlabel(r'Age [Gyr]')
     plt.legend()
-    # f1.savefig('Age_KDE_all.pdf', bbox_inches='tight')
-    # plt.show()
+    f1.savefig('Age_KDE_spec.pdf', bbox_inches='tight')
+    plt.show()
     # pdf.savefig(f1)
-    # sys.exit()
+    sys.exit()
 
     ''' Replication of Andrea's plot (10/09/2018) using spectroscopic K2 data (mass/age vs Z with [Fe/H] colour bar - date split by alpha) '''
     # fig, ((ax,ax1),(ax2,ax3)) = plt.subplots(2,2)
