@@ -17,6 +17,9 @@ from scipy.stats import norm
 import Detection_prob_K2 as DP
 import Detection_prob_kep as DP2
 import K2_constants as const
+import matplotlib
+import matplotlib.pyplot as plt
+import colormaps
 ''' Credit to M. Schofield for creation of the detection recipe code, 01/2017 '''
 
 def selection_function(data,numax):
@@ -25,10 +28,10 @@ def selection_function(data,numax):
         the C3 and C6 campaigns '''
     for i in range(0,len(data),1):
         df = data[i]
-        if i < 8: # C3
+        if i < 6: # C3
             df = df[ (df[numax[i]] > 10) & (df[numax[i]] < 280) & (df['Hmag'] > 7) & (df['Hmag'] < 12) & (df['JK'] > 0.5) & (df['prob_s'] >= 0.95) ]
             # df = df[ (df['Hmag'] > 7) & (df['Hmag'] < 12) & (df['JK'] > 0.5) ]
-        elif i >= 8: # C6
+        elif i >= 6: # C6
             df = df[ (df[numax[i]] > 10) & (df[numax[i]] < 280) & (df['Vcut'] > 9) & (df['Vcut'] < 15) & (df['JK'] > 0.5) & (df['prob_s'] >= 0.95) ]
             # df = df[ (df['Vcut'] > 9) & (df['Vcut'] < 15) & (df['JK'] > 0.5) ]
 
@@ -72,6 +75,10 @@ def det_prob(X,numax,Numax,Dnu):
     X['prob_s'], X['SNR'] = DP.globalDetections(X['imag'],X['KepMag'],X['L'],X['Radius'],X['Teff'],X[numax],1.0,X['Tred'], \
                     const.teffred_solar,const.solar_Teff,Numax,Dnu,const.sys_limit,const.dilution,const.vnyq, \
                     const.cadence, vary_beta=True)
+    X['det_prob_flag'] = 0.
+    x = np.where(X['prob_s']>=0.95)
+    X['det_prob_flag'].iloc[x] = 1.
+
     return X
 
 def det_prob_GAP(X,numax,Numax,Dnu):
@@ -201,7 +208,13 @@ def least_squares_1err(Matched):
 
 def sigma_clip(X,a,b,c,d,a1,b1,c1,d1,sigma):
     ''' Reduce data set to those values that fall within an n sigma difference
-        of each other for numax and dnu '''
+        of each other for numax and dnuself.
+
+        - 'Dnu_Diff' and 'Nmx_Diff' to be used as Nsigma flags as they
+          are the parameters the sigma clips are based upon.
+
+        - Returns the reduced, clipped dataframe and the outlier parameters too.
+    '''
     x = len(X['EPIC'])
     Y = X
     Y['comp_err_Nmx'] = np.sqrt(Y[a1]**2+Y[b1]**2)
@@ -222,6 +235,12 @@ def sigma_clip(X,a,b,c,d,a1,b1,c1,d1,sigma):
     # print( Y['Dnu_Diff'])
     Y = Y[Y['Dnu_Diff'] >= -sigma]
     Y = Y[Y['Dnu_Diff'] <= sigma]
+    # a = np.where((Y['Dnu_Diff'] <= sigma) & (Y['Dnu_Diff'] >= -sigma))
+    # print(a)
+    # X['sig_clip_flag'] = 0.
+    # X['sig_clip_flag'].iloc[a] = 1.
+    # print(X['sig_clip_flag'])
+    # sys.exit()
     # print( len(Y), len(X))
     fract_outl = (float(len(X))-float(len(Y)))/float(x)
     # print( fract_outl)
@@ -230,7 +249,49 @@ def sigma_clip(X,a,b,c,d,a1,b1,c1,d1,sigma):
     Z = Z.reset_index(drop=True)
     X = Y
 
-    return X, Z
+    return X
+
+def sigma_clip_nmx(X,a,b,a1,b1,sigma):
+    ''' Reduce data set to those values that fall within an n sigma difference
+        of each other for numax and dnuself.
+
+        - 'Nmx_Diff' to be used as Nsigma flags as they
+          are the parameters the sigma clips are based upon.
+
+        - Returns the reduced, clipped dataframe and the outlier parameters too.
+    '''
+    x = len(X['EPIC'])
+    X['comp_err_Nmx'] = np.sqrt(X[a1]**2+X[b1]**2)
+    X = X[X['comp_err_Nmx'] >= -4]
+    X = X[X['comp_err_Nmx'] <= 4]
+    X['Nmx_Diff'] = ((X[a]-X[b])/X['comp_err_Nmx'])
+    a = np.where((X['Nmx_Diff'] >= -sigma) & (X['Nmx_Diff'] <= sigma))
+    X['sig_clip_flag'] = 0.
+    X['sig_clip_flag'].iloc[a] = 1.
+    # print(X[X['sig_clip_flag']==0])
+    # sys.exit()
+    return X
+
+def sigma_clip_dnu(X,c,d,c1,d1,sigma):
+    ''' Reduce data set to those values that fall within an n sigma difference
+        of each other for numax and dnuself.
+
+        - 'Dnu_Diff' to be used as Nsigma flags as they
+          are the parameters the sigma clips are based upon.
+
+        - Returns the reduced, clipped dataframe and the outlier parameters too.
+    '''
+    x = len(X['EPIC'])
+    X['comp_err_Dnu'] = np.sqrt(X[c1]**2+X[d1]**2)
+    X = X[X['comp_err_Dnu'] >= -0.9]
+    X = X[X['comp_err_Dnu'] <= 0.9]
+    X['Dnu_Diff'] = ((X[c]-X[d])/X['comp_err_Dnu'])
+    b = np.where((X['Dnu_Diff'] <= sigma) & (X['Dnu_Diff'] >= -sigma))
+    X['sig_clip_flag1'] = 0.
+    X['sig_clip_flag1'].iloc[b] = 1.
+    # print(X[X['sig_clip_flag']==0])
+    # sys.exit()
+    return X
 
 def temp_JK(I,met,JK):
     ''' Calculate temperature from J-K, Alonso 1999 + 2001 erratum
@@ -249,140 +310,51 @@ def temp_JK(I,met,JK):
 
     return I
 
-def individ(df,df1,df2,pipeline):
+def individ(df,df1,df2):
     ''' Generate outfile containing EPIC numbers that only appear in single
         datasets '''
-    Y = pd.DataFrame([])
-    Y['EPIC'] = df['EPIC']
-    Y['Y'] = 1.0
-    Y['B'] = 0.0
-    Y['S'] = 0.0
-    # Y['YDnu'] = df['dnu']
-    # Y['e_YDnu'] = df['dnu_err']
-    # Y['Ynumax'] = df['nmx']
-    # Y['e_Ynumax'] = df['nmx_err']
-    # Y['BDnu'] = -99.9
-    # Y['e_BDnu'] = -99.9
-    # Y['Bnumax'] = -99.9
-    # Y['e_Bnumax'] = -99.9
-    # Y['SDnu'] = -99.9
-    # Y['e_SDnu'] = -99.9
-    # Y['Snumax'] = -99.9
-    # Y['e_Snumax'] = -99.9
 
-    B = pd.DataFrame([])
-    B['EPIC'] = df1['EPIC']
-    B['Y'] = 0.0
+    B = pd.DataFrame()
+    B['EPIC'] = df['EPIC']
     B['B'] = 1.0
-    B['S'] = 0.0
-    # B['BDnu'] = df1['EDnu']
-    # B['e_BDnu'] = df1['e_EDnu']
-    # B['Bnumax'] = df1['Enumax']
-    # B['e_Bnumax'] = df1['e_Enumax']
-    # B['YDnu'] = -99.9
-    # B['e_YDnu'] = -99.9
-    # B['Ynumax'] = -99.9
-    # B['e_Ynumax'] = -99.9
-    # B['SDnu'] = -99.9
-    # B['e_SDnu'] = -99.9
-    # B['Snumax'] = -99.9
-    # B['e_Snumax'] = -99.9
 
-    S = pd.DataFrame([])
+    Y = pd.DataFrame()
+    Y['EPIC'] = df1['EPIC']
+    Y['Y'] = 1.0
+
+    S = pd.DataFrame()
     S['EPIC'] = df2['EPIC']
-    S['Y'] = 0.0
-    S['B'] = 0.0
     S['S'] = 1.0
-    # S['SDnu'] = df2['SDnu']
-    # S['e_SDnu'] = df2['e_SDnu']
-    # S['Snumax'] = df2['Snumax']
-    # S['e_Snumax'] = df2['e_Snumax']
-    # S['BDnu'] = -99.9
-    # S['e_BDnu'] = -99.9
-    # S['Bnumax'] = -99.9
-    # S['e_Bnumax'] = -99.9
-    # S['YDnu'] = -99.9
-    # S['e_YDnu'] = -99.9
-    # S['Ynumax'] = -99.9
-    # S['e_Ynumax'] = -99.9
 
-    for i in range(0,len(Y['EPIC']),1):
-        for j in range(0,len(B['EPIC']),1):
-            if Y['EPIC'][i] == B['EPIC'][j]:
-                Y['B'][i] = 1
-                # Y['BDnu'][i] = df1['EDnu'][j]
-                # Y['e_BDnu'][i] = df1['e_EDnu'][j]
-                # Y['Bnumax'][i] = df1['Enumax'][j]
-                # Y['e_Bnumax'][i] = df1['e_Enumax'][j]
-        for k in range(0,len(S['EPIC']),1):
-            if Y['EPIC'][i] == S['EPIC'][k]:
-                Y['S'][i] = 1
-                # Y['SDnu'][i] = df2['SDnu'][k]
-                # Y['e_SDnu'][i] = df2['e_SDnu'][k]
-                # Y['Snumax'][i] = df2['Snumax'][k]
-                # Y['e_Snumax'][i] = df2['e_Snumax'][k]
+    Y = Y.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
+    Y = Y.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
+    Y['B'].fillna(value=0.0,inplace=True)
+    Y['S'].fillna(value=0.0,inplace=True)
 
-    for i in range(0,len(B['EPIC']),1):
-        for j in range(0,len(Y['EPIC']),1):
-            if B['EPIC'][i] == Y['EPIC'][j]:
-                B['Y'][i] = 1
-                # B['YDnu'][i] = df['dnu'][k]
-                # B['e_YDnu'][i] = df['dnu_err'][k]
-                # B['Ynumax'][i] = df['nmx'][k]
-                # B['e_Ynumax'][i] = df['nmx_err'][k]
-        for k in range(0,len(S['EPIC']),1):
-            if B['EPIC'][i] == S['EPIC'][k]:
-                B['S'][i] = 1
-                # B['SDnu'][i] = df2['SDnu'][k]
-                # B['e_SDnu'][i] = df2['e_SDnu'][k]
-                # B['Snumax'][i] = df2['Snumax'][k]
-                # B['e_Snumax'][i] = df2['e_Snumax'][k]
+    B = B.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
+    B = B.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
+    B['Y'].fillna(value=0.0,inplace=True)
+    B['S'].fillna(value=0.0,inplace=True)
 
-    for i in range(0,len(S['EPIC']),1):
-        for j in range(0,len(B['EPIC']),1):
-            if S['EPIC'][i] == B['EPIC'][j]:
-                S['B'][i] = 1
-                # S['BDnu'][i] = df1['EDnu'][j]
-                # S['e_BDnu'][i] = df1['e_EDnu'][j]
-                # S['Bnumax'][i] = df1['Enumax'][j]
-                # S['e_Bnumax'][i] = df1['e_Enumax'][j]
-        for k in range(0,len(Y['EPIC']),1):
-            if S['EPIC'][i] == Y['EPIC'][k]:
-                S['Y'][i] = 1
-                # S['YDnu'][i] = df['dnu'][k]
-                # S['e_YDnu'][i] = df['dnu_err'][k]
-                # S['Ynumax'][i] = df['nmx'][k]
-                # S['e_Ynumax'][i] = df['nmx_err'][k]
+    S = S.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
+    S = S.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
+    S['B'].fillna(value=0.0,inplace=True)
+    S['Y'].fillna(value=0.0,inplace=True)
 
     Y['Nseismo'] = Y['Y'] + Y['B'] + Y['S']
     B['Nseismo'] = B['Y'] + B['B'] + B['S']
     S['Nseismo'] = S['Y'] + S['B'] + S['S']
 
-
-    df = pd.merge(df,Y,how='inner',on=['EPIC'])
+    df = pd.merge(df,B,how='inner',on=['EPIC'])
     df = df.reset_index(drop=True)
-    df1 = pd.merge(df1,B,how='inner',on=['EPIC'])
+    df1 = pd.merge(df1,Y,how='inner',on=['EPIC'])
     df1 = df1.reset_index(drop=True)
     df2 = pd.merge(df2,S,how='inner',on=['EPIC'])
     df2 = df2.reset_index(drop=True)
 
-    # All = pd.concat([Y,B,S],ignore_index=True)
-    # All = All.drop_duplicates(subset=['EPIC'])
-    # All = All.reset_index(drop=True)
-
-    # Yo = All[All['Y'] == 1.0]
-    # Yo = Yo[Yo['B'] == 0.0]
-    # Yo = Yo[Yo['S'] == 0.0]
-    # Yno = All[All['Y'] == 0.0]
-    # Bo = All[All['B'] == 0.0]
-    # So = All[All['S'] == 0.0]
-
-    # Yo.to_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/YvonneOnly_seismic_'+pipeline,index=False)
-    # Yno.to_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/YvonneNoDet_seismic_'+pipeline,index=False)
-    # B.to_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/Benoit_nseismo_'+pipeline,index=False)
-    # S.to_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/Savita_nseismo_'+pipeline,index=False)
-    # All.to_csv('/home/bmr135/Dropbox/K2Poles/Data0405/PARAM_out_MDs/Poles/All_nseismo_'+pipeline,index=False)
-    print( pipeline)
+    Y = Y[(Y['Nseismo'] == 1.0)]
+    B = B[(B['Nseismo'] == 1.0)]
+    S = S[(S['Nseismo'] == 1.0)]
 
     return df, df1, df2
 
@@ -413,9 +385,10 @@ def nyq_refl(x,dnu,t,name):
 
 def single_seismo(df,keys,output):
     ''' Generation of single column of seismic values '''
+    # print(output)
     a,b,c = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
     a['EPIC'],b['EPIC'],c['EPIC'] = df['EPIC'],df['EPIC'],df['EPIC']
-    a[output] = df[keys[0]]
+    a[output] = df[keys[0]].dropna(axis=0,how='any')
     a = a[a[output] != 'NaN']
     b[output] = df[keys[1]].dropna(axis=0,how='any')
     b = b[b[output] != 'NaN']
@@ -427,6 +400,8 @@ def single_seismo(df,keys,output):
     if len(df) == len(df1):
         df = pd.merge(df,df1,how='inner',on=['EPIC'])
         df = df.reset_index(drop=True)
+    else:
+        df = df.join(df1.set_index('EPIC'),on='EPIC')
     return df
 
 def met_filter(df):

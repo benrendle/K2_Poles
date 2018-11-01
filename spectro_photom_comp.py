@@ -4,11 +4,11 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-# import emcee
-# import corner
 import numpy as np
 import scipy.optimize as op
 import scipy.odr.odrpack as odrpack
+from sklearn import linear_model, datasets
+import sys
 import os
 
 matplotlib.rcParams['xtick.direction'] = 'out'
@@ -31,157 +31,181 @@ def truncate(a,b):
     y['EPIC'] = b['EPIC']
     a = pd.merge(y,a,how='inner',on=['EPIC'])
     a.reset_index(drop=True)
-    print(len(a),len(b))
+    # print(len(a),len(b))
 
     return a,b
 
-def comp_scat(A,B,teff,logg,feh,title,xsub,ysub,fit,save):
-    ''' comparative scatter plots between surveys '''
-    fig, ax = plt.subplots(3)
-    plt.suptitle(title)
-    if fit == 0:
-        dt = fitting0(A,B,teff,'teff')
-        dg = fitting0(A,B,logg,'logg')
-        df = fitting0(A,B,feh,'feh')
-        print(dt,dg,df)
-    elif fit == 1:
-        dt = fitting(A,B,teff,'teff')
-        dg = fitting(A,B,logg,'logg')
-        df = fitting(A,B,feh,'feh')
-        print(dt,dg,df)
+def ransac_fit(df,df1,param,label,f):#,uncert):
+    ''' Using RANSAC fitting algorithm to fit the trends observed between different
+        spectroscopic pipelines.
 
-    ax[0].scatter(A[teff[0]],(A[teff[0]]-B[teff[1]]))
-    ax[0].plot([min(A[teff[0]])-20,max(A[teff[0]])+20],[0,0],color='k')
-    a = np.linspace(min(A[teff[0]])-20,max(A[teff[0]])+20,200)
-    ax[0].plot(a,dt[0]*a+dt[1],color='m')
-    ax[0].set_xlabel(r'T$_{\rm{eff},%s}$ [K]'%(xsub))
-    ax[0].set_xlim(min(A[teff[0]])-20,max(A[teff[0]])+20)
-    ax[0].set_ylabel(r'$\Delta$T$_{\rm{eff,%s}}$ [K]'%(ysub))
+    Data in:
+        - DataFrames containing the parameters to be compared (should already be
+          the same length)
+        - Parameters to be compared (string)
+        - Uncertainty if applicable (string)
+        - Axes labels (string)
+        - f, factor to extend plot limits to in the x-axis (float)
+    '''
+    df['Diff'] = df[param[0]] - df1[param[1]]
+    # df['sig'] = np.sqrt(df[uncert[0]]**2 + df1[uncert[1]]**2)
+    X = (df[param[0]])
+    X = X.values.reshape(-1,1)
+    y = (df['Diff'])
 
-    ax[1].scatter(A[logg[0]],(A[logg[0]]-B[logg[1]]))
-    ax[1].plot([min(A[logg[0]])-0.1,max(A[logg[0]])+0.1],[0,0],color='k')
-    b = np.linspace(min(A[logg[0]])-0.1,max(A[logg[0]])+0.1,200)
-    ax[1].plot(b,dg[0]*b+dg[1],color='m')
-    ax[1].set_xlabel(r'log$_{10}$(g)$_{\rm{%s}}$'%(xsub))
-    ax[1].set_xlim(min(A[logg[0]])-0.1,max(A[logg[0]])+0.1)
-    ax[1].set_ylabel(r'$\Delta$log$_{10}$(g)$_{%s}$'%(ysub))
+    ''' Fit line using all data '''
+    lr = linear_model.LinearRegression()
+    lr.fit(X, y)
 
-    ax[2].scatter(A[feh[0]],(A[feh[0]]-B[feh[1]]))
-    ax[2].plot([min(A[feh[0]])-0.1,max(A[feh[0]])+0.1],[0,0],color='k')
-    c = np.linspace(min(A[feh[0]])-0.1,max(A[feh[0]])+0.1,200)
-    ax[2].plot(c,df[0]*c+df[1],color='m')
-    ax[2].set_xlabel(r'[Fe/H]$_{\rm{%s}}$'%(xsub))
-    ax[2].set_xlim(min(A[feh[0]])-0.1,max(A[feh[0]])+0.1)
-    ax[2].set_ylabel(r'$\Delta$[Fe/H]$_{\rm{%s}}$'%(ysub))
+    ''' Robustly fit linear model with RANSAC algorithm '''
+    a = np.zeros((100,2))
+    b = np.zeros((100,np.shape(df)[0])) # Size of inlier mask
+    for i in range(100):
+        ransac = linear_model.RANSACRegressor(min_samples=5)
+        ransac.fit(X, y)
+        inlier_mask = ransac.inlier_mask_
+        outlier_mask = np.logical_not(inlier_mask)
 
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+        ''' Predict data of estimated models '''
+        line_X = np.arange(X.min()-f, X.max()+f, 0.01)#[:, np.newaxis]
+        line_X = line_X.reshape(-1,1)
+        line_y = lr.predict(line_X)
+        line_y_ransac = ransac.predict(line_X)
+        ''' Compare estimated coefficients '''
+        a[i,0], a[i,1] = ransac.estimator_.coef_,ransac.estimator_.intercept_
+        b[i,:] = inlier_mask
 
-    plt.savefig('/media/bmr135/SAMSUNG/GA/K2Poles/Spec_Comp/'+save+'.png')
+    ''' Make inliers boolean and find optimal fit using the median of the data '''
+    b = b.astype('bool')
+    c = np.median(a[:,0])
+    medIdx = (np.abs(a[:,0] - c)).argmin()
+    print(a[medIdx,0],a[medIdx,1])
+    # print(np.median(a[:,0]),a[medIdx,0],b[medIdx])
 
-def fitting(df1,df2,param,param_str):
-    ''' Least squares fitting approach to calculating offsets betrween params '''
-    def f(Par,x):
-        return Par[0]*x + Par[1]
-    alt = 'alt_' + param_str
-    df2[alt] = df1[param[0]] - df2[param[1]]
-    # print(np.mean(df2[alt]),np.median(df2[alt]), len(df2), len(df1), df2[alt])
-    df1['null'] = 0
-    mpar, cpar, empar, ecpar = [], [], [], []
-    linear = odrpack.Model(f)
-    mydata = odrpack.RealData(df1[param[0]], df2[alt])#, sy=df2['feh_err'])
-    myodr = odrpack.ODR(mydata, linear, beta0=[0., 0.],maxit=100000)
-    myoutput = myodr.run()
-    mpar.append(myoutput.beta[0])
-    cpar.append(myoutput.beta[1])
-    empar.append(myoutput.sd_beta[0])
-    ecpar.append(myoutput.sd_beta[1])
-    # myoutput.pprint()
-
-    return mpar,cpar,ecpar
-
-def fitting0(df1,df2,param,param_str):
-    ''' Least squares fitting approach to calculating offsets betrween params '''
-    def f(Par,x):
-        return Par[0]*x + Par[1]
-    alt = 'alt_' + param_str
-    df2[alt] = df1[param[0]] - df2[param[1]]
-    df1['null'] = 0
-    mpar, cpar, empar, ecpar = [], [], [], []
-    linear = odrpack.Model(f)
-    mydata = odrpack.RealData(df1['null'], df2[alt])#, sy=df2['feh_err'])
-    myodr = odrpack.ODR(mydata, linear, beta0=[0., 0.],maxit=100000)
-    myoutput = myodr.run()
-    mpar.append(myoutput.beta[0])
-    cpar.append(myoutput.beta[1])
-    empar.append(myoutput.sd_beta[0])
-    ecpar.append(myoutput.sd_beta[1])
-    # myoutput.pprint()
-
-    return mpar,cpar,ecpar
-
+    ''' Plot the inliers, outliers and optimal fit to the data '''
+    plt.figure()
+    lw = 2
+    plt.plot(line_X, a[medIdx,0]*line_X + a[medIdx,1], color='k', linewidth=3, label=r'%.5s$*x$ + %.5s'%(a[medIdx,0],a[medIdx,1]), alpha=0.5)
+    # plt.errorbar(X, y, yerr=df['sig'], color='gold', marker='.', label='Outliers',fmt='o')
+    # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o')
+    plt.scatter(X, y, color='gold', label='Outliers')
+    plt.scatter(X[b[medIdx]], y[b[medIdx]], color='yellowgreen', label='Inliers')
+    plt.xlabel(label[0])
+    plt.ylabel(label[1])
+    plt.xlim(X.min()-f, X.max()+f)
+    plt.legend()
+    df['outlier_flag'] = 1.
+    df['outlier_flag'][b[medIdx]] = 0.
+    print(df['outlier_flag'])
+    sys.exit()
+    # plt.savefig('/home/bmr135/spectro_comp/C3_RAVE_GES_'+param[1]+'.png')
 
 if __name__ == "__main__":
     ''' Read in Data '''
-    # ext = '/home/bmr135/GA/K2Poles'
-    ext = '/media/ben/SAMSUNG/GA/K2Poles'
-    APO = pd.read_csv(ext+'/matlab_in/APOGEE_full.csv')
-    APO = APO.dropna(subset=['TEFF','LOGG','FE_H'])
+    ext = '/media/bmr135/SAMSUNG/GA/K2Poles'
+    A3 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C3.csv')
+    A3 = A3.dropna(subset=['TEFF','LOGG','FE_H'])
+    A6 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C6.csv')
+    A6 = A6.dropna(subset=['TEFF','LOGG','FE_H'])
     G = pd.read_csv(ext+'/Gaia_ESO/GES_full.csv')
     G = G.dropna(subset=['TEFF','LOGG','FEH'])
-    R3 = pd.read_csv(ext+'/matlab_in/RC3.csv')
+    R3 = pd.read_csv(ext+'/RAVE_C3.csv')
     R3 = R3.dropna(subset=['Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'])
     R3 = R3[R3['logg_RAVE'] > 0]
-    R6 = pd.read_csv(ext+'/matlab_in/RC6.csv')
+    R6 = pd.read_csv(ext+'/RAVE_C6.csv')
     R6 = R6.dropna(subset=['Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'])
     R6 = R6[R6['logg_RAVE'] > 0]
-    # L3 = pd.read_csv(ext+'/matlab_in/LAMOST3_multidet.csv')
-    # L3 = L3.dropna(subset=['teff_L','logg_L','feh_L'])
-    L6 = pd.read_csv(ext+'/matlab_in/LAMOST6_multidet.csv')
+    L6 = pd.read_csv(ext+'/APO_LAMOST/LAMOST_full_C6.csv')
     L6 = L6.dropna(subset=['teff_L','logg_L','feh_L'])
-    # LR6 = pd.read_csv(ext+'/matlab_in/LAMOST_RAVE_C6.csv')
-    # LR6 = LR6.dropna(subset=['teff_L','logg_L','feh_L','Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'])
-    # LR6 = LR6[LR6['logg_RAVE'] > 0]
-    C3 = pd.read_csv(ext+'/matlab_in/C3.csv')
+    C3 = pd.read_csv(ext+'/matlab_in/C3_17102018.csv')
     C3 = C3.dropna(subset=['Teff','logg','[Fe/H]'])
-    C6 = pd.read_csv(ext+'/matlab_in/C6.csv')
+    C6 = pd.read_csv(ext+'/matlab_in/C6_17102018.csv')
     C6 = C6.dropna(subset=['Teff','logg','[Fe/H]'])
 
-    a, ac = truncate(APO,C6)
+    ''' Combine datasets prior to comparisons '''
+    a3, ac3 = truncate(A3,C3)
+    a6, ac6 = truncate(A6,C6)
     g, gc = truncate(G,C3)
     r3, rc3 = truncate(R3,C3)
     r6, rc6 = truncate(R6,C6)
-    # l3, lc3 = truncate(L3,C3)
     l6, lc6 = truncate(L6,C6)
-    ar, ra = truncate(APO,R6)
+    ar3, ra3 = truncate(A3,R3)
+    ag, ga = truncate(A3,G)
     gr, rg = truncate(G,R3)
+    ar, ra = truncate(A6,R6)
+    al, la = truncate(A6,L6)
 
+    # print(R3.columns.values)
 
     ''' Compare Teff, [Fe/H], logg of given datasets '''
-    # comp_scat(LR6,LR6,['teff_L','Teff_RAVE'],['logg_L','logg_RAVE'],['feh_L','[Fe/H]_RAVE'], \
-    # r'LAMOST-RAVE: C6','L','L-R',1,'LAMOST_RAVE_C6')
 
-    comp_scat(a,ac,['TEFF','Teff'],['LOGG','logg'],['FE_H','[Fe/H]'], \
-    r'APOGEE-EPIC: C6','A','A-Ep',1,'APOGEE_EPIC')
+    ''' APOGEE vs EPIC - C3 '''
+    # ransac_fit(a3,ac3,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)#,['TEFF_ERR','sig_Teff'])
+    # ransac_fit(a3,ac3,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)#,['LOGG_ERR','sig_logg'])
+    # ransac_fit(a3,ac3,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)#,['FE_H_ERR','sig_feh'])
+    # plt.show()
 
-    comp_scat(g,gc,['TEFF','Teff'],['LOGG','logg'],['FEH','[Fe/H]'], \
-    r'GES-EPIC: C3','G','G-Ep',1,'GES_EPIC')
+    ''' APOGEE vs EPIC - C6 '''
+    # ransac_fit(a6,ac6,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)
+    # ransac_fit(a6,ac6,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)
+    # ransac_fit(a6,ac6,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)
+    # plt.show()
 
-    comp_scat(r3,rc3,['Teff_RAVE','Teff'],['logg_RAVE','logg'],['[Fe/H]_RAVE','[Fe/H]'], \
-    r'RAVE-EPIC: C3','R','R-Ep',1,'RAVE_EPIC_C3')
+    ''' Gaia-ESO vs EPIC - C3 '''
+    # ransac_fit(g,gc,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - Gaia-ESO, C3',r'$\Delta(T_{\rm{eff}})_{GES-EPIC}$'],10)
+    # ransac_fit(g,gc,['LOGG','logg'],[r'log$_{10}$(g) - Gaia-ESO, C3',r'$\Delta($log$_{10}$(g)$)_{GES-EPIC}$'],0.1)
+    # ransac_fit(g,gc,['FEH','[Fe/H]'],[r'[Fe/H] - Gaia-ESO, C3',r'$\Delta($[Fe/H]$)_{GES-EPIC}$'],0.1)
+    # plt.show()
 
-    comp_scat(r6,rc6,['Teff_RAVE','Teff'],['logg_RAVE','logg'],['[Fe/H]_RAVE','[Fe/H]'], \
-    r'RAVE-EPIC: C6','R','R-Ep',1,'RAVE_EPIC_C6')
+    ''' RAVE vs EPIC - C3 '''
+    # ransac_fit(r3,rc3,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
+    # ransac_fit(r3,rc3,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
+    # ransac_fit(r3,rc3,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
+    # plt.show()
 
-    # comp_scat(l3,lc3,['teff_L','Teff'],['logg_L','logg'],['feh_L','[Fe/H]'], \
-    # r'LAMOST-EPIC: C3','L','L-Ep',1,'LAMOST_EPIC_C3')
+    ''' RAVE vs EPIC - C6 '''
+    # ransac_fit(r6,rc6,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C6',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
+    # ransac_fit(r6,rc6,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C6',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
+    # ransac_fit(r6,rc6,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C6',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
+    # plt.show()
 
-    comp_scat(l6,lc6,['teff_L','Teff'],['logg_L','logg'],['feh_L','[Fe/H]'], \
-    r'LAMOST-EPIC: C6','L','L-Ep',1,'LAMOST_EPIC_C6')
+    ''' LAMOST vs EPIC - C6 '''
+    # ransac_fit(l6,lc6,['teff_L','Teff'],[r'$T_{\rm{eff}}$ - LAMOST, C6',r'$\Delta(T_{\rm{eff}})_{LAMOST-EPIC}$'],10)
+    # ransac_fit(l6,lc6,['logg_L','logg'],[r'log$_{10}$(g) - LAMOST, C6',r'$\Delta($log$_{10}$(g)$)_{LAMOST-EPIC}$'],0.1)
+    # ransac_fit(l6,lc6,['feh_L','[Fe/H]'],[r'[Fe/H] - LAMOST, C6',r'$\Delta($[Fe/H]$)_{LAMOST-EPIC}$'],0.1)
+    # plt.show()
 
-    comp_scat(ar,ra,['TEFF','Teff_RAVE'],['LOGG','logg_RAVE'],['FE_H','[Fe/H]_RAVE'], \
-    r'APOGEE-RAVE: C6','A','A-R',0,'APOGEE_RAVE')
+    ''' APOGEE vs RAVE - C3 '''
+    # if len(ar3) > 2:
+    #     ransac_fit(ar3,ra3,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+    #     ransac_fit(ar3,ra3,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+    #     ransac_fit(ar3,ra3,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
+    # plt.show()
 
-    comp_scat(gr,rg,['TEFF','Teff_RAVE'],['LOGG','logg_RAVE'],['FEH','[Fe/H]_RAVE'], \
-    r'GES-RAVE: C3','G','G-R',0,'GES_RAVE')
+    ''' APOGEE vs RAVE - C6 '''
+    # if len(ar) > 2:
+    #     ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+    #     ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+    #     ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
+    # plt.show()
 
+    ''' APOGEE vs Gaia-ESO - C3 '''
+    # if len(ag) > 2:
+    #     ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+    #     ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+    #     ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
+    # plt.show()
+
+    ''' RAVE vs Gaia-ESO - C3 '''
+    # if len(rg) > 2:
+    #     ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
+    #     ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
+    #     ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
+    # plt.show()
+
+    ''' APOGEE vs LAMOST - C6 '''
+    # if len(al) > 2:
+    #     ransac_fit(al,la,['TEFF','teff_L'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-LAMOST}$'],10)
+    #     ransac_fit(al,la,['LOGG','logg_L'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-LAMOST}$'],0.1)
+    #     ransac_fit(al,la,['FE_H','feh_L'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-LAMOST}$'],0.1)
     # plt.show()

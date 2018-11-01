@@ -22,6 +22,7 @@ import Detection_prob_K2 as DP
 import K2_constants as const
 from numbers import Number
 import colormaps
+import time
 
 mpl.rcParams['xtick.direction'] = 'out'
 mpl.rcParams['ytick.direction'] = 'out'
@@ -63,62 +64,29 @@ def individ(df,df1,df2):
     Y = pd.DataFrame()
     Y['EPIC'] = df1['EPIC']
     Y['Y'] = 1.0
-    Y['B'] = 0.0
-    Y['S'] = 0.0
 
     B = pd.DataFrame()
     B['EPIC'] = df['EPIC']
-    B['Y'] = 0.0
     B['B'] = 1.0
-    B['S'] = 0.0
 
     S = pd.DataFrame()
     S['EPIC'] = df2['EPIC']
-    S['Y'] = 0.0
-    S['B'] = 0.0
     S['S'] = 1.0
 
-    j=0
-    for i in Y['EPIC']:
-        for k in B['EPIC']:
-            if i == k:
-                Y['B'][j] += 1
-        j+=1
+    Y = Y.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
+    Y = Y.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
+    Y['B'].fillna(value=0.0,inplace=True)
+    Y['S'].fillna(value=0.0,inplace=True)
 
-    j=0
-    for i in Y['EPIC']:
-        for k in S['EPIC']:
-            if i == k:
-                Y['S'][j] += 1
-        j+=1
+    B = B.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
+    B = B.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
+    B['Y'].fillna(value=0.0,inplace=True)
+    B['S'].fillna(value=0.0,inplace=True)
 
-    j=0
-    for i in B['EPIC']:
-        for k in Y['EPIC']:
-            if i == k:
-                B['Y'][j] += 1
-        j+=1
-
-    j=0
-    for i in B['EPIC']:
-        for k in S['EPIC']:
-            if i == k:
-                B['S'][j] += 1
-        j+=1
-
-    j=0
-    for i in S['EPIC']:
-        for k in B['EPIC']:
-            if i == k:
-                S['B'][j] = 1
-        j+=1
-
-    j=0
-    for i in S['EPIC']:
-        for k in Y['EPIC']:
-            if i == k:
-                S['Y'][j] = 1
-        j+=1
+    S = S.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
+    S = S.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
+    S['B'].fillna(value=0.0,inplace=True)
+    S['Y'].fillna(value=0.0,inplace=True)
 
     Y['Nseismo'] = Y['Y'] + Y['B'] + Y['S']
     B['Nseismo'] = B['Y'] + B['B'] + B['S']
@@ -180,32 +148,32 @@ def hist_orig(df,df1,cut,bins,ext,n):
     d = [0,0,0,0,0]
     ratio = [0,0,0,0,0]
 
-    hist0[0], d[0], c = ax0.hist(df['mass'],bins=bins[0],histtype='step')
-    hist[0], b[0], c = ax0.hist(df1['mass'],bins=bins[0])
+    hist0[0], d[0], c = ax0.hist(df['mass'],bins=bins[0],histtype='step',linewidth=2)
+    hist[0], b[0], c = ax0.hist(df1['mass'],bins=bins[0],histtype='step',linewidth=2)
     ax0.set_xlabel(r'Mass [M$_{\odot}$]')
     if n == 6:
         ax0.set_xlim(0.5,2.5)
 
-    hist0[1], d[1], c = ax1.hist(df['Radius'],bins=bins[1],histtype='step')
-    hist[1], b[1], c = ax1.hist(df1['Radius'],bins=bins[1])
+    hist0[1], d[1], c = ax1.hist(df['Radius'],bins=bins[1],histtype='step',linewidth=2)
+    hist[1], b[1], c = ax1.hist(df1['Radius'],bins=bins[1],histtype='step',linewidth=2)
     ax1.set_xlabel(r'Radius [R$_{\odot}$]')
     if n == 6:
         ax1.set_xlim(0,30)
 
-    hist0[2], d[2], c = ax2.hist(df['Teff'],bins=bins[2],histtype='step')
-    hist[2], b[2], c = ax2.hist(df1['Teff'],bins=bins[2])
+    hist0[2], d[2], c = ax2.hist(df['Teff'],bins=bins[2],histtype='step',linewidth=2)
+    hist[2], b[2], c = ax2.hist(df1['Teff'],bins=bins[2],histtype='step',linewidth=2)
     ax2.set_xlabel(r'T$_{\rm{eff}}$ [K]')
     if n == 6:
         ax2.set_xlim(4000,5250)
 
-    hist0[3], d[3], c = ax3.hist(df['[Fe/H]'],bins=bins[3],histtype='step')
-    hist[3], b[3], c = ax3.hist(df1['[Fe/H]'],bins=bins[3])
+    hist0[3], d[3], c = ax3.hist(df['[Fe/H]'],bins=bins[3],histtype='step',linewidth=2)
+    hist[3], b[3], c = ax3.hist(df1['[Fe/H]'],bins=bins[3],histtype='step',linewidth=2)
     ax3.set_xlabel(r'[Fe/H] [dex]')
     if n == 6:
         ax3.set_xlim(-1.2,0.2)
 
-    hist0[4], d[4], c = ax4.hist(df['logg'],bins=bins[4],histtype='step')
-    hist[4], b[4], c = ax4.hist(df1['logg'],bins=bins[4])
+    hist0[4], d[4], c = ax4.hist(df['logg'],bins=bins[4],histtype='step',linewidth=2)
+    hist[4], b[4], c = ax4.hist(df1['logg'],bins=bins[4],histtype='step',linewidth=2)
     ax4.set_xlabel(r'log$_{10}$(g)')
     if n == 6:
         ax4.set_xlim(1,4)
@@ -218,7 +186,7 @@ def hist_orig(df,df1,cut,bins,ext,n):
     ratio[4] = (hist[4]/hist0[4])*100
     # ax0.set_title(r'Cut Applied: '+cut)
     plt.tight_layout()
-    plt.savefig(ext+'_'+str(n)+'.png')
+    # plt.savefig('/home/bmr135/sel_func_comp/'+str(n)+'_'+time.strftime("%d%m%Y")+'_C6.png')
 
     if n == 6:
         fig, axes = plt.subplots(3,2)
@@ -246,7 +214,9 @@ def hist_orig(df,df1,cut,bins,ext,n):
 
         ax5.axis('off')
         plt.tight_layout()
-        plt.show()
+        # plt.savefig('/home/bmr135/sel_func_comp/Percentage_reductions_'+time.strftime("%d%m%Y")+'_C6.png')
+        # plt.show()
+
 
     return hist, b
 
@@ -275,13 +245,13 @@ def percentage_decrease(h0,h1,h2,h3,h4,h5,h6,b,field):
     Radius = Radius.rename(lambda x: b[1][x])
 
     Teff = pd.DataFrame()
-    Teff['numax'] = np.nan_to_num(100*(h2[2]-h1[2])/h2[2])
+    Teff['numax'] = np.nan_to_num(100*(h0[2]-h1[2])/h0[2])
     Teff['mag'] = np.nan_to_num(100*(h1[2]-h2[2])/h1[2])
     Teff['JK'] = np.nan_to_num(100*(h2[2]-h3[2])/h2[2])
     Teff['detP'] = np.nan_to_num(100*(h3[2]-h4[2])/h3[2])
     Teff['Nseis'] = np.nan_to_num(100*(h4[2]-h5[2])/h4[2])
     Teff['Sig'] = np.nan_to_num(100*(h5[2]-h6[2])/h5[2])
-    Teff['OVERALL'] = np.nan_to_num(100*(h2[2]-h6[2])/h2[2])
+    Teff['OVERALL'] = np.nan_to_num(100*(h0[2]-h6[2])/h0[2])
     Teff = Teff.rename(lambda x: b[2][x])
 
     feh = pd.DataFrame()
@@ -305,31 +275,19 @@ def percentage_decrease(h0,h1,h2,h3,h4,h5,h6,b,field):
     logg = logg.rename(lambda x: b[4][x])
 
     if field == 3:
-        mass.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/mass_percentage_reduction')
-        Radius.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/Radius_percentage_reduction')
-        Teff.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/Teff_percentage_reduction')
-        feh.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/feh_percentage_reduction')
-        logg.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/logg_percentage_reduction')
-        np.savetxt('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/bins',b,delimiter=',')
-        # mass.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/mass_percentage_reduction')
-        # Radius.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/Radius_percentage_reduction')
-        # Teff.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/Teff_percentage_reduction')
-        # feh.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/feh_percentage_reduction')
-        # logg.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/logg_percentage_reduction')
-        # np.savetxt('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/bins',b,delimiter=',')
+        mass.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/mass_percentage_reduction'+time.strftime("%d%m%Y"))
+        Radius.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/Radius_percentage_reduction'+time.strftime("%d%m%Y"))
+        Teff.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/Teff_percentage_reduction'+time.strftime("%d%m%Y"))
+        feh.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/feh_percentage_reduction'+time.strftime("%d%m%Y"))
+        logg.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/logg_percentage_reduction'+time.strftime("%d%m%Y"))
+        np.savetxt('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/bins'+time.strftime("%d%m%Y"),b,delimiter=',')
     if field == 6:
-        mass.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/mass_percentage_reduction')
-        Radius.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/Radius_percentage_reduction')
-        Teff.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/Teff_percentage_reduction')
-        feh.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/feh_percentage_reduction')
-        logg.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/logg_percentage_reduction')
-        np.savetxt('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/bins',b,delimiter=',')
-        # mass.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/mass_percentage_reduction')
-        # Radius.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/Radius_percentage_reduction')
-        # Teff.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/Teff_percentage_reduction')
-        # feh.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/feh_percentage_reduction')
-        # logg.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/logg_percentage_reduction')
-        # np.savetxt('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/bins',b,delimiter=',')
+        mass.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/mass_percentage_reduction'+time.strftime("%d%m%Y"))
+        Radius.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/Radius_percentage_reduction'+time.strftime("%d%m%Y"))
+        Teff.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/Teff_percentage_reduction'+time.strftime("%d%m%Y"))
+        feh.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/feh_percentage_reduction'+time.strftime("%d%m%Y"))
+        logg.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/logg_percentage_reduction'+time.strftime("%d%m%Y"))
+        np.savetxt('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/bins'+time.strftime("%d%m%Y"),b,delimiter=',')
 
 def extents(f):
   delta = f[1] - f[0]
@@ -352,6 +310,26 @@ def likeli_plt(sim,dat,param1,param2,prob):
     plt.hlines(mean, bin_edges[:-1], bin_edges[1:], colors='g', lw=2, label='binned statistic of data')
     plt.legend(fontsize=10)
 
+def single_seismo(df,keys,output):
+    ''' Generation of single column of seismic values '''
+    a,b,c = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    a['EPIC'],b['EPIC'],c['EPIC'] = df['EPIC'],df['EPIC'],df['EPIC']
+    a[output] = df[keys[0]]
+    a = a.dropna(subset=[output])
+    b[output] = df[keys[1]].dropna(axis=0,how='any')
+    b = b.dropna(subset=[output])
+    c[output] = df[keys[2]].dropna(axis=0,how='any')
+    c = c.dropna(subset=[output])
+    df1 = pd.concat([a,b,c],ignore_index=True)
+    df1 = df1.drop_duplicates(subset=['EPIC'])
+    df1 = df1.reset_index(drop=True)
+    if len(df) == len(df1):
+        df = pd.merge(df,df1,how='inner',on=['EPIC'])
+        df = df.reset_index(drop=True)
+    else:
+        df = df.join(df1.set_index('EPIC'),on='EPIC')
+    # print(df[output])
+    return df
 
 if __name__ == '__main__':
 
@@ -362,6 +340,10 @@ if __name__ == '__main__':
         Yvonne_C3, Yvonne_C6, Yvonne_EC6, Yvonne_EC3 = dat.Yvonne()
         Savita_C3, Savita_C6, Savita_EC3, Savita_EC6 = dat.Savita()
         Benoit_C3, Benoit_C6, Everest_C3, Everest_C6 = dat.Benoit()
+        # GAP3 = GAP3.drop(columns=['Radius'])
+        # GAP3.rename(columns={'radius_val':'Radius'},inplace=True)
+        # GAP6 = GAP6.drop(columns=['Radius'])
+        # GAP6.rename(columns={'radius_val':'Radius'},inplace=True)
 
         C3 = [Benoit_C3,Yvonne_C3,Savita_C3]
         YC3, BC3, SC3 = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
@@ -382,13 +364,12 @@ if __name__ == '__main__':
             C6m[i] = pd.merge(GAP6,C6[i],how='inner',on=['EPIC'])
             C6m[i] = C6m[i].reset_index(drop=True)
 
+        C3m[0]['numax_const'], C6m[0]['numax_const'] = 3104, 3104
+        C3m[0]['dnu_const'], C6m[0]['dnu_const'] = 138.8, 138.8
         C3m[1]['numax_const'], C6m[1]['numax_const'] = 3135, 3135
         C3m[1]['dnu_const'], C6m[1]['dnu_const'] = 135.045, 135.045
         C3m[2]['numax_const'], C6m[2]['numax_const'] = 3097.33, 3097.33
         C3m[2]['dnu_const'], C6m[2]['dnu_const'] = 135.2, 135.2
-        C3m[0]['numax_const'], C6m[0]['numax_const'] = 3104, 3104
-        C3m[0]['dnu_const'], C6m[0]['dnu_const'] = 138.8, 138.8
-
 
         nmxB3, nmxB6, nmxY3, nmxY6, nmxS3, nmxS6 = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
         dnuB3, dnuB6, dnuY3, dnuY6, dnuS3, dnuS6 = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
@@ -405,96 +386,33 @@ if __name__ == '__main__':
         C3m = seismic_params(C3m,numax_C3,dnu_C3)
         C6m = seismic_params(C6m,numax_C6,dnu_C6)
 
+        ''' Single Numax/Dnu creation for C3 '''
         K2_3 = pd.concat([C3m[0],C3m[1],C3m[2]],ignore_index=True)
         K2_3 = K2_3.drop_duplicates(subset=['EPIC'])
         K2_3 = K2_3.reset_index(drop=True)
+        # K2_3['Glogg'] = np.log10((6.6742e-8*K2_3['mass']*1.9884e33)/(K2_3['Radius']*6.957e10)**2)
 
-        K2_3['NUMAX'] = 0.0
-        K2_3['DNU'] = 0.0
-        K2_3['NUMAX_err'] = 0.0
-        K2_3['DNU_err'] = 0.0
+        K2_3 = single_seismo(K2_3,['Bnumax','nmx','Snumax'],'NUMAX')
+        K2_3 = single_seismo(K2_3,['BDnu','dnu','SDnu'],'DNU')
+        K2_3 = single_seismo(K2_3,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
+        K2_3 = single_seismo(K2_3,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 
 
-        ''' Single Numax/Dnu creation for C3 '''
-        for i in range(len(K2_3['EPIC'])):
-            if np.isnan(K2_3['Bnumax'][i]) == False:
-                K2_3['NUMAX'][i] = K2_3['Bnumax'][i]
-            elif (np.isnan(K2_3['Bnumax'][i]) == True) and (np.isnan(K2_3['nmx'][i]) == False):
-                K2_3['NUMAX'][i] = K2_3['nmx'][i]
-            elif (np.isnan(K2_3['Bnumax'][i]) == True) & (np.isnan(K2_3['nmx'][i]) == True) & (np.isnan(K2_3['Snumax'][i]) == False):
-                K2_3['NUMAX'][i] = K2_3['Snumax'][i]
-
-        for i in range(len(K2_3['EPIC'])):
-            if np.isnan(K2_3['Bnumax'][i]) == False:
-                K2_3['NUMAX_err'][i] = K2_3['e_Bnumax'][i]
-            elif (np.isnan(K2_3['e_Bnumax'][i]) == True) and (np.isnan(K2_3['nmx_err'][i]) == False):
-                K2_3['NUMAX_err'][i] = K2_3['nmx_err'][i]
-            elif (np.isnan(K2_3['e_Bnumax'][i]) == True) and (np.isnan(K2_3['nmx_err'][i]) == True) and (np.isnan(K2_3['e_Snumax'][i]) == False):
-                K2_3['NUMAX_err'][i] = K2_3['e_Snumax'][i]
-
-        for i in range(len(K2_3['EPIC'])):
-            if np.isnan(K2_3['BDnu'][i]) == False:
-                K2_3['DNU'][i] = K2_3['BDnu'][i]
-            elif (np.isnan(K2_3['BDnu'][i]) == True) and (np.isnan(K2_3['dnu'][i]) == False):
-                K2_3['DNU'][i] = K2_3['dnu'][i]
-            elif (np.isnan(K2_3['BDnu'][i]) == True) and (np.isnan(K2_3['dnu'][i]) == True) and (np.isnan(K2_3['SDnu'][i]) == False):
-                K2_3['DNU'][i] = K2_3['SDnu'][i]
-
-        for i in range(len(K2_3['EPIC'])):
-            if np.isnan(K2_3['e_BDnu'][i]) == False:
-                K2_3['DNU_err'][i] = K2_3['e_BDnu'][i]
-            elif (np.isnan(K2_3['e_BDnu'][i]) == True) and (np.isnan(K2_3['dnu_err'][i]) == False):
-                K2_3['DNU_err'][i] = K2_3['dnu_err'][i]
-            elif (np.isnan(K2_3['e_BDnu'][i]) == True) and (np.isnan(K2_3['dnu_err'][i]) == True) and (np.isnan(K2_3['e_SDnu'][i]) == False):
-                K2_3['DNU_err'][i] = K2_3['e_SDnu'][i]
-
+        ''' Single Numax/Dnu creation for C6 '''
         K2_6 = pd.concat([C6m[0],C6m[1],C6m[2]],ignore_index=True)
         K2_6 = K2_6.drop_duplicates(subset=['EPIC'])
         K2_6 = K2_6.reset_index(drop=True)
+        # K2_6['Glogg'] = np.log10((6.6742e-8*K2_6['mass']*1.9884e33)/(K2_6['Radius']*6.957e10)**2)
 
-        K2_6['NUMAX'] = 0.0
-        K2_6['DNU'] = 0.0
-        K2_6['NUMAX_err'] = 0.0
-        K2_6['DNU_err'] = 0.0
+        K2_6 = single_seismo(K2_6,['Bnumax','nmx','Snumax'],'NUMAX')
+        K2_6 = single_seismo(K2_6,['BDnu','dnu','SDnu'],'DNU')
+        K2_6 = single_seismo(K2_6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
+        K2_6 = single_seismo(K2_6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 
-        ''' Single Numax/Dnu creation for C6 '''
-        for i in range(0,len(K2_6['EPIC']),1):
-            if np.isnan(K2_6['Bnumax'][i]) == False:
-                K2_6['NUMAX'][i] = K2_6['Bnumax'][i]
-            elif (np.isnan(K2_6['Bnumax'][i]) == True) and (np.isnan(K2_6['nmx'][i]) == False):
-                K2_6['NUMAX'][i] = K2_6['nmx'][i]
-            elif (np.isfinite(K2_6['Bnumax'][i]) != True) & (np.isfinite(K2_6['nmx'][i]) != True) & (np.isfinite(K2_6['Snumax'][i]) == False):
-                K2_6['NUMAX'][i] = K2_6['Snumax'][i]
-
-        for i in range(0,len(K2_6['EPIC']),1):
-            if np.isnan(K2_6['Bnumax'][i]) == False:
-                K2_6['NUMAX_err'][i] = K2_6['e_Bnumax'][i]
-            elif (np.isnan(K2_6['e_Bnumax'][i]) == True) and (np.isnan(K2_6['nmx_err'][i]) == False):
-                K2_6['NUMAX_err'][i] = K2_6['nmx_err'][i]
-            elif (np.isnan(K2_6['e_Bnumax'][i]) == True) and (np.isnan(K2_6['nmx_err'][i]) == True) and (np.isnan(K2_6['e_Snumax'][i]) == False):
-                K2_6['NUMAX_err'][i] = K2_6['e_Snumax'][i]
-
-        for i in range(0,len(K2_6['EPIC']),1):
-            if np.isnan(K2_6['BDnu'][i]) == False:
-                K2_6['DNU'][i] = K2_6['BDnu'][i]
-            elif (np.isnan(K2_6['BDnu'][i]) == True) and (np.isnan(K2_6['dnu'][i]) == False):
-                K2_6['DNU'][i] = K2_6['dnu'][i]
-            elif (np.isnan(K2_6['BDnu'][i]) == True) and (np.isnan(K2_6['dnu'][i]) == True) and (np.isnan(K2_6['SDnu'][i]) == False):
-                K2_6['DNU'][i] = K2_6['SDnu'][i]
-
-        for i in range(0,len(K2_6['EPIC']),1):
-            if np.isnan(K2_6['e_BDnu'][i]) == False:
-                K2_6['DNU_err'][i] = K2_6['e_BDnu'][i]
-            elif (np.isnan(K2_6['e_BDnu'][i]) == True) and (np.isnan(K2_6['dnu_err'][i]) == False):
-                K2_6['DNU_err'][i] = K2_6['dnu_err'][i]
-            elif (np.isnan(K2_6['e_BDnu'][i]) == True) and (np.isnan(K2_6['dnu_err'][i]) == True) and (np.isnan(K2_6['e_SDnu'][i]) == False):
-                K2_6['DNU_err'][i] = K2_6['e_SDnu'][i]
 
         ''' Save full list of stars here for all tests bar Sigma Clip '''
-        K2_3.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full',index=False,na_rep='NaN')
-        K2_6.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full',index=False,na_rep='NaN')
-        # K2_3.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full',index=False,na_rep='NaN')
-        # K2_6.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full',index=False,na_rep='NaN')
+        K2_3.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_'+time.strftime("%d%m%Y"),index=False,na_rep='NaN')
+        K2_6.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_'+time.strftime("%d%m%Y"),index=False,na_rep='NaN')
 
         Camp3 = pd.DataFrame()
         Camp3['EPIC'] = K2_3['EPIC']
@@ -551,7 +469,7 @@ if __name__ == '__main__':
         C6m2[2] = sigma_clip(C6m2[2],'Bnumax','Snumax','BDnu','SDnu', \
                     'e_Bnumax','e_Snumax','e_BDnu','e_SDnu',3)
 
-        ''' SIGMA CLIP NUMAX/DNU MERGER!!!!! '''
+        ''' SIGMA CLIP NUMAX/DNU MERGER '''
 
         K2_3m = pd.concat([C3m2[0],C3m2[1],C3m2[2]],ignore_index=True)
         K2_3m = K2_3m.drop_duplicates(subset=['EPIC'])
@@ -566,40 +484,38 @@ if __name__ == '__main__':
         K2_6m = K2_6m.reset_index(drop=True)
 
         ''' Save Sigma Clipped Stars '''
-        K2_3m.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip',index=False,na_rep='NaN')
-        K2_6m.to_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip',index=False,na_rep='NaN')
-        # K2_3m.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip',index=False,na_rep='NaN')
-        # K2_6m.to_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip',index=False,na_rep='NaN')
+        K2_3m.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip_'+time.strftime("%d%m%Y"),index=False,na_rep='NaN')
+        K2_6m.to_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip_'+time.strftime("%d%m%Y"),index=False,na_rep='NaN')
 
     ''' Step-by-Step Breakdown of Selection Function '''
     if sys.argv[1] == '1':
 
-        C3orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full')
-        C6orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full')
-        SigC3 = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip')
-        SigC6 = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip')
-        # C3orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
-        # C6orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
-        # SigC3 = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip')
-        # SigC6 = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip')
+        C3orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_01112018')
+        C6orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_01112018')
+        SigC3 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full_sig_clip_01112018')
+        SigC6 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full_sig_clip_01112018')
 
         ''' Selection Function Pre-Applied to Sigma-Clipped Stars '''
         SigC3 = SigC3[ (SigC3['NUMAX'] > 10) & (SigC3['NUMAX'] < 280) & (SigC3['Hmag'] > 7) & (SigC3['Hmag'] < 12) & (SigC3['JK'] > 0.5) & (SigC3['prob_s'] >= 0.95) ]
         SigC6 = SigC6[ (SigC6['NUMAX'] > 10) & (SigC6['NUMAX'] < 280) & (SigC6['Vcut'] > 9) & (SigC6['Vcut'] < 15) & (SigC6['JK'] > 0.5) & (SigC6['prob_s'] >= 0.95) ]
 
-        print('Files read in successfully')
         C3orig = C3orig[C3orig['mass']>0.0]
         C6orig = C6orig[C6orig['mass']>0.0]
-        param = ['mass','Radius','Teff','[Fe/H]','logg']
+        C6orig = C6orig.dropna(subset=['Radius'])
+        param = ['mass','radius','Teff','[Fe/H]','slogg']
         fancy = [r'Mass [M$_{\odot}$]',r'Radius [R$_{\odot}$]',r'T$_{\rm{eff}}$',r'[Fe/H]',r'log$_{10}$(g)']
-        ext3 = '/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3/'
-        ext6 = '/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6/'
-        # ext3 = '/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/'
-        # ext6 = '/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/'
+        ext3 = '/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3/'
+        ext6 = '/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6/'
         ext = [ext3,ext6]
         inputs = [C3orig,C6orig]
         field = [3,6]
         histo1 = [0,0,0,0,0]
+
+        smol_rad3 = C3orig[C3orig['Radius'] < 2]
+        print(smol_rad3[['EPIC','Radius','logg','NUMAX']])
+        smol_rad6 = C6orig[C6orig['Radius'] < 2]
+        print(smol_rad6[['EPIC','Radius','logg','NUMAX']])
+        sys.exit()
 
         j=0
         for i in inputs:
@@ -614,7 +530,7 @@ if __name__ == '__main__':
                 hist0, b0 = hist_orig(C3orig,C3orig,r'None',bins,ext[0],0)
             if field[j] == 6:
                 bins = [np.linspace(min(C6orig['mass']),max(C6orig['mass']),50), \
-                        np.linspace(min(C6orig['Radius']),max(C6orig['Radius']),50), \
+                        np.linspace(min(C6orig['Radius']),25,50), \
                         np.linspace(min(C6orig['Teff']),max(C6orig['Teff']),50), \
                         np.linspace(min(C6orig['[Fe/H]']),max(C6orig['[Fe/H]']),50), \
                         np.linspace(min(C6orig['logg']),max(C6orig['logg']),50)]
@@ -639,21 +555,22 @@ if __name__ == '__main__':
                 hist1, b = hist_orig(i,cut[0],r'$\nu_{\rm{max}}$ (\#1)',bins,ext[1],1)
             numax = cut[1]
             cut[1] = 0.0
-            fig, axes = plt.subplots(3,2)
-            ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-            ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-            for k in range(len(param)):
-                ax[k].hist([numax[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$'])
-                ax[k].set_xlabel(fancy[k])
-            box = ax[4].get_position()
-            ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-            ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
-            ax[5].axis('off')
-            plt.tight_layout()
-            if field[j] == 3:
-                plt.savefig(ext3+'numax.png')
-            if field[j] == 6:
-                plt.savefig(ext6+'numax.png')
+            m=cut[0]
+            # fig, axes = plt.subplots(3,2)
+            # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+            # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+            # for k in range(len(param)):
+            #     ax[k].hist([numax[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$'])
+            #     ax[k].set_xlabel(fancy[k])
+            # box = ax[4].get_position()
+            # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+            # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
+            # ax[5].axis('off')
+            # plt.tight_layout()
+            # if field[j] == 3:
+            #     # plt.savefig(ext3+'numax.png')
+            # if field[j] == 6:
+            #     # plt.savefig(ext6+'numax.png')
 
             ''' Magnitude Cuts '''
             if field[j] == 3:
@@ -663,19 +580,20 @@ if __name__ == '__main__':
                 cut[0] = cut[0][cut[0]['Hmag'] >= 7]
                 hist2, b = hist_orig(i,cut[0],r'H-band (\#2)',bins,ext[0],2)
                 mag = cut[1]
+                m1=cut[0]
                 cut[1] = 0.0
-                fig, axes = plt.subplots(3,2)
-                ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-                ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-                for k in range(len(param)):
-                    ax[k].hist([numax[param[k]],mag[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band'])
-                    ax[k].set_xlabel(fancy[k])
-                box = ax[4].get_position()
-                ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-                ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
-                ax[5].axis('off')
-                plt.tight_layout()
-                plt.savefig(ext3+'numax_mag.png')
+                # fig, axes = plt.subplots(3,2)
+                # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+                # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+                # for k in range(len(param)):
+                #     ax[k].hist([numax[param[k]],mag[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band'])
+                #     ax[k].set_xlabel(fancy[k])
+                # box = ax[4].get_position()
+                # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+                # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
+                # ax[5].axis('off')
+                # plt.tight_layout()
+                # plt.savefig(ext3+'numax_mag.png')
 
             if field[j] == 6:
                 cut[1] = cut[0][cut[0]['Vcut'] > 15]
@@ -684,19 +602,20 @@ if __name__ == '__main__':
                 cut[0] = cut[0][cut[0]['Vcut'] > 9]
                 hist2, b = hist_orig(i,cut[0],r'H-band (\#2)',bins,ext[1],2)
                 mag = cut[1]
+                m1=cut[0]
                 cut[1] = 0.0
-                fig, axes = plt.subplots(3,2)
-                ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-                ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-                for k in range(len(param)):
-                    ax[k].hist([numax[param[k]],mag[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'V-Band'])
-                    ax[k].set_xlabel(fancy[k])
-                box = ax[4].get_position()
-                ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-                ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
-                ax[5].axis('off')
-                plt.tight_layout()
-                plt.savefig(ext6+'numax_mag.png')
+                # fig, axes = plt.subplots(3,2)
+                # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+                # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+                # for k in range(len(param)):
+                #     ax[k].hist([numax[param[k]],mag[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'V-Band'])
+                #     ax[k].set_xlabel(fancy[k])
+                # box = ax[4].get_position()
+                # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+                # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
+                # ax[5].axis('off')
+                # plt.tight_layout()
+                # plt.savefig(ext6+'numax_mag.png')
 
             ''' J-K '''
             cut[1] = cut[0][cut[0]['JK'] < 0.5]
@@ -706,22 +625,23 @@ if __name__ == '__main__':
             if field[j] == 6:
                 hist3, b = hist_orig(i,cut[0],r'J-K (\#3)',bins,ext[1],3)
             JK = cut[1]
+            m2=cut[0]
             cut[1] = 0.0
-            fig, axes = plt.subplots(3,2)
-            ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-            ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-            for k in range(len(param)):
-                ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K'])
-                ax[k].set_xlabel(fancy[k])
-            box = ax[4].get_position()
-            ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-            ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
-            ax[5].axis('off')
-            plt.tight_layout()
-            if field[j] == 3:
-                plt.savefig(ext3+'numax_mag_JK.png')
-            if field[j] == 6:
-                plt.savefig(ext6+'numax_mag_JK.png')
+            # fig, axes = plt.subplots(3,2)
+            # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+            # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+            # for k in range(len(param)):
+            #     ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K'])
+            #     ax[k].set_xlabel(fancy[k])
+            # box = ax[4].get_position()
+            # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+            # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=1)
+            # ax[5].axis('off')
+            # plt.tight_layout()
+            # if field[j] == 3:
+            #     # plt.savefig(ext3+'numax_mag_JK.png')
+            # if field[j] == 6:
+            #     # plt.savefig(ext6+'numax_mag_JK.png')
 
 
             ''' Detection Probability '''
@@ -732,22 +652,23 @@ if __name__ == '__main__':
             if field[j] == 6:
                 hist4, b = hist_orig(i,cut[0],r'Det. Prob. (\#4)',bins,ext[1],4)
             detPro = cut[1]
+            m3=cut[0]
             cut[1] = 0.0
-            fig, axes = plt.subplots(3,2)
-            ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-            ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-            for k in range(len(param)):
-                ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.'])
-                ax[k].set_xlabel(fancy[k])
-            box = ax[4].get_position()
-            ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-            ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
-            ax[5].axis('off')
-            plt.tight_layout()
-            if field[j] == 3:
-                plt.savefig(ext3+'numax_mag_JK_detP.png')
-            if field[j] == 6:
-                plt.savefig(ext6+'numax_mag_JK_detP.png')
+            # fig, axes = plt.subplots(3,2)
+            # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+            # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+            # for k in range(len(param)):
+            #     ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.'])
+            #     ax[k].set_xlabel(fancy[k])
+            # box = ax[4].get_position()
+            # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+            # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
+            # ax[5].axis('off')
+            # plt.tight_layout()
+            # if field[j] == 3:
+            #     # plt.savefig(ext3+'numax_mag_JK_detP.png')
+            # if field[j] == 6:
+            #     # plt.savefig(ext6+'numax_mag_JK_detP.png')
 
             ''' Mulitple Detections '''
             cut[1] = cut[0][cut[0]['Nseismo'] < 2]
@@ -757,74 +678,98 @@ if __name__ == '__main__':
             if field[j] == 6:
                 hist5, b = hist_orig(i,cut[0],r'Number Seismic Dets. (\#5)',bins,ext[1],5)
             Nseis = cut[1]
+            m4=cut[0]
             cut[1] = 0.0
-            fig, axes = plt.subplots(3,2)
-            ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-            ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-            for k in range(len(param)):
-                ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$'])
-                ax[k].set_xlabel(fancy[k])
-            box = ax[4].get_position()
-            ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-            ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
-            ax[5].axis('off')
-            plt.tight_layout()
-            if field[j] == 3:
-                plt.savefig(ext3+'numax_mag_JK_detP_Nseis.png')
-            if field[j] == 6:
-                plt.savefig(ext6+'numax_mag_JK_detP_Nseis.png')
+            # fig, axes = plt.subplots(3,2)
+            # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+            # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+            # for k in range(len(param)):
+            #     ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$'])
+            #     ax[k].set_xlabel(fancy[k])
+            # box = ax[4].get_position()
+            # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+            # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
+            # ax[5].axis('off')
+            # plt.tight_layout()
+            # if field[j] == 3:
+            #     # plt.savefig(ext3+'numax_mag_JK_detP_Nseis.png')
+            # if field[j] == 6:
+            #     # plt.savefig(ext6+'numax_mag_JK_detP_Nseis.png')
 
             ''' Sigma Clip '''
             if field[j] ==3:
+                cutt = pd.merge(cut[0],SigC3[['EPIC']],how='inner',on=['EPIC'])
+                cutt = cutt.reset_index(drop=True)
                 cut[1] = pd.concat([cut[0],SigC3],ignore_index=True)
                 cut[1] = cut[1].drop_duplicates(subset=['EPIC'],keep=False)
                 cut[1] = cut[1].reset_index(drop=True)
-                hist6, b = hist_orig(i,SigC3,r'Sigma Clip. (\#6)',bins,ext[0],6)
+                hist6, b = hist_orig(i,cutt,r'Sigma Clip. (\#6)',bins,ext[0],6)
+                m5=cut[0]
                 SC = cut[1]
-                fig, axes = plt.subplots(3,2)
-                ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-                ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-                for k in range(len(param)):
-                    ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]],SC[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$',r'Sig. Clip'])
-                    ax[k].set_xlabel(fancy[k])
-                box = ax[4].get_position()
-                ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-                ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
-                ax[5].axis('off')
-                plt.tight_layout()
-                plt.savefig(ext3+'numax_mag_JK_detP_Nseis_Sig.png')
+                # fig, axes = plt.subplots(3,2)
+                # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+                # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+                # for k in range(len(param)):
+                #     ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]],SC[param[k]]],bins=bins[k],stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$',r'Sig. Clip'])
+                #     ax[k].set_xlabel(fancy[k])
+                # box = ax[4].get_position()
+                # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+                # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
+                # ax[5].axis('off')
+                # plt.tight_layout()
+                # plt.savefig(ext3+'numax_mag_JK_detP_Nseis_Sig.png')
 
             if field[j] ==6:
+                cutt = pd.merge(cut[0],SigC6[['EPIC']],how='inner',on=['EPIC'])
+                cutt = cutt.reset_index(drop=True)
                 cut[1] = pd.concat([cut[0],SigC6],ignore_index=True)
                 cut[1] = cut[1].drop_duplicates(subset=['EPIC'],keep=False)
                 cut[1] = cut[1].reset_index(drop=True)
-                hist6, b = hist_orig(i,SigC6,r'Sigma Clip. (\#6)',bins,ext[1],6)
+                hist6, b = hist_orig(i,cutt,r'Sigma Clip. (\#6)',bins,ext[1],6)
+                m5=cut[0]
                 SC = cut[1]
-                fig, axes = plt.subplots(3,2)
-                ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-                ax = [ax0,ax1,ax2,ax3,ax4,ax5]
-                for k in range(len(param)):
-                    ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]],SC[param[k]]],bins=50,stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$',r'Sig. Clip'])
-                    ax[k].set_xlabel(fancy[k])
-                box = ax[4].get_position()
-                ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
-                ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
-                ax[5].axis('off')
-                plt.tight_layout()
-                plt.savefig(ext6+'numax_mag_JK_detP_Nseis_Sig.png')
+                # fig, axes = plt.subplots(3,2)
+                # ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+                # ax = [ax0,ax1,ax2,ax3,ax4,ax5]
+                # for k in range(len(param)):
+                #     ax[k].hist([numax[param[k]],mag[param[k]],JK[param[k]],detPro[param[k]],Nseis[param[k]],SC[param[k]]],bins=50,stacked=True,label=[r'$\nu_{\rm{max}}$',r'H-Band',r'J-K',r'Det. Prob.',r'N$_{seismic}$',r'Sig. Clip'])
+                #     ax[k].set_xlabel(fancy[k])
+                # box = ax[4].get_position()
+                # ax[4].set_position([box.x0, box.y0 + box.height * 0.1,box.width, box.height * 0.9])
+                # ax[4].legend(loc='upper center', bbox_to_anchor=(1.6, 1.0),fancybox=True, shadow=True, ncol=2)
+                # ax[5].axis('off')
+                # plt.tight_layout()
+                # plt.savefig(ext6+'numax_mag_JK_detP_Nseis_Sig.png')
 
             percentage_decrease(hist0,hist1,hist2,hist3,hist4,hist5,hist6,b0,field[j])
             j+=1
+
+            fig, ax = plt.subplots()
+            ax.scatter(i['Teff'],i['slogg'],label=r'Full')
+            ax.scatter(m['Teff'],m['slogg'],label=r'$\nu_{\rm{max}}$')
+            ax.scatter(m1['Teff'],m1['slogg'],label=r'Mag.')
+            ax.scatter(m2['Teff'],m2['slogg'],label=r'Colour')
+            ax.scatter(m3['Teff'],m3['slogg'],label=r'Det. Prob.')
+            ax.scatter(m4['Teff'],m4['slogg'],label=r'N$_{\rm{det}}$')
+            ax.scatter(m5['Teff'],m5['slogg'],label=r'$\sigma_{\rm{clip}}$')
+            ax.set_xlabel(r'$T_{\rm{eff}}$')
+            ax.set_ylabel(r'log$_{10}$(g)')
+            ax.legend()
+            plt.gca().invert_xaxis()
+            plt.gca().invert_yaxis()
+            # plt.savefig('/home/bmr135/sel_func_comp/Reduction_HRD_'+time.strftime("%d%m%Y")+'_C6.png')
+            # plt.show()
+            # sys.exit()
+
+
 
 
         # plt.show()
 
     ''' Direct Comparison of Original Fields and Seismic Data '''
     if sys.argv[1] == '2':
-        C3orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full')
-        C6orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full')
-        # C3orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
-        # C6orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
+        C3orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
+        C6orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
         GAP3, GAP6 = dat.K2_GAP()
 
         C3orig = C3orig[ (C3orig['Hmag'] > 7) & (C3orig['Hmag'] < 12) & (C3orig['JK'] > 0.5) & (C3orig['mass'] > 0)]
@@ -832,8 +777,7 @@ if __name__ == '__main__':
         GAP3 = GAP3[ (GAP3['Hmag'] > 7) & (GAP3['Hmag'] < 12) & (GAP3['JK'] > 0.5) & (GAP3['mass'] > 0)]
         GAP6 = GAP6[ (GAP6['Vcut'] > 9) & (GAP6['Vcut'] < 15) & (GAP6['JK'] > 0.5) & (GAP6['mass'] > 0)]
 
-        ext_fig = '/home/bmr135/Dropbox/K2Poles/pop_trends/261017/GAP_vs_Dets/'
-        # ext_fig = '/home/ben/Dropbox/K2Poles/pop_trends/261017/GAP_vs_Dets/'
+        ext_fig = '/home/bmr135/Dropbox/K2Poles/pop_trends/231018/GAP_vs_Dets/'
 
         ''' Mag vs J-K '''
         fig, axes = plt.subplots(2,1,sharex=True)
@@ -1025,8 +969,8 @@ if __name__ == '__main__':
 
         C3orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full')
         C6orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full')
-        # C3orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
-        # C6orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
+        # C3orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
+        # C6orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
         GAP3, GAP6 = dat.K2_GAP()
         T3, T6 = dat.TRILEGAL()
 
@@ -1044,7 +988,7 @@ if __name__ == '__main__':
         T6 = T6.reset_index(drop=True)
 
         ext_fig = '/home/bmr135/Dropbox/K2Poles/pop_trends/261017/Sim_vs_Obs/'
-        # ext_fig = '/home/ben/Dropbox/K2Poles/pop_trends/261017/Sim_vs_Obs/'
+        # ext_fig = '/home/bmr135/Dropbox/K2Poles/pop_trends/261017/Sim_vs_Obs/'
 
         ''' Comparison to Whole Samples '''
         fig, axes = plt.subplots(2,1,sharex=True)
@@ -1341,10 +1285,8 @@ if __name__ == '__main__':
     ''' Statistics - Sim and Obs Comparisons '''
     if sys.argv[1] == '4':
         ''' Data and Probability Cut '''
-        C3orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C3_full')
-        C6orig = pd.read_csv('/home/bmr135/GA/K2Poles/Selection_Function_Biases/C6_full')
-        # C3orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
-        # C6orig = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
+        C3orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C3_full')
+        C6orig = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Selection_Function_Biases/C6_full')
         GAP3, GAP6 = dat.K2_GAP()
         T3, T6 = dat.TRILEGAL()
 

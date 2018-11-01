@@ -63,8 +63,8 @@ C6['ddist'] = C6['dist']*1e-3 - C6['dist_G']
 C6 = C6.dropna(subset=['parallax'])
 # print(len(C3),len(C6))
 
-C3.to_csv('/home/ben/K2_Poles/Mass_Distr_In/C3_Gaia_Sample',index=False)
-C6.to_csv('/home/ben/K2_Poles/Mass_Distr_In/C6_Gaia_Sample',index=False)
+# C3.to_csv('/home/ben/K2_Poles/Mass_Distr_In/C3_Gaia_Sample',index=False)
+# C6.to_csv('/home/ben/K2_Poles/Mass_Distr_In/C6_Gaia_Sample',index=False)
 
 ''' Stars with sig_parallax > 10% '''
 C3_pe = C3[(C3['parallax_error']/C3['parallax'])>0.1]

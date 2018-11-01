@@ -30,6 +30,7 @@ def TRILEGAL():
     TRILEGAL_C3['L'] = 10**(TRILEGAL_C3['logL'])
     TRILEGAL_C3['radius'] = np.sqrt(TRILEGAL_C3['Mass'] / (TRILEGAL_C3['g']/const.solar_g))
     TRILEGAL_C3['JK'] = TRILEGAL_C3['Jmag'] - TRILEGAL_C3['Kmag']
+    TRILEGAL_C3['Vcut'] = TRILEGAL_C3['Kmag'] + 2*(TRILEGAL_C3['JK']+0.14) + 0.382*np.exp(2*(TRILEGAL_C3['JK']-0.2))
     TRILEGAL_C3 = TRILEGAL_C3.dropna(axis=0)
 
     TRILEGAL_C6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/k1.6_K16_c6.all.out.txt',delimiter=r'\s+')
@@ -43,44 +44,44 @@ def TRILEGAL():
 
     return TRILEGAL_C3, TRILEGAL_C6
 
-def BESANCON():
-    ''' Return BESANCON C3/C6 fields (Data from Celine Reyle) '''
-    c3 = pd.read_csv(ext_GA+'GA/K2Poles/K2c3.sim1705',delim_whitespace=True)
-    c3 = prop.galactic_coords2(c3)
-    c3['logTe'] = np.log10(c3['Teff'])
-    c3['numax'] = c3['IniMass'] * c3['Radius']**-2 * (c3['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
-    c3['dnu'] = c3['IniMass']**0.5 * c3['Radius']**-1.5 * const.solar_Dnu
-    c3['imag'] = np.nan
-    c3['Hmag'] = c3['V'] - c3['V-H']
-    c3.rename(columns={'J-K':'JK','V':'Vmag'},inplace=True)
-    c3['Kmag'] = c3['Vmag'] - c3['V-J'] - c3['JK']
-
-    c6 = pd.read_csv(ext_GA+'GA/K2Poles/K2c6.sim1705',delim_whitespace=True)
-    c6['logTe'] = np.log10(c6['Teff'])
-    c6['numax'] = c6['IniMass'] * c6['Radius']**-2 * (c6['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
-    c6['dnu'] = c6['IniMass']**0.5 * c6['Radius']**-1.5 * const.solar_Dnu
-    c6.rename(columns={'J-K':'JK','V':'Vmag'},inplace=True)
-    c6 = prop.galactic_coords2(c6)
-    c6['imag'] = np.nan
-    c6['Kmag'] = c6['Vmag'] - c6['V-J'] - c6['JK']
-    c6['Vcut'] = c6['Kmag'] + 2*(c6['JK']+0.14) + 0.382*np.exp(2*(c6['JK']-0.2))
-
-    ''' Kepler magnitude calculation: Eq. 4, Huber et al., 2016 '''
-    c3['KepMag'] = 0.314377 + 3.85667*c3['JK'] + 3.176111*c3['JK']**2 - \
-                   25.3126*c3['JK']**3 + 40.7221*c3['JK']**4 - \
-                   19.2112*c3['JK']**5 + c3['Kmag']
-    c6['KepMag'] = 0.314377 + 3.85667*c6['JK'] + 3.176111*c6['JK']**2 - \
-               25.3126*c6['JK']**3 + 40.7221*c6['JK']**4 - \
-               19.2112*c6['JK']**5 + c6['Kmag']
-
-    data = [c3,c6]
-    numax = ['numax','numax']
-    dnu = ['dnu','dnu']
-    Numax = [const.solar_Numax,const.solar_Numax]
-    Dnu = [const.solar_Dnu,const.solar_Dnu]
-    c3,c6 = prop.lmrl_comps(data,numax,dnu,Numax,Dnu,0)
-
-    return c3, c6
+# def BESANCON():
+#     ''' Return BESANCON C3/C6 fields (Data from Celine Reyle) '''
+#     c3 = pd.read_csv(ext_GA+'GA/K2Poles/K2c3.sim1705',delim_whitespace=True)
+#     c3 = prop.galactic_coords2(c3)
+#     c3['logTe'] = np.log10(c3['Teff'])
+#     c3['numax'] = c3['IniMass'] * c3['Radius']**-2 * (c3['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
+#     c3['dnu'] = c3['IniMass']**0.5 * c3['Radius']**-1.5 * const.solar_Dnu
+#     c3['imag'] = np.nan
+#     c3['Hmag'] = c3['V'] - c3['V-H']
+#     c3.rename(columns={'J-K':'JK','V':'Vmag'},inplace=True)
+#     c3['Kmag'] = c3['Vmag'] - c3['V-J'] - c3['JK']
+#
+#     c6 = pd.read_csv(ext_GA+'GA/K2Poles/K2c6.sim1705',delim_whitespace=True)
+#     c6['logTe'] = np.log10(c6['Teff'])
+#     c6['numax'] = c6['IniMass'] * c6['Radius']**-2 * (c6['Teff']/const.solar_Teff)**-0.5 * const.solar_Numax
+#     c6['dnu'] = c6['IniMass']**0.5 * c6['Radius']**-1.5 * const.solar_Dnu
+#     c6.rename(columns={'J-K':'JK','V':'Vmag'},inplace=True)
+#     c6 = prop.galactic_coords2(c6)
+#     c6['imag'] = np.nan
+#     c6['Kmag'] = c6['Vmag'] - c6['V-J'] - c6['JK']
+#     c6['Vcut'] = c6['Kmag'] + 2*(c6['JK']+0.14) + 0.382*np.exp(2*(c6['JK']-0.2))
+#
+#     ''' Kepler magnitude calculation: Eq. 4, Huber et al., 2016 '''
+#     c3['KepMag'] = 0.314377 + 3.85667*c3['JK'] + 3.176111*c3['JK']**2 - \
+#                    25.3126*c3['JK']**3 + 40.7221*c3['JK']**4 - \
+#                    19.2112*c3['JK']**5 + c3['Kmag']
+#     c6['KepMag'] = 0.314377 + 3.85667*c6['JK'] + 3.176111*c6['JK']**2 - \
+#                25.3126*c6['JK']**3 + 40.7221*c6['JK']**4 - \
+#                19.2112*c6['JK']**5 + c6['Kmag']
+#
+#     data = [c3,c6]
+#     numax = ['numax','numax']
+#     dnu = ['dnu','dnu']
+#     Numax = [const.solar_Numax,const.solar_Numax]
+#     Dnu = [const.solar_Dnu,const.solar_Dnu]
+#     # c3,c6 = prop.lmrl_comps(data,numax,dnu,Numax,Dnu,0)
+#
+#     return c3, c6
 
 def C3_cat():
     # EPIC C3 Catalogue
@@ -148,8 +149,8 @@ def K2_GAP():
     # GAP6.to_csv(ext_DB+'Dropbox/K2Poles/GAP6',index=False)
 
     ''' GAP read in when no updates required '''
-    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3_gaia')
-    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6_gaia')
+    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
+    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
 
     return GAP3, GAP6
 
@@ -299,7 +300,7 @@ def APOGEE():
     ''' Input for current APOGEE data '''
     APO3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14_C3_180418')
     APO6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/APOGEE_DR14_C6_180418')
-    print(len(APO3),len(APO6))
+    # print(len(APO3),len(APO6))
 
     return APO3, APO6
 
