@@ -1,0 +1,270 @@
+                             PURPOSE OF THIS PACKAGE                            
+
+The FORTRAN programs and shell scripts included in this package allow to compute
+bolometric corrections in a number of filters (up to 5) for input values of
+Teff, log(g), [Fe/H], E(B-V) and [alpha/Fe]. Bolometric corrections are
+computed as described in Casagrande & VandenBerg (2014, Paper I), Casagrande &
+VandenBerg (2018a, Paper II) and Casagrande & VandenBerg (2018b, for the Gaia
+system), using MARCS synthetic stellar fluxes (Gustafsson et al. 2008).
+The grid covers the range Teff=[2600,8000], log(g)=[-0.5,5.5] and
+[Fe/H]=[-4.0,+1.0] for standard alpha-enhancement (although the coverage is not
+uniform across the grid, and the range of [Fe/H] varies somewhat for different
+values of alpha-enhancement). Note that bolometric corrections can be combined
+to derive colour combinations (see description in next Section). 
+
+Please refer to Appendix A of Paper II for an in-depth description of the
+parameter space covered, and FORTRAN programs included in this package. 
+Here we give a very brief explanation of each file, along with a few practical
+examples to bring users up to speed in learning how to run the codes provided.
+Commands are intended for UNIX-like based systems (UNIX/Linux/Mac OS X). The
+shell scripts provided (bcgo, bcall, cmdgo) use a number of standard terminal
+commands, and assume that a gfortran compiler is installed. Mac OS X gfortran
+compiler is freely available from http://hpc.sourceforge.net
+Please see comments in the shell scrips for further info, and compiler options.
+Feel free to modify the shell scripts to use your preferred FORTRAN compiler,
+or to best fit your needs.
+Now, to jump-start go to EXAMPLES below (in most cases, example B is what you
+will be dealing with). Otherwise, keep reading. 
+
+                              BOLOMETRIC CORRECTIONS
+			      
+The bolometric correction (BC) in a given filter (say, "i") is defined as:
+BC_i = M_bol - M_i
+where M_bol is the bolometric magnitude, and M_i is the magnitude in "i" filter.
+It follows that the colour index between two filters ("i" and "j") is:
+i-j = BC_j - BC_i
+(note the reversal in the subscripts!). If the bolometric flux (i.e. the flux
+as measured on the Earth in units of erg s-1 cm-2) from a star of known apparent
+magnitude wants to be derived from a bolometric correction, please use 
+Eq (3) in Paper II. Our tables of bolometric corrections adopt
+M_(bol,Sun) = 4.75. This is a an arbitrary zero-point, and any value is
+equally legitimate on the condition that once chosen, all bolometric
+corrections are scaled accordingly. At the cost of being pedantic, please
+beware that if you use our bolometric correction tables with a set of M_bol
+from another source, where a different M_(bol,Sun) is adopted, then a zero-point
+correction is necessary (see discussion in Section 3 of Paper II).
+
+Our programs return bolometric corrections for a given set of log(g), [Fe/H] and
+Teff. Hence, errors associated to bolometric corrections can easily be
+estimated running a MonteCarlo with realistic uncertainties on input stellar
+parameters. Errors associated to a bolometric flux can then be derived
+propagating in Eq (3, Paper II) errors in BC (from MonteCarlo) and observed
+magnitude (note that the uncertainty in adopted Lsun should also be included,
+if the uncertainty in the zero point of the bolometric flux scale wants to be
+taken into account).
+Note that the above sources of uncertainty do not address how realistic the
+MARCS synthetic stellar fluxes (from which BCs are derived) are. Extensive
+comparison of our synthetic photometry with observations indicates that MARCS
+fluxes perform overall well across optical and infrared bands (but please,
+refer to Sections 4 in Paper I and II for a thorough discussion of successes
+and limitations). For F and G dwarfs, absolute spectrophotometry from the
+CALSPEC library shows that bolometric fluxes can be recovered to about 2
+percent from bolometric corrections in a single band. Uncertainties are halved
+when combining bolometric corrections in more bands. Importantly, for F and G
+dwarfs the CALSPEC comparison indicates that errors estimated from a MonteCarlo
+as described above account for the dominant source of uncertainty. 
+
+Bolometric corrections can be computed in several photometric systems. For a
+description of each of those, please refer to our papers (Sec 2.9-2.11 in
+Paper I, and Sec 2.1-2.4 in Paper II, and Sec 2 in Casagrande & VandenBerg
+2018b). Some notable caveats:
+
+- In selectbc.data, it is possible to select Gaia synthetic photometry in the 
+  (_vega) or AB (_ab) system, although magnitudes published in Data Release 2
+  are on the Vega system only. Also, it is possible to select different
+  flavours of Gaia filters and zero-points as explained further below (although
+  the effects are rather small, unless going to extreme colours). 
+  Synthetic photometry is available with transmission curves and zero-points
+  used for the Gaia data processing (Gaia_pro), and with revised transmission
+  curves and zero-points (Gaia_rev). Further details on transmission curves and
+  zero-points are given in Evan et al. (2018). A third set has also been
+  computed, using revised transmission curves together with the zero-points
+  used for the data processing, and it should better represent the actual Gaia
+  data (Gaia_DR2).
+  We advise using the Gaia_DR2 set, although differences among the three are
+  typically few mmag only, and users are welcome to explore the effect of
+  choosing different sets.
+
+  ***************
+  ** IMPORTANT **
+  ***************
+  Please note that the magnitude dependent offset in Gaia G band found by
+  Casagrande & VandenBerg (2018b) is not corrected for by our routines. In fact,
+  this correction applies to Gaia magnitudes, and not to our BCs. If users wish
+  to correct observed Gaia G photometry, they should do so by applying Eq (3)
+  from Casagrande & VandenBerg (2018b).
+
+- Tycho photometry quickly downgrades for Vtycho > 9, and Hipparcos
+  Hp photometry of the brightest stars is likely affected by pulse pileup:
+  beware when using bolometric corrections for stars in these Tycho/Hipparcos
+  regimes!
+  
+- SkyMapper synthetic photometry is computed assuming perfect standardisation to
+  the AB system: the standardisation of observations is still work in progress.
+  As a result, zero-point shifts might be necessary to replicate observations.
+  
+- JWST synthetic photometry is computed with certain assumptions on zero-points:
+  the standardisation of real data should be checked to determine whether any
+  zero-point shifts should be applied to our definitions. JWST synthetic
+  photometry is computed using the throughputs described in Paper II (Sec 2.4.1
+  and 2.4.2), but modification of optical telescope elements might occur
+  during the deployment of JWST in space. Note that synthetic photometry
+  in the AB system can be readily transformed into Jansky (Eq 4, Paper II).
+
+
+       	              REDDENING AND EXTINCTION COEFFICIENTS
+  
+Since our BCs can be computed for different values of reddening (assuming the
+Cardelli et al. 1989 extinction law), our routines by-pass the need for
+extinction coefficients. In fact, this approach should be preferred as
+superior, since extinction coefficients are not truly constant, but vary as
+function of stellar parameters. This is discussed at length in Paper I (see
+Fig 18). For practical purposes however, it might be useful to have an
+estimate of the extinction coefficient appropriate for each filter. With this
+purpose in mind, in our papers we provide tables of extinction coefficients for
+all our filters. For very cool stars (in particular for filters at short
+wavelengths), extinction coefficients might depart significantly from our
+tabulated values. Users can easily compute extinction coefficients from our
+routines as described in Paper I, Appendix A.
+
+
+	    	              DESCRIPTION OF FILES
+
+-selectbc.data     input file where up to 5 filters can be selected by the user
+		   to compute bolometric corrections. The user can also select
+		   the [alpha/Fe] vs. [Fe/H] relation underlying the synthetic
+		   stellar fluxes from which bolometric corrections have been
+		   computed.
+
+-get4bctables.for  program to create tables of BC in the filters selected above,
+		   at the reddening E(B-V) entered when running the program.
+		   E(B-V) can range from 0 to 0.72.
+
+-bcutil.for        program containing subroutines to interpolate the bolometric
+		   correction tables created with get4bctables.for, at the
+		   desired value of Teff, log(g) and [Fe/H], for the chosen
+		   [alpha/Fe] vs. [Fe/H] relation (depending on the subroutine
+		   called: getbc_std, getbc_m04, getbc_p00, and getbc_p04). By
+		   default, bcutil.for produces a verbose output via:
+		   write(6,1004) ebv,fe,(fil(k),k=1,ndx)
+		   Verbose mode is commented out when running the shell scripts
+		   provided with this package.
+
+-bcstars.for       program to print out bolometric corrections. It must be
+		   compiled and linked with bcutil.for (from which it calls one
+		   of the following subroutines getbc_std, getbc_m04, getbc_p00,
+		   and getbc_p04. The user must change the subroutine called,
+		   depending on the [alpha/Fe] vs. [Fe/H] relation chosen in
+		   selectbc.data).
+
+-iso2cmd.for       to convert Victoria-Regina isochrones (VandenBerg et al.
+		   2014) from the theoretical Teff-Luminosity plane into the
+		   observational planes chosen in selectbc.data.
+		   Victoria-Regina isochrones can be retrieved from 
+		   http://apps.canfar.net/storage/list/VRmodels
+		   One example of such isochrones is included here
+		   (a0zz_p0y25p00.iso).
+
+For practical purposes, most users will have a list of input values for which
+they wish to know bolometric corrections in the systems entered in selectbc.data
+To this purpose, we provide three shell scripts that automatise most of the
+work. The shell scripts are listed below, and their use is described in
+EXAMPLES.
+
+-bcgo              to compute bolometric corrections from an input list of
+		   log(g), [Fe/H] and Teff (an example of this list is given in
+		   the file input.sample). User will be prompted to input the
+		   desired value of reddening. 
+
+-bcall             to compute bolometric corrections from an input list of
+		   log(g), [Fe/H] Teff and E(B-V) (an example of this list is
+		   given in the file input.sample.all).
+
+-cmdgo             to convert isochrones in the observational plane.
+
+				 EXAMPLES
+
+A) Generate bolometric correction for stars of know logg, [Fe/H] and Teff at
+   fixed E(B-V).
+
+   1- add parameters for your stars (logg, [Fe/H] and Teff) in file input.sample
+   2- select filters, and alpha enhancement models in selectbc.data
+   3- compile and run get4bctables.for. A value of E(B-V) will be requested.
+      Enter 0. for no reddening, or whichever value of reddening necessary (as
+      long as E(B-V)<=0.72).
+   4- compile, link (with bcutil.for) and run bstars.for (bcstars.for assumes
+      that input stellar parameters are read from a file named input.sample.
+      Also, by default bcstars.for calls the subroutine getbc_std. This is
+      correct if 1  = ialf in selectbc.data. If other values of ialf are
+      selected, then getbc_p04, getbc_p00 or getbc_m04 must be called instead).
+   5- bolometric corrections in filters selected at 2- will appear on the
+      screen. If less than 5 filters have been specified in selectbc.data,
+      0.000 will be returned in the remaining columns. 
+      The program will run in verbose mode, for each object in input.sample
+      until the end, or it will STOP if one of the input stellar parameter is
+      outside of the grid.
+
+   Steps 3 to 5 can be done automatically running the script bcgo. This script
+   comments out the verbose mode, hence it is more practical when dealing with a
+   large input sample. (bcgo should be executable; if not, on the terminal
+   window go to the directory where bcgo is located and type "chmod u+x bcgo"
+   to make it executable once for all).
+   Then, simply type "./bcgo" on terminal, input desired reddening value
+   when prompted to do so, and hit return. A table for the bolometric
+   corrections and [alpha/Fe] vs. [Fe/H] relation selected will be printed on
+   the screen (or see option in bcgo to redirect the output into a file). 
+
+
+
+B) Generate bolometric correction from an input list (named input.sample.all)
+   having the following columns: star ID, logg, [Fe/H], Teff, E(B-V)<=0.72.
+
+   This is a generalisation of the previous example.   
+   1- Select filters and alpha enhancement models in selectbc.data
+   2- Run the shell script bcall (type "./bcall" on terminal), and everything
+      will be done automatically for you (the script bcall should be executable;
+      if not, "chmod u+x bcall" to make it such).
+      The script will read the file input.sample.all, and return an output file
+      named output.file.all. This file contains the information in
+      input.sample.all, plus the bolometric corrections for the filters and
+      alpha-enhancement models selected in selectbc.data (if less than 5
+      filters have been specified in selectbc.data, 0.000 will be returned in
+      the remaining columns).
+      Please NOTE that in output.file.all entries will be sorted in order of
+      ascending E(B-V) (i.e. the order will not be necessarily the same as in
+      input.sample.all, but this is not an issue since all information in
+      input.sample.all is carried along in output.file.all).
+      Also, if an entry is outside of the parameter space covered by the grid,
+      the script will write "input stellar parameters outside of the grid" in
+      output.file.all, and move to the next object.
+
+
+
+C) Apply synthetic colours and bolometric corrections to the Victoria-Regina
+   isochrones. Here, one example of such isochrones is included
+   (a0zz_p0y25p00.iso). For more Victoria-Regina isochrones, please go to:
+   http://apps.canfar.net/storage/list/VRmodels
+
+   1- select filters in selectbc.data (alpha-enhancement is not relevant, as
+      the program will interpolate to the same alpha-enhancement of the
+      Victoria-Regina isochrones).
+   2- compile and run get4bctables.for. A value of E(B-V) will be requested.
+      Enter 0. for no reddening, or whichever value of reddening necessary (as
+      long as E(B-V)<=0.72).
+   3- compile, link (with bcutil.for) and run iso2cmd.for
+   4- isochrones in the filters selected at 1- and reddening entered at 2- are
+      written in a file with standard extension .cmd
+      Please NOTE that the filters returned in the .cdm file are bolometric
+      corrections (e.g. BC_i and BC_j), not magnitudes! Hence absolute
+      magnitudes will be:
+      M_i = M_bol - BC_i
+      M_j = M_bol - BC_j
+      and colours
+      i-j = BC_j - BC_i
+
+   Steps 2 and 3 can be done automatically with the script cmdgo (the script
+   should be executable; if not, on the terminal window, go to the directory
+   where cmdgo is located and type "chmod u+x cmdgo" to make it executable).
+   Then, simply type "./cmdgo" on terminal, and enter reddening and isochrone
+   name when prompted to do so. 
+

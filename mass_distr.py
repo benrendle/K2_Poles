@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 import scipy
 import scipy.odr.odrpack as odrpack
+from sklearn import linear_model, datasets
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
@@ -34,6 +35,73 @@ import matplotlib.backends.backend_pdf
 mpl.rcParams['xtick.direction'] = 'out'
 mpl.rcParams['ytick.direction'] = 'out'
 mpl.rcParams["font.family"] = "Times New Roman"
+
+def ransac_fit(df,df1,param,label,f):#,uncert):
+    ''' Using RANSAC fitting algorithm to fit the trends observed between different
+        spectroscopic pipelines.
+
+    Data in:
+        - DataFrames containing the parameters to be compared (should already be
+          the same length)
+        - Parameters to be compared (string)
+        - Uncertainty if applicable (string)
+        - Axes labels (string)
+        - f, factor to extend plot limits to in the x-axis (float)
+    '''
+    df['Diff'] = df[param[0]] - df1[param[1]]
+    print(np.std(df['Diff']))
+    # df['sig'] = np.sqrt(df[uncert[0]]**2 + df1[uncert[1]]**2)
+    X = (df[param[0]])
+    X = X.values.reshape(-1,1)
+    y = (df['Diff'])
+
+    ''' Fit line using all data '''
+    lr = linear_model.LinearRegression()
+    lr.fit(X, y)
+
+    ''' Robustly fit linear model with RANSAC algorithm '''
+    a = np.zeros((1000,2))
+    b = np.zeros((1000,np.shape(df)[0])) # Size of inlier mask
+    for i in range(1000):
+        ransac = linear_model.RANSACRegressor(min_samples=5)
+        ransac.fit(X, y)
+        inlier_mask = ransac.inlier_mask_
+        outlier_mask = np.logical_not(inlier_mask)
+
+        ''' Predict data of estimated models '''
+        line_X = np.arange(X.min()-f, X.max()+f, 0.01)#[:, np.newaxis]
+        line_X = line_X.reshape(-1,1)
+        line_y = lr.predict(line_X)
+        line_y_ransac = ransac.predict(line_X)
+        ''' Compare estimated coefficients '''
+        a[i,0], a[i,1] = ransac.estimator_.coef_,ransac.estimator_.intercept_
+        b[i,:] = inlier_mask
+
+    ''' Make inliers boolean and find optimal fit using the median of the data '''
+    b = b.astype('bool')
+    c = np.median(a[:,0])
+    medIdx = (np.abs(a[:,0] - c)).argmin()
+    print(a[medIdx,0],a[medIdx,1])
+    # print(np.median(a[:,0]),a[medIdx,0],b[medIdx])
+
+    ''' Plot the inliers, outliers and optimal fit to the data '''
+    plt.figure()
+    lw = 2
+    plt.plot(line_X, a[medIdx,0]*line_X + a[medIdx,1], color='k', linewidth=3, label=r'%.5s$*x$ + %.5s'%(a[medIdx,0],a[medIdx,1]), alpha=0.5)
+    # plt.errorbar(X, y, yerr=df['sig'], color='gold', marker='.', label='Outliers',fmt='o')
+    # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o')
+    plt.scatter(X, y, color='gold', label='Outliers')
+    plt.scatter(X[b[medIdx]], y[b[medIdx]], color='yellowgreen', label='Inliers')
+    plt.xlabel(label[0])
+    plt.ylabel(label[1])
+    plt.xlim(X.min()-f, X.max()+f)
+    plt.legend()
+    df['outlier_flag'] = 1.
+    df['outlier_flag'][b[medIdx]] = 0.
+    # print(df['outlier_flag'])
+    plt.show()
+    sys.exit()
+
 
 if __name__ == '__main__':
 
@@ -559,7 +627,10 @@ if __name__ == '__main__':
     C3_feh = pd.read_csv(ext_load+'Additional_Tests/C3_FeH_070918')
     C6_feh = pd.read_csv(ext_load+'Additional_Tests/C6_FeH_070918')
 
-    ''' Skymapper (Luca Casagrande) [Fe/H] and Teff input results '''
+    ''' Skymapper (Luca Casagrande) [Fe/H] and Teff input results
+
+        - IS -> Improved Simga: PARAM run determined with improved uncertainties
+    '''
     C3_Luca = pd.read_csv(ext_load+'Luca_photom/C3_070918')
     C3_LucaIS = pd.read_csv(ext_load+'Luca_photom/C3_impSig280918')
     C6_Luca = pd.read_csv(ext_load+'Luca_photom/C6_070918')
@@ -568,6 +639,16 @@ if __name__ == '__main__':
     # Luca6en = pd.read_csv(ext_load+'Luca_photom/C6en070918')
     # Luca3 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C3_Luca.in')
     # Luca6 = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/C6_Luca.in')
+
+    ''' Brief investigation of Teff relation between the EPIC and SkyMapper. EPIC Teff
+        values are reasonably good, with a comparable scatter to that shown in the
+        Huber et al. 2016 paper describing how the parameters were derived. '''
+    # print(C3_New.columns.values)
+    # print(C3_LucaIS.columns.values)
+    # sys.exit()
+    C3 = pd.merge(C3_New[['#Id','feh']],C3_LucaIS[['#Id','feh']],on=['#Id'])
+    ransac_fit(C3,C3,['feh_x','feh_y'],[r'$T_{\rm{eff}}$ - EPIC, C3',r'$T_{\rm{eff}}$ - SkyMapper'],0.1)
+
 
     C3_Luca['Glon'] = C3_Luca['GLON']
     C3_Luca['Glat'] = C3_Luca['GLAT']

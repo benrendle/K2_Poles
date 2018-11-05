@@ -63,16 +63,19 @@ def lmrl_comps(data,numax,dnu,Numax,Dnu,GAP):#,Numax,Dnu,Teff,g):
 
 def det_prob(X,numax,Numax,Dnu):
     ''' Run detection probability code from Mat, calculating teffred to
-    start with and then running the global detection code with added
-    noise. Output is the detection probability and SNR
+        start with and then running the global detection code with added
+        noise. Output is the detection probability and SNR
 
-    X = data frame
-    numax = stellar numax
-    Numax = calibration numax
-    Dnu = calibration delta nu '''
+        X = data frame
+        numax = stellar numax
+        Numax = calibration numax
+        Dnu = calibration delta nu
+        radius = seismic radius
+        Radius = photometric radius
+    '''
 
     X['Tred'] = DP.properties(X, constants_only=False)
-    X['prob_s'], X['SNR'] = DP.globalDetections(X['imag'],X['KepMag'],X['L'],X['Radius'],X['Teff'],X[numax],1.0,X['Tred'], \
+    X['prob_s'], X['SNR'] = DP.globalDetections(X['imag'],X['KepMag'],X['L'],X['radius'],X['Teff'],X[numax],1.0,X['Tred'], \
                     const.teffred_solar,const.solar_Teff,Numax,Dnu,const.sys_limit,const.dilution,const.vnyq, \
                     const.cadence, vary_beta=True)
     X['det_prob_flag'] = 0.
@@ -216,81 +219,18 @@ def sigma_clip(X,a,b,c,d,a1,b1,c1,d1,sigma):
         - Returns the reduced, clipped dataframe and the outlier parameters too.
     '''
     x = len(X['EPIC'])
-    Y = X
-    Y['comp_err_Nmx'] = np.sqrt(Y[a1]**2+Y[b1]**2)
-    Y = Y[Y['comp_err_Nmx'] >= -4]
-    Y = Y[Y['comp_err_Nmx'] <= 4]
-    # print( max(Y['comp_err_Nmx']))
-    Y['Nmx_Diff'] = ((Y[a]-Y[b])/Y['comp_err_Nmx'])
-    # print( Y['Nmx_Diff'])
-    Y = Y[Y['Nmx_Diff'] >= -sigma]
-    Y = Y[Y['Nmx_Diff'] <= sigma]
-
-
-    Y['comp_err_Dnu'] = np.sqrt(Y[c1]**2+Y[d1]**2)
-    Y = Y[Y['comp_err_Dnu'] >= -0.9]
-    Y = Y[Y['comp_err_Dnu'] <= 0.9]
-    # print( max(Y['comp_err_Dnu']))
-    Y['Dnu_Diff'] = ((Y[c]-Y[d])/Y['comp_err_Dnu'])
-    # print( Y['Dnu_Diff'])
-    Y = Y[Y['Dnu_Diff'] >= -sigma]
-    Y = Y[Y['Dnu_Diff'] <= sigma]
-    # a = np.where((Y['Dnu_Diff'] <= sigma) & (Y['Dnu_Diff'] >= -sigma))
-    # print(a)
-    # X['sig_clip_flag'] = 0.
-    # X['sig_clip_flag'].iloc[a] = 1.
-    # print(X['sig_clip_flag'])
-    # sys.exit()
-    # print( len(Y), len(X))
-    fract_outl = (float(len(X))-float(len(Y)))/float(x)
-    # print( fract_outl)
-    Z = pd.concat([X,Y],ignore_index=True)
-    Z = Z.drop_duplicates(subset=['EPIC'],keep=False)
-    Z = Z.reset_index(drop=True)
-    X = Y
-
-    return X
-
-def sigma_clip_nmx(X,a,b,a1,b1,sigma):
-    ''' Reduce data set to those values that fall within an n sigma difference
-        of each other for numax and dnuself.
-
-        - 'Nmx_Diff' to be used as Nsigma flags as they
-          are the parameters the sigma clips are based upon.
-
-        - Returns the reduced, clipped dataframe and the outlier parameters too.
-    '''
-    x = len(X['EPIC'])
     X['comp_err_Nmx'] = np.sqrt(X[a1]**2+X[b1]**2)
+    X['comp_err_Dnu'] = np.sqrt(X[c1]**2+X[d1]**2)
+    X['Nmx_Diff'] = ((X[a]-X[b])/X['comp_err_Nmx'])
+    X['Dnu_Diff'] = ((X[c]-X[d])/X['comp_err_Dnu'])
     X = X[X['comp_err_Nmx'] >= -4]
     X = X[X['comp_err_Nmx'] <= 4]
-    X['Nmx_Diff'] = ((X[a]-X[b])/X['comp_err_Nmx'])
-    a = np.where((X['Nmx_Diff'] >= -sigma) & (X['Nmx_Diff'] <= sigma))
-    X['sig_clip_flag'] = 0.
-    X['sig_clip_flag'].iloc[a] = 1.
-    # print(X[X['sig_clip_flag']==0])
-    # sys.exit()
-    return X
-
-def sigma_clip_dnu(X,c,d,c1,d1,sigma):
-    ''' Reduce data set to those values that fall within an n sigma difference
-        of each other for numax and dnuself.
-
-        - 'Dnu_Diff' to be used as Nsigma flags as they
-          are the parameters the sigma clips are based upon.
-
-        - Returns the reduced, clipped dataframe and the outlier parameters too.
-    '''
-    x = len(X['EPIC'])
-    X['comp_err_Dnu'] = np.sqrt(X[c1]**2+X[d1]**2)
     X = X[X['comp_err_Dnu'] >= -0.9]
     X = X[X['comp_err_Dnu'] <= 0.9]
-    X['Dnu_Diff'] = ((X[c]-X[d])/X['comp_err_Dnu'])
-    b = np.where((X['Dnu_Diff'] <= sigma) & (X['Dnu_Diff'] >= -sigma))
-    X['sig_clip_flag1'] = 0.
-    X['sig_clip_flag1'].iloc[b] = 1.
-    # print(X[X['sig_clip_flag']==0])
-    # sys.exit()
+    a = np.where((X['Nmx_Diff'] >= -sigma) & (X['Nmx_Diff'] <= sigma) & (X['Dnu_Diff'] <= sigma) & (X['Dnu_Diff'] >= -sigma))
+    X['sig_clip_flag'] = 0.
+    X['sig_clip_flag'].iloc[a] = 1.
+
     return X
 
 def temp_JK(I,met,JK):

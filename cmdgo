@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# This script assumes a gfortran compiler is available (further below).
+# If a different FORTRAN compiler is used, modify as appropriate.
+#
+# This script also assumes that stream editor (sed) is available. If not,
+# bcutil.for can be manually commented (further below)
+#
+# read whether ialf is 1, 2, 3 or 4
+ialf=$(grep '= ialf' selectbc.data | cut -b 1-5)
+done=0
+#
+# just for checking purposes, since isochrones will be interpolated at the 
+# exact [alpha/Fe] value
+#
+if [ $ialf -eq 1 ]
+then
+   done=1
+fi
+if [ $ialf -eq 2 ]
+then
+   done=1
+fi
+if [ $ialf -eq 3 ]
+then
+   done=1
+fi
+if [ $ialf -eq 4 ]
+then
+   done=1
+fi
+if [ $done -eq 0 ]
+then
+   echo ialf must be between 1 and 4. Please check selectbc.data file. 
+   exit
+fi
+#
+# assuming gfortran compiler is available
+gfortran get4bctables.for -o get4bctables.exe
+./get4bctables.exe
+#
+# comment verbose mode in bcutil.for. Rename the program so modified as
+# tmputl.for. This is done using command sed. If sed is not available,
+# bcutil.for can be commented manually, saved as tmputl.for and step below
+# removed from the script
+#
+sed -e 's/      write(6,1004) ebv,fe,(fil(k),k=1,ndx)/C       write(6,1004) ebv,fe,(fil(k),k=1,ndx)/g' bcutil.for > tmputl.for
+#
+# compile, link and run 
+gfortran iso2cmd.for tmputl.for -o iso2cmd.exe
+./iso2cmd.exe
+#
+# clean
+#
+rm get4bctables.exe iso2cmd.exe tmputl.for bc_???.data inputbc_???.data

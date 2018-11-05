@@ -1,0 +1,77 @@
+#!/bin/bash
+# This script assumes a gfortran compiler is available further below.
+# If a different FORTRAN compiler is used, modify as appropriate.
+#
+# This script also assumes that stream editor (sed) is available. If not,
+# bcutil.for can be manually commented (further below)
+#
+# read whether ialf is 1, 2, 3 or 4
+ialf=$(grep '= ialf' selectbc.data | cut -b 1-5)
+done=0
+#
+# depending on ialf, bcstars.for is modified to call the proper subroutine:
+# getbc_std, getbc_p04, getbc_p00, getbc_m04. The program so modified is renamed
+# bcalpha.for
+#
+if [ $ialf -eq 1 ]
+then
+   echo
+   echo You are using standard variation of [alpha/Fe] with [Fe/H]
+   echo
+   cp bcstars.for bcalpha.for
+   done=1
+fi
+if [ $ialf -eq 2 ]
+then
+   echo
+   echo You are using [alpha/Fe] = +0.4 models
+   echo
+   sed -e 's/      call getbc_std/      call getbc_p04/g' bcstars.for > bcalpha.for
+   done=1
+fi
+if [ $ialf -eq 3 ]
+then
+   echo
+   echo You are using [alpha/Fe] = +0.0 models
+   echo
+   sed -e 's/      call getbc_std/      call getbc_p00/g' bcstars.for > bcalpha.for
+   done=1
+fi
+if [ $ialf -eq 4 ]
+then
+   echo
+   echo You are using [alpha/Fe] = -0.4 models
+   echo
+   sed -e 's/      call getbc_std/      call getbc_m04/g' bcstars.for > bcalpha.for
+   done=1
+fi
+if [ $done -eq 0 ]
+then
+   echo ialf must be between 1 and 4. Please check selectbc.data file. 
+   exit
+fi
+#
+# assuming gfortran compiler is available
+gfortran get4bctables.for -o get4bctables.exe
+./get4bctables.exe
+#
+# comment verbose mode in bcutil.for. Rename the program so modified as tmpX.for
+# This is done using command sed. If sed is not available, bcutil.for can be 
+# commented manually, saved as tmpX.for and step below removed from the script
+#
+sed -e 's/      write(6,1004) ebv,fe,(fil(k),k=1,ndx)/C       write(6,1004) ebv,fe,(fil(k),k=1,ndx)/g' bcutil.for > tmpX.for
+#
+# compile, link and run 
+gfortran bcalpha.for tmpX.for -o bcalpha.exe
+# on certain version of gfortran, a warning might be issued when nfil<4.
+# add option -ffpe-summary='none' to avoid IEEE_DENORMAL warning when nfil<4
+#gfortran bcalpha.for tmpX.for -ffpe-summary='none' -o bcalpha.exe
+#
+./bcalpha.exe
+# should you wish to have the results written in a file instead of the screen
+# replace ./bcalpha.exe with line below
+#./bcalpha.exe > output.file
+#
+# clean
+#
+rm bcalpha.for bcalpha.exe get4bctables.exe tmpX.for bc_???.data inputbc_???.data

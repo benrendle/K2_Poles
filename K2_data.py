@@ -13,6 +13,7 @@ import K2_properties as prop
 import K2_constants as const
 import K2_data as dat
 from numbers import Number
+import subprocess
 
 ''' Dropbox Path '''
 ext_DB = '/home/bmr135/' # Work
@@ -114,14 +115,14 @@ def K2_GAP():
     # GAP3['sig_Teff'] = (abs(GAP3['ep_teff'])+abs(GAP3['em_teff']))/2
     # GAP3['sig_logg'] = (abs(GAP3['ep_logg'])+abs(GAP3['em_logg']))/2
     # GAP3['sig_feh'] = (abs(GAP3['ep_[Fe/H]'])+abs(GAP3['em_[Fe/H]']))/2
-    # GAP3['[Fe/H]'] = GAP3['Fe/H'] - 0.2
+    # GAP3['[Fe/H]'] = GAP3['[Fe/H]'] - 0.2
     # # GAP3['[Fe/H]'] = np.random.normal(-0.294,0.305,len(GAP3)) # mu/std dev. from RAVE (22/02/2018)
     # GAP6['JK'] = GAP6['Jmag'] - GAP6['Kmag']
     # GAP6['BV'] = GAP6['Bmag'] - GAP6['Vmag']
     # GAP6['Vcut'] = GAP6['Kmag'] + 2*(GAP6['JK']+0.14) + 0.382*np.exp(2*(GAP6['JK']-0.2))
     # GAP6['sig_Teff'] = (abs(GAP6['ep_teff'])+abs(GAP6['em_teff']))/2
     # # GAP6['[Fe/H]'] = np.random.normal(-0.405,0.437,len(GAP6)) # mu/std dev. from RAVE (22/02/2018)
-    # GAP6['[Fe/H]'] = GAP6['Fe/H'] - 0.2
+    # GAP6['[Fe/H]'] = GAP6['[Fe/H]'] - 0.2
     # ''' [Fe/H] uncertainty threshold using std. dev. of population '''
     # sig3 = np.std(GAP3['[Fe/H]'])
     # sig6 = np.std(GAP6['[Fe/H]'])
@@ -152,6 +153,54 @@ def K2_GAP():
     GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
     GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
 
+    K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
+    K2_camp = K2_camp.reset_index(drop=True)
+
+    g = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+    # g = g.join(K2_camp[['2MASS','EPIC','Teff','Kmag','[Fe/H]','logg']].set_index('2MASS'),on='2MASS')
+    # g['Kabs'] = g['Kmag'] - 5*np.log10(g['dist_ABJ']/10)
+    # g.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+    # print(g.columns.values)
+    # sys.exit()
+
+    #!/usr/bin/env python2
+    # -*- coding: utf-8 -*-
+    """
+    Created on Sun Jul  1 18:13:39 2018
+    Bolometric correcion implementation code.
+    @author: Saniya Khan
+    """
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.rc('axes', labelsize=12)
+    # plt.rc('xtick', labelsize=12)
+    # plt.rc('ytick', labelsize=12)
+    # plt.rc('legend', fontsize=12)
+    # plt.rcParams['savefig.dpi'] = 300
+
+    pd.set_option('display.max_seq_items', None)
+
+    # data = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/g_COR_DR14_R7S29.txt', sep=r',', header=0)
+    g['EBV'] = 0
+    cols = ['EPIC', 'logg', '[Fe/H]', 'Teff', 'EBV']
+    g2 = g[cols]
+
+
+    g2.to_csv('input.sample.all', header=None, sep=r' ', index=False)
+    p = subprocess.Popen(['./bcall'])
+    p.wait()
+    p = subprocess.Popen(["mv", "output.file.all", "/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv"])
+    p.wait()
+
+    BC = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv', sep=r'\s+', header=0)
+    BC = BC[['ID', 'BC_1', 'BC_2']]
+    BC = BC.rename(columns={'ID':'EPIC','BC_1':'BC_K','BC_2':'BC_G'})
+
+    data_BC = pd.merge(g, BC, on=['EPIC'], how='inner')
+    # data_BC = data_BC.drop(['ID'], axis=1)
+    data_BC.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv', index=False)
+
+    sys.exit()
     return GAP3, GAP6
 
 def KASOC_LC_in():

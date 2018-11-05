@@ -1,0 +1,127 @@
+#!/bin/bash
+# This script assumes a gfortran compiler is available further below.
+# If a different FORTRAN compiler is used, modify as appropriate.
+#
+# This script also assumes that stream editor (sed) and awk are available.
+#
+# just to make sure there are no left-overs. Refresh (or create, if non
+# existing) and remove these files
+touch tmp.ebv.sorted tmp.sorted tmp.output.file bctmp.for bcalpha.for bcalpha.exe get4bctables.exe tmpX.for inputbc_r72.data inputbc_r60.data inputbc_r48.data inputbc_r36.data inputbc_r24.data inputbc_r12.data inputbc_r00.data bc_std.data bc_p04.data bc_p00.data bc_m04.data
+
+rm tmp.ebv.sorted tmp.sorted tmp.output.file bctmp.for bcalpha.for bcalpha.exe get4bctables.exe tmpX.for inputbc_r72.data inputbc_r60.data inputbc_r48.data inputbc_r36.data inputbc_r24.data inputbc_r12.data inputbc_r00.data bc_std.data bc_p04.data bc_p00.data bc_m04.data
+
+# sort input file by reddening (5th column)
+sort -n -k5 input.sample.all -o tmp.ebv.sorted
+
+# read columns in sorted file using awk
+ids=($(awk '{print $1}' ./tmp.ebv.sorted ))
+lgg=($(awk '{print $2}' ./tmp.ebv.sorted ))
+feh=($(awk '{print $3}' ./tmp.ebv.sorted ))
+tef=($(awk '{print $4}' ./tmp.ebv.sorted ))
+ebv=($(awk '{print $5}' ./tmp.ebv.sorted ))
+
+# modify bcstars.for to read tmp.sorted as default input, 
+# and not to print BC_* headers
+sed -e "s/      open(3,file='input.sample')/      open(3,file='tmp.sorted')/g" -e "s/      write(6,1002)/c     write(6,1002)/g" bcstars.for > bctmp.for
+
+# check ialf in selectbc.data and exit if value is not between 1 and 4
+ialf=$(grep '= ialf' selectbc.data | cut -b 1-5)
+done=0
+feedback=''
+
+if [ $ialf -eq 1 ]
+then
+   feedback='Models with standard variation of [alpha/Fe] with [Fe/H] have been used'
+   cp bctmp.for bcalpha.for
+   done=1
+fi
+
+if [ $ialf -eq 2 ]
+then
+   feedback='Models with [alpha/Fe] = +0.4 have been used'
+   sed -e 's/      call getbc_std/      call getbc_p04/g' bctmp.for > bcalpha.for
+   done=1
+fi
+
+if [ $ialf -eq 3 ]
+then
+   feedback='Models with [alpha/Fe] = +0.0 have been used'
+   sed -e 's/      call getbc_std/      call getbc_p00/g' bctmp.for > bcalpha.for
+   done=1
+fi
+
+if [ $ialf -eq 4 ]
+then
+   feedback='Models with [alpha/Fe] = -0.4 have been used'
+   sed -e 's/      call getbc_std/      call getbc_m04/g' bctmp.for > bcalpha.for
+   done=1
+fi
+
+if [ $done -eq 0 ]
+then
+   echo ialf must be between 1 and 4. Please check selectbc.data file. 
+   exit
+fi
+
+# comment verbose mode in bcutil.for. Rename the program so modified as tmpX.for
+sed -e 's/      write(6,1004) ebv,fe,(fil(k),k=1,ndx)/C       write(6,1004) ebv,fe,(fil(k),k=1,ndx)/g' bcutil.for > tmpX.for
+
+# compile assuming gfortran is available
+gfortran get4bctables.for -o get4bctables.exe
+gfortran bcalpha.for tmpX.for -o bcalpha.exe
+# on certain version of gfortran, a warning might be issued when nfil<4.
+# add option -ffpe-summary='none' to avoid IEEE_DENORMAL warning when nfil<4
+#gfortran bcalpha.for tmpX.for -ffpe-summary='none' -o bcalpha.exe
+
+check=0.9
+for idx in ${!lgg[@]}; do
+
+    printf "%s %s %s\n" ${lgg[idx]} ${feh[idx]} ${tef[idx]} > tmp.sorted    
+
+    # if reddening has changed, then re-build tables
+    # string matching in bash, so 0.0 different from 0.
+    if [ ${ebv[idx]} != $check ]
+    then
+	./get4bctables.exe <<< ${ebv[idx]}
+    fi
+    check=${ebv[idx]}
+
+    ./bcalpha.exe >> tmp.output.file
+    
+done	   
+
+# read columns in tmp.output.file
+bc1=($(awk '{print $1}' ./tmp.output.file ))
+bc2=($(awk '{print $2}' ./tmp.output.file ))
+bc3=($(awk '{print $3}' ./tmp.output.file ))
+bc4=($(awk '{print $4}' ./tmp.output.file ))
+bc5=($(awk '{print $5}' ./tmp.output.file ))
+
+
+# create output.file.all which contains input file (reddening sorted) and
+# output BCs
+echo ' ID                  log(g) [Fe/H] Teff  E(B-V)  BC_1     BC_2    BC_3    BC_4   BC_5' > output.file.all
+
+for idx in ${!lgg[@]}; do
+
+    read linea 
+    grep -q 'outside' <<< $linea
+    
+    if [ $? -eq 0 ]
+    then
+	printf "%-20s %-6s %-6s %-6s %-6s %s\n" ${ids[idx]} ${lgg[idx]} ${feh[idx]} ${tef[idx]} ${ebv[idx]} 'input stellar parameters outside of the grid' >> output.file.all
+    else
+	printf "%-20s %-6s %-6s %-6s %-6s %-7s %-7s %-7s %-7s %-7s\n" ${ids[idx]} ${lgg[idx]} ${feh[idx]} ${tef[idx]} ${ebv[idx]} ${bc1[idx]} ${bc2[idx]} ${bc3[idx]} ${bc4[idx]} ${bc5[idx]} >> output.file.all
+    fi
+	
+done < tmp.output.file
+
+
+echo 
+echo '*******************************************************************************'
+echo '   '$feedback
+echo '*******************************************************************************'
+echo
+
+rm tmp.ebv.sorted tmp.sorted tmp.output.file bctmp.for bcalpha.for bcalpha.exe get4bctables.exe tmpX.for bc_???.data inputbc_???.data
+
