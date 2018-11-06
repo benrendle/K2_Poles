@@ -14,6 +14,8 @@ import K2_constants as const
 import K2_data as dat
 from numbers import Number
 import subprocess
+import matplotlib
+import matplotlib.pyplot as plt
 
 ''' Dropbox Path '''
 ext_DB = '/home/bmr135/' # Work
@@ -153,23 +155,20 @@ def K2_GAP():
     GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
     GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
 
-    K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
-    K2_camp = K2_camp.reset_index(drop=True)
-
-    g = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
-    # g = g.join(K2_camp[['2MASS','EPIC','Teff','Kmag','[Fe/H]','logg']].set_index('2MASS'),on='2MASS')
-    # g['Kabs'] = g['Kmag'] - 5*np.log10(g['dist_ABJ']/10)
-    # g.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
-    # print(g.columns.values)
-    # sys.exit()
-
-    #!/usr/bin/env python2
-    # -*- coding: utf-8 -*-
     """
     Created on Sun Jul  1 18:13:39 2018
     Bolometric correcion implementation code.
     @author: Saniya Khan
     """
+    # K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
+    # K2_camp = K2_camp.reset_index(drop=True)
+    #
+    # g = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+    # g = g.join(K2_camp[['2MASS','EPIC','Teff','Kmag','[Fe/H]','logg']].set_index('2MASS'),on='2MASS')
+    # g['Kabs'] = g['Kmag'] - 5*np.log10((g['dist_ABJ']*1000)/10)
+    # g.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+    # print(g.columns.values)
+    # sys.exit()
     # plt.rc('text', usetex=True)
     # plt.rc('font', family='serif')
     # plt.rc('axes', labelsize=12)
@@ -177,30 +176,49 @@ def K2_GAP():
     # plt.rc('ytick', labelsize=12)
     # plt.rc('legend', fontsize=12)
     # plt.rcParams['savefig.dpi'] = 300
+    #
+    # pd.set_option('display.max_seq_items', None)
+    #
+    # # data = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/g_COR_DR14_R7S29.txt', sep=r',', header=0)
+    # g['EBV'] = 0
+    # cols = ['EPIC', 'logg', '[Fe/H]', 'Teff', 'EBV']
+    # g2 = g[cols]
+    #
+    #
+    # g2.to_csv('input.sample.all', header=None, sep=r' ', index=False)
+    # p = subprocess.Popen(['./bcall'])
+    # p.wait()
+    # p = subprocess.Popen(["mv", "output.file.all", "/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv"])
+    # p.wait()
+    #
+    # BC = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv', sep=r'\s+', header=0)
+    # BC = BC[['ID', 'BC_1', 'BC_2']]
+    # BC = BC.rename(columns={'ID':'EPIC','BC_1':'BC_K','BC_2':'BC_G'})
+    #
+    # data_BC = pd.merge(g, BC, on=['EPIC'], how='inner')
+    # # data_BC = data_BC.drop(['ID'], axis=1)
+    # data_BC.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv', index=False)
+    # sys.exit()
+    ''' Computation of radii from Gaia '''
+    df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv')
+    df['Kabs'] = df['Kmag'] - 5*np.log10((df['dist_ABJ']*1000)/10)
+    # print(df.columns.values)
+    T = (5777/df['Teff'])**4 # Temperature term
+    Mm = (4.75-df['BC_K']-df['Kabs']-df['A_K'])/2.5 # Magnitude term including bolometric correction and extinction
+    df['Rgaia'] = np.sqrt(T * 10**(Mm))
+    # print(df['Rgaia'])
+    GAP3 = pd.merge(GAP3,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
+    GAP3['glogg'] = np.log10((const.G * GAP3['mass']*const.solar_mass)/((GAP3['Rgaia']*const.solar_radius)**2))
+    GAP6 = pd.merge(GAP6,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
+    GAP6['glogg'] = np.log10((const.G * GAP6['mass']*const.solar_mass)/((GAP6['Rgaia']*const.solar_radius)**2))
+    # fig, ax = plt.subplots()
+    # ax.scatter(df['Rgaia'],df['radius_val'])
+    # ax.set_xlabel(r'Radius, Calc.')
+    # ax.set_ylabel(r'Radius, Gaia Catalogue')
+    # plt.show()
 
-    pd.set_option('display.max_seq_items', None)
+    # sys.exit()
 
-    # data = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/g_COR_DR14_R7S29.txt', sep=r',', header=0)
-    g['EBV'] = 0
-    cols = ['EPIC', 'logg', '[Fe/H]', 'Teff', 'EBV']
-    g2 = g[cols]
-
-
-    g2.to_csv('input.sample.all', header=None, sep=r' ', index=False)
-    p = subprocess.Popen(['./bcall'])
-    p.wait()
-    p = subprocess.Popen(["mv", "output.file.all", "/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv"])
-    p.wait()
-
-    BC = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv', sep=r'\s+', header=0)
-    BC = BC[['ID', 'BC_1', 'BC_2']]
-    BC = BC.rename(columns={'ID':'EPIC','BC_1':'BC_K','BC_2':'BC_G'})
-
-    data_BC = pd.merge(g, BC, on=['EPIC'], how='inner')
-    # data_BC = data_BC.drop(['ID'], axis=1)
-    data_BC.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv', index=False)
-
-    sys.exit()
     return GAP3, GAP6
 
 def KASOC_LC_in():

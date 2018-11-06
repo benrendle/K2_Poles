@@ -36,6 +36,65 @@ ext_DB = '/home/bmr135/' # Work
 ''' GA directory '''
 ext_GA = '/media/bmr135/SAMSUNG/' # Hard-Drive
 
+def hist_orig(df,df1,df2,bins,n):
+    '''
+    df = original data
+    df1 = reduced data set
+    '''
+    fig, axes = plt.subplots(3,2)
+    ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
+    hist = [0,0,0,0,0]
+    hist0 = [0,0,0,0,0]
+    b = [0,0,0,0,0]
+    d = [0,0,0,0,0]
+    ratio = [0,0,0,0,0]
+
+    hist0[0], d[0], c = ax0.hist(df['mass'],bins=bins[0],histtype='step',linewidth=2,label=r'Full')
+    hist[0], b[0], c = ax0.hist(df1['mass'],bins=bins[0],histtype='step',linewidth=2,label=r'EPIC Rad.')
+    hist[0], b[0], c = ax0.hist(df2['mass'],bins=bins[0],histtype='step',linewidth=2,label=r'Gaia Rad.')
+    ax0.set_xlabel(r'Mass [M$_{\odot}$]')
+    ax0.legend()
+    if n == 6:
+        ax0.set_xlim(0.5,2.5)
+
+    hist0[1], d[1], c = ax1.hist(df['Radius'],bins=bins[1],histtype='step',linewidth=2)
+    hist[1], b[1], c = ax1.hist(df1['Radius'],bins=bins[1],histtype='step',linewidth=2)
+    hist[1], b[1], c = ax1.hist(df2['Rgaia'],bins=bins[1],histtype='step',linewidth=2)
+    ax1.set_xlabel(r'Radius [R$_{\odot}$]')
+    if n == 6:
+        ax1.set_xlim(0,30)
+
+    hist0[2], d[2], c = ax2.hist(df['Teff'],bins=bins[2],histtype='step',linewidth=2)
+    hist[2], b[2], c = ax2.hist(df1['Teff'],bins=bins[2],histtype='step',linewidth=2)
+    hist[2], b[2], c = ax2.hist(df2['Teff'],bins=bins[2],histtype='step',linewidth=2)
+    ax2.set_xlabel(r'T$_{\rm{eff}}$ [K]')
+    if n == 6:
+        ax2.set_xlim(4000,5250)
+
+    hist0[3], d[3], c = ax3.hist(df['[Fe/H]'],bins=bins[3],histtype='step',linewidth=2)
+    hist[3], b[3], c = ax3.hist(df1['[Fe/H]'],bins=bins[3],histtype='step',linewidth=2)
+    hist[3], b[3], c = ax3.hist(df2['[Fe/H]'],bins=bins[3],histtype='step',linewidth=2)
+    ax3.set_xlabel(r'[Fe/H] [dex]')
+    if n == 6:
+        ax3.set_xlim(-1.2,0.2)
+
+    hist0[4], d[4], c = ax4.hist(df['logg'],bins=bins[4],histtype='step',linewidth=2)
+    hist[4], b[4], c = ax4.hist(df1['logg'],bins=bins[4],histtype='step',linewidth=2)
+    hist[4], b[4], c = ax4.hist(df2['glogg'],bins=bins[4],histtype='step',linewidth=2)
+    ax4.set_xlabel(r'log$_{10}$(g)')
+    if n == 6:
+        ax4.set_xlim(1,4)
+
+    ax5.axis('off')
+    ratio[0] = (hist[0]/hist0[0])*100
+    ratio[1] = (hist[1]/hist0[1])*100
+    ratio[2] = (hist[2]/hist0[2])*100
+    ratio[3] = (hist[3]/hist0[3])*100
+    ratio[4] = (hist[4]/hist0[4])*100
+    # ax0.set_title(r'Cut Applied: '+cut)
+    plt.tight_layout()
+    fig.savefig('Det_prob_cut_props.pdf', bbox_inches='tight')
+
 ''' Read in simulated and real data '''
 # besa3, besa6 = dat.BESANCON()
 # print("Besancon")
@@ -57,30 +116,69 @@ print( "All files in")
 GAP6 = dat.n_epics(GAP6,oc)
 
 ''' Preparing GAP for probability detections '''
-# GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
-# GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
-# GAP3_v2 = GAP3[GAP3['foma'] < 280]
-# GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
-# GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
-# GAP3_v2 = GAP3_v2.reset_index(drop=True)
-# GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
+GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
+GAP3['fomag'] = GAP3['mass'] * GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+GAP3['Lumog'] = GAP3['Rgaia']**2 * (GAP3['Teff']/const.solar_Teff)**4
+GAP3_v2 = GAP3[GAP3['foma'] < 280]
+GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
+GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
+GAP3_v2 = GAP3_v2.reset_index(drop=True)
+GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
+GAP3_v3 = GAP3[GAP3['fomag'] < 280]
+GAP3_v3 = GAP3_v3[GAP3_v3['fomag'] > 10]
+GAP3_v3 = GAP3_v3[GAP3_v3['imag'] > 0.0]
+GAP3_v3 = GAP3_v3.reset_index(drop=True)
+GAP3_v3 = prop.det_prob_GAP_gaia(GAP3_v3,'fomag',3090,135.1)
 # GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
-# GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob',index=False)
-#
-# GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
-# GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
-# GAP6_v2 = GAP6[GAP6['foma'] < 280]
-# GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
-# GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
-# GAP6_v2 = GAP6_v2.reset_index(drop=True)
-# GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
+# GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob_gaia',index=False)
+
+GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
+GAP6['fomag'] = GAP6['mass'] * GAP6['Rgaia']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['Lumog'] = GAP6['Rgaia']**2 * (GAP6['Teff']/const.solar_Teff)**4
+GAP6_v2 = GAP6[GAP6['foma'] < 280]
+GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
+GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
+GAP6_v2 = GAP6_v2.reset_index(drop=True)
+GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
+GAP6_v3 = GAP6[GAP6['fomag'] < 280]
+GAP6_v3 = GAP6_v3[GAP6_v3['fomag'] > 10]
+GAP6_v3 = GAP6_v3[GAP6_v3['imag'] > 0.0]
+GAP6_v3 = GAP6_v3.reset_index(drop=True)
+GAP6_v3 = prop.det_prob_GAP(GAP6_v3,'fomag',3090,135.1)
 # GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
-# GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob',index=False)
-#
+# GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob_gaia',index=False)
+K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
+K2_camp = K2_camp.reset_index(drop=True)
+K2_camp_v2 = pd.concat([GAP3_v2,GAP6_v2],ignore_index=True)
+K2_camp_v2 = K2_camp_v2.reset_index(drop=True)
+K2_camp_v3 = pd.concat([GAP3_v3,GAP6_v3],ignore_index=True)
+K2_camp_v3 = K2_camp_v3.reset_index(drop=True)
+
+fig,ax = plt.subplots()
+a = np.where(K2_camp_v2['prob_s'] >= 0.95)
+b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
+ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
+ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'EPIC Rad.')
+ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'Rad. from Gaia')
+ax.set_xlabel(r'J - K',fontsize=15)
+ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+ax.invert_yaxis()
+ax.legend()
+# plt.show()
+
+bins = [np.linspace(min(K2_camp['mass']),max(K2_camp['mass']),50), \
+        np.linspace(min(K2_camp['Radius']),25,50), \
+        np.linspace(min(K2_camp['Teff']),max(K2_camp['Teff']),50), \
+        np.linspace(min(K2_camp['[Fe/H]']),max(K2_camp['[Fe/H]']),50), \
+        np.linspace(min(K2_camp['logg']),max(K2_camp['logg']),50)]
+hist_orig(K2_camp,K2_camp_v2,K2_camp_v3,bins,0)
+
 # cols = ['EPIC','2MASS','RA','Dec']#,'Teff','[Fe/H]','logg']
 # GAP3_v2.to_csv('/home/ben/Desktop/C3_GAP_Gaia',columns=cols,index=False)
 # GAP6_v2.to_csv('/home/ben/Desktop/C6_GAP_Gaia',columns=cols,index=False)
-# sys.exit()
+sys.exit()
 
 ''' Merge data with GAP target lists '''
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
@@ -125,88 +223,6 @@ YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6 = prop.lmrl_comps(seismo_lis
 YC3,SC3,BC3,EC3,YEC3,SEC3,YC6,SC6,BC6,EC6,YEC6,SEC6 = prop.selection_function(sel_list,sel_numax)
 print('GAP selection funciton implemented')
 # sys.exit()
-def hist_orig(df,df1,cut,bins,ext,n):
-    '''
-    df = original data
-    df1 = reduced data set
-    '''
-    fig, axes = plt.subplots(3,2)
-    ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-    hist = [0,0,0,0,0]
-    hist0 = [0,0,0,0,0]
-    b = [0,0,0,0,0]
-    d = [0,0,0,0,0]
-    ratio = [0,0,0,0,0]
-
-    hist0[0], d[0], c = ax0.hist(df['Mass'],bins=bins[0],histtype='step')
-    hist[0], b[0], c = ax0.hist(df1['Mass'],bins=bins[0])
-    ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-    if n == 6:
-        ax0.set_xlim(0.5,2.5)
-
-    hist0[1], d[1], c = ax1.hist(df['radius'],bins=bins[1],histtype='step')
-    hist[1], b[1], c = ax1.hist(df1['radius'],bins=bins[1])
-    ax1.set_xlabel(r'Radius [R$_{\odot}$]')
-    if n == 6:
-        ax1.set_xlim(0,30)
-
-    hist0[2], d[2], c = ax2.hist(df['Teff'],bins=bins[2],histtype='step')
-    hist[2], b[2], c = ax2.hist(df1['Teff'],bins=bins[2])
-    ax2.set_xlabel(r'T$_{\rm{eff}}$ [K]')
-    if n == 6:
-        ax2.set_xlim(4000,5250)
-
-    hist0[3], d[3], c = ax3.hist(df['M_H'],bins=bins[3],histtype='step')
-    hist[3], b[3], c = ax3.hist(df1['M_H'],bins=bins[3])
-    ax3.set_xlabel(r'[Fe/H] [dex]')
-    if n == 6:
-        ax3.set_xlim(-1.2,0.2)
-
-    hist0[4], d[4], c = ax4.hist(df['logg'],bins=bins[4],histtype='step')
-    hist[4], b[4], c = ax4.hist(df1['logg'],bins=bins[4])
-    ax4.set_xlabel(r'log$_{10}$(g)')
-    if n == 6:
-        ax4.set_xlim(1,4)
-
-    ax5.axis('off')
-    ratio[0] = (hist[0]/hist0[0])*100
-    ratio[1] = (hist[1]/hist0[1])*100
-    ratio[2] = (hist[2]/hist0[2])*100
-    ratio[3] = (hist[3]/hist0[3])*100
-    ratio[4] = (hist[4]/hist0[4])*100
-    # ax0.set_title(r'Cut Applied: '+cut)
-    plt.tight_layout()
-    plt.savefig(ext+'_'+'TC6.png')
-
-    if n == 6:
-        fig, axes = plt.subplots(3,2)
-        ax0,ax1,ax2,ax3,ax4,ax5 = axes.flatten()
-
-        ax0.scatter(bins[0][:-1],ratio[0])
-        ax0.set_xlabel(r'Mass [M$_{\odot}$]')
-        ax0.set_xlim(0.5,2.5)
-
-        ax1.scatter(bins[1][:-1],ratio[1])
-        ax1.set_xlabel(r'Radius [R$_{\odot}$]')
-        ax1.set_xlim(0,30)
-
-        ax2.scatter(bins[2][:-1],ratio[2])
-        ax2.set_xlabel(r'T$_{\rm{eff}}$ [K]')
-        ax2.set_xlim(4000,5250)
-
-        ax3.scatter(bins[3][:-1],ratio[3])
-        ax3.set_xlabel(r'[Fe/H] [dex]')
-        ax3.set_xlim(-1.2,0.2)
-
-        ax4.scatter(bins[4][:-1],ratio[4])
-        ax4.set_xlabel(r'log$_{10}$(g)')
-        ax4.set_xlim(1,4)
-
-        ax5.axis('off')
-        plt.tight_layout()
-        plt.show()
-
-    return hist, b
 
 ''' TRILEGAL selection cuts '''
 # TRILEGAL_C3 = prop.det_prob(TRILEGAL_C3,'numax',3090.0,135.1)

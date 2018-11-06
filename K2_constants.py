@@ -14,4 +14,6 @@ cadence = 29.4*60 # 58.5 sec or 29.4 mins depending on choice of SC or LC data
 vnyq = 1.0/(2*cadence) * 1e6 # Nyquist frequency muHz
 sys_limit = 0
 dilution = 1.0
-G = 6.67408E-11 # Gravitational Constant m^3 kg^-1 s^-2
+G = 6.67408e-8 # Gravitational Constant m^3 kg^-1 s^-2
+solar_mass = 1.9884e33
+solar_radius = 6.957e10

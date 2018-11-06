@@ -22,7 +22,7 @@ G6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/GAP6')
 # C6s = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Normal/C6_07092018')
 # C6s.rename(columns={'#Id':'EPIC'},inplace=True)
 
-''' Convert parallax to distance using the Astraatmadja and Bailer-Jones 2016 method '''
+''' Convert parallax to distance using the Astraatmadja and Bailer-Jones 2016 method - results in kpc '''
 # df['dist_G'] = 0.0
 # df['sig_dist_G'] = 0.0
 df1['dist_G'] = 0.0

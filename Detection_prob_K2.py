@@ -46,6 +46,18 @@ def properties_GAP(X, constants_only=False):
 
     return X['Tred']
 
+def properties_GAP_gaia(X, constants_only=False):
+    # solar parameters
+    # teff_solar = 5777.0 # Kelvin
+    teffred_solar = 8907.0 #in Kelvin
+    # numax_solar = 3104 # in micro Hz
+    # dnu_solar = 138.8 # in micro Hz
+    # lum = (rad**2)*((teff/teff_solar)**4)
+
+    X['Tred'] = teffred_solar*(X['Lumog']**-0.093) # from (3) eqn 8. red-edge temp
+
+    return X['Tred']
+
 def globalDetections(imag, Kp, lum, rad, teff, \
         numax, max_T, teffred, teff_solar, teffred_solar, \
         numax_solar, dnu_solar, sys_limit, dilution, vnyq, \
