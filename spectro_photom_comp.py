@@ -81,6 +81,12 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     medIdx = (np.abs(a[:,0] - c)).argmin()
     print(a[medIdx,0],a[medIdx,1])
     # print(np.median(a[:,0]),a[medIdx,0],b[medIdx])
+    # df1['Teff_apo_corr'] = 0 - (a[medIdx,0]*df[param[0]] + a[medIdx,1])
+    df1['corr'] = df1[param[1]] + (a[medIdx,0]*df[param[0]] + a[medIdx,1])
+
+    plt.figure()
+    # plt.scatter(df[param[0]],df1['corr'])
+    plt.scatter(df[param[0]],df1['corr']-df[param[0]])
 
     ''' Plot the inliers, outliers and optimal fit to the data '''
     plt.figure()
@@ -97,7 +103,6 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     df['outlier_flag'] = 1.
     df['outlier_flag'][b[medIdx]] = 0.
     print(df['outlier_flag'])
-    sys.exit()
     # plt.savefig('/home/bmr135/spectro_comp/C3_RAVE_GES_'+param[1]+'.png')
 
 if __name__ == "__main__":
@@ -117,9 +122,9 @@ if __name__ == "__main__":
     R6 = R6[R6['logg_RAVE'] > 0]
     L6 = pd.read_csv(ext+'/APO_LAMOST/LAMOST_full_C6.csv')
     L6 = L6.dropna(subset=['teff_L','logg_L','feh_L'])
-    C3 = pd.read_csv(ext+'/matlab_in/C3_17102018.csv')
+    C3 = pd.read_csv(ext+'/matlab_in/C3_02112018.csv')
     C3 = C3.dropna(subset=['Teff','logg','[Fe/H]'])
-    C6 = pd.read_csv(ext+'/matlab_in/C6_17102018.csv')
+    C6 = pd.read_csv(ext+'/matlab_in/C6_02112018.csv')
     C6 = C6.dropna(subset=['Teff','logg','[Fe/H]'])
 
     ''' Combine datasets prior to comparisons '''
@@ -183,18 +188,22 @@ if __name__ == "__main__":
     # plt.show()
 
     ''' APOGEE vs RAVE - C6 '''
-    # if len(ar) > 2:
-    #     ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
-    #     ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
-    #     ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
-    # plt.show()
+    if len(ar) > 2:
+        ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+        plt.show()
+        ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+        plt.show()
+        ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
+        plt.show()
 
     ''' APOGEE vs Gaia-ESO - C3 '''
-    # if len(ag) > 2:
-    #     ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
-    #     ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
-    #     ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
-    # plt.show()
+    if len(ag) > 2:
+        ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+        plt.show()
+        ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+        plt.show()
+        ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
+        plt.show()
 
     ''' RAVE vs Gaia-ESO - C3 '''
     # if len(rg) > 2:
