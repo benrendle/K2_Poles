@@ -272,39 +272,40 @@ def individ(df,df1,df2):
     B = pd.DataFrame()
     B['EPIC'] = df['EPIC']
     B['B'] = 1.0
+    B = B.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
     Y = pd.DataFrame()
     Y['EPIC'] = df1['EPIC']
     Y['Y'] = 1.0
+    Y = Y.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
     S = pd.DataFrame()
     S['EPIC'] = df2['EPIC']
     S['S'] = 1.0
+    S = S.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
+
+    B = B.join(Y.set_index('EPIC'),on='EPIC')
+    B = B.join(S.set_index('EPIC'),on='EPIC')
+    B['Y'].fillna(value=0.0,inplace=True)
+    B['S'].fillna(value=0.0,inplace=True)
+    B['Nseismo'] = B['Y'] + B['B'] + B['S']
+    df = pd.merge(df,B,how='inner',on=['EPIC'])
+    df = df.reset_index(drop=True)
 
     Y = Y.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
     Y = Y.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
     Y['B'].fillna(value=0.0,inplace=True)
     Y['S'].fillna(value=0.0,inplace=True)
-
-    B = B.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
-    B = B.join(S[['EPIC','S']].set_index('EPIC'),on='EPIC')
-    B['Y'].fillna(value=0.0,inplace=True)
-    B['S'].fillna(value=0.0,inplace=True)
-
-    S = S.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
-    S = S.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
-    S['B'].fillna(value=0.0,inplace=True)
-    S['Y'].fillna(value=0.0,inplace=True)
-
     Y['Nseismo'] = Y['Y'] + Y['B'] + Y['S']
-    B['Nseismo'] = B['Y'] + B['B'] + B['S']
-    S['Nseismo'] = S['Y'] + S['B'] + S['S']
-
-    df = pd.merge(df,B,how='inner',on=['EPIC'])
-    df = df.reset_index(drop=True)
     df1 = pd.merge(df1,Y,how='inner',on=['EPIC'])
     df1 = df1.reset_index(drop=True)
-    df2 = pd.merge(df2,S,how='inner',on=['EPIC'])
+
+    S = S.join(Y[['EPIC','Y']].set_index('EPIC'),on='EPIC')
+    S = S.join(B[['EPIC','B']].set_index('EPIC'),on='EPIC')
+    S['B'].fillna(value=0.0,inplace=True)
+    S['Y'].fillna(value=0.0,inplace=True)
+    S['Nseismo'] = S['Y'] + S['B'] + S['S']
+    df2 = pd.merge(df2,S[['EPIC','Nseismo']],how='inner',on=['EPIC'])
     df2 = df2.reset_index(drop=True)
 
     Y = Y[(Y['Nseismo'] == 1.0)]
@@ -369,5 +370,38 @@ def met_filter(df):
     # print(df['[Fe/H]'])
     # df['[Fe/H]'] = df.where(df['stpropflag'] == 'rpm', -99.9)
     # print(df['[Fe/H]'])
+
+    return df
+
+def alt_spec_params(df,j,survey,param,uncert):
+    '''
+    Function to map one set of spectroscopic variables to another
+    - df: dataframe of original spectroscopic data
+    - j: integer to determine which transformation set is to be used (int)
+        - 0) C6: APOGEE to RAVE
+        - 1) C3: APOGEE to Gaia-ESO
+        - 2) C3: RAVE to Gaia-ESO
+    - survey: name of survey original values are being converted to
+    - param: array of parameter names for the original survey [teff,logg,feh]
+    - uncert: array of uncertainty names for the original survey [teff,logg,feh]
+    '''
+    mT = [1.163,0.345,0.968]
+    cT = [-5380.311,-1600.185,-4604.654]
+    sigT = [119.010,61.651,135.698]
+
+    mG = [-0.126,0.204,-0.080]
+    cG = [0.267,-0.445,0.234]
+    sigG = [0.025,0.088,0.018]
+
+    mF = [-0.266,0.104,0.465]
+    cF = [0.180,0.146,0.130]
+    sigF = [0.105,0.052,0.199]
+
+    df['Teff_'+survey] = df[param[0]] - (mT[j]*df[param[0]] + cT[j])
+    df['Teff_sig_'+survey] = np.sqrt(df[uncert[0]]**2 + sigT[j]**2)
+    df['logg_'+survey] = df[param[1]] - (mG[j]*df[param[1]] + cG[j])
+    df['logg_sig_'+survey] = np.sqrt(df[uncert[1]]**2 + sigG[j]**2)
+    df['feh_'+survey] = df[param[2]] - (mF[j]*df[param[2]] + cF[j])
+    df['feh_sig_'+survey] = np.sqrt(df[uncert[2]]**2 + sigF[j]**2)
 
     return df

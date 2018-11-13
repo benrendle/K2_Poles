@@ -151,10 +151,6 @@ def K2_GAP():
     # GAP3.to_csv(ext_DB+'Dropbox/K2Poles/GAP3',index=False)
     # GAP6.to_csv(ext_DB+'Dropbox/K2Poles/GAP6',index=False)
 
-    ''' GAP read in when no updates required '''
-    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
-    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
-
     """
     Created on Sun Jul  1 18:13:39 2018
     Bolometric correcion implementation code.
@@ -200,24 +196,31 @@ def K2_GAP():
     # data_BC.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv', index=False)
     # sys.exit()
     ''' Computation of radii from Gaia '''
-    df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv')
-    df['Kabs'] = df['Kmag'] - 5*np.log10((df['dist_ABJ']*1000)/10)
-    # print(df.columns.values)
-    T = (5777/df['Teff'])**4 # Temperature term
-    Mm = (4.75-df['BC_K']-df['Kabs']-df['A_K'])/2.5 # Magnitude term including bolometric correction and extinction
-    df['Rgaia'] = np.sqrt(T * 10**(Mm))
-    # print(df['Rgaia'])
-    GAP3 = pd.merge(GAP3,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
-    GAP3['glogg'] = np.log10((const.G * GAP3['mass']*const.solar_mass)/((GAP3['Rgaia']*const.solar_radius)**2))
-    GAP6 = pd.merge(GAP6,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
-    GAP6['glogg'] = np.log10((const.G * GAP6['mass']*const.solar_mass)/((GAP6['Rgaia']*const.solar_radius)**2))
-    # fig, ax = plt.subplots()
-    # ax.scatter(df['Rgaia'],df['radius_val'])
-    # ax.set_xlabel(r'Radius, Calc.')
-    # ax.set_ylabel(r'Radius, Gaia Catalogue')
-    # plt.show()
-
+    # GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
+    # GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
+    # df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv')
+    # df['Kabs'] = df['Kmag'] - 5*np.log10((df['dist_ABJ']*1000)/10)
+    # # print(df.columns.values)
+    # T = (5777/df['Teff'])**4 # Temperature term
+    # Mm = (4.75-df['BC_K']-df['Kabs']-df['A_K'])/2.5 # Magnitude term including bolometric correction and extinction
+    # df['Rgaia'] = np.sqrt(T * 10**(Mm))
+    # # print(df['Rgaia'])
+    # GAP3 = pd.merge(GAP3,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
+    # GAP3['glogg'] = np.log10((const.G * GAP3['mass']*const.solar_mass)/((GAP3['Rgaia']*const.solar_radius)**2))
+    # GAP6 = pd.merge(GAP6,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
+    # GAP6['glogg'] = np.log10((const.G * GAP6['mass']*const.solar_mass)/((GAP6['Rgaia']*const.solar_radius)**2))
+    # # fig, ax = plt.subplots()
+    # # ax.scatter(df['Rgaia'],df['radius_val'])
+    # # ax.set_xlabel(r'Radius, Calc.')
+    # # ax.set_ylabel(r'Radius, Gaia Catalogue')
+    # # plt.show()
+    # GAP3.to_csv(ext_DB+'Dropbox/K2Poles/GAP3',index=False)
+    # GAP6.to_csv(ext_DB+'Dropbox/K2Poles/GAP6',index=False)
     # sys.exit()
+
+    ''' GAP read in when no updates required '''
+    GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
+    GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
 
     return GAP3, GAP6
 

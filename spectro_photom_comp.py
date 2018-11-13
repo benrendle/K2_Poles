@@ -1,5 +1,7 @@
 ''' Program for determining offsets between spectroscopic and photometric values '''
 
+import warnings
+warnings.filterwarnings("ignore")
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
@@ -58,9 +60,9 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     lr.fit(X, y)
 
     ''' Robustly fit linear model with RANSAC algorithm '''
-    a = np.zeros((100,2))
-    b = np.zeros((100,np.shape(df)[0])) # Size of inlier mask
-    for i in range(100):
+    a = np.zeros((1000,2))
+    b = np.zeros((1000,np.shape(df)[0])) # Size of inlier mask
+    for i in range(1000):
         ransac = linear_model.RANSACRegressor(min_samples=5)
         ransac.fit(X, y)
         inlier_mask = ransac.inlier_mask_
@@ -79,19 +81,32 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     b = b.astype('bool')
     c = np.median(a[:,0])
     medIdx = (np.abs(a[:,0] - c)).argmin()
-    print(a[medIdx,0],a[medIdx,1])
+    # print(a[medIdx,0],a[medIdx,1])
+    print(np.std(df['Diff']))
+    d = -a[medIdx,1]/a[medIdx,0]
     # print(np.median(a[:,0]),a[medIdx,0],b[medIdx])
     # df1['Teff_apo_corr'] = 0 - (a[medIdx,0]*df[param[0]] + a[medIdx,1])
-    df1['corr'] = df1[param[1]] + (a[medIdx,0]*df[param[0]] + a[medIdx,1])
+    df['corr'] = df[param[0]] - (a[medIdx,0]*df[param[0]] + a[medIdx,1])
+    # df1['corr'] = 0.
+    # for i in range(len(df)):
+    #     if (df[param[0]].iloc[i] > d) & ((a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1]) > 0.):
+    #         df1['corr'].iloc[i] = df1[param[1]].iloc[i] + (a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1])
+    #     elif (df[param[0]].iloc[i] > d) & ((a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1]) < 0.):
+    #         df1['corr'].iloc[i] = df1[param[1]].iloc[i] - (a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1])
+    #     elif (df[param[0]].iloc[i] < d) & ((a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1]) > 0.):
+    #         df1['corr'].iloc[i] = df1[param[1]].iloc[i] - (a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1])
+    #     elif (df[param[0]].iloc[i] < d) & ((a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1]) < 0.):
+    #         df1['corr'].iloc[i] = df1[param[1]].iloc[i] + (a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1])
 
     plt.figure()
     # plt.scatter(df[param[0]],df1['corr'])
-    plt.scatter(df[param[0]],df1['corr']-df[param[0]])
-
+    plt.scatter(df[param[0]],df['corr']-df1[param[1]])
     ''' Plot the inliers, outliers and optimal fit to the data '''
     plt.figure()
     lw = 2
     plt.plot(line_X, a[medIdx,0]*line_X + a[medIdx,1], color='k', linewidth=3, label=r'%.5s$*x$ + %.5s'%(a[medIdx,0],a[medIdx,1]), alpha=0.5)
+    plt.axhline(y=0., color='r', linestyle='-')
+    plt.axvline(x=d, color='r', linestyle='-')
     # plt.errorbar(X, y, yerr=df['sig'], color='gold', marker='.', label='Outliers',fmt='o')
     # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o')
     plt.scatter(X, y, color='gold', label='Outliers')
@@ -100,9 +115,10 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     plt.ylabel(label[1])
     plt.xlim(X.min()-f, X.max()+f)
     plt.legend()
-    df['outlier_flag'] = 1.
-    df['outlier_flag'][b[medIdx]] = 0.
-    print(df['outlier_flag'])
+    # plt.show()
+    # df['outlier_flag'] = 1.
+    # df['outlier_flag'][b[medIdx]] = 0.
+    # print(df['outlier_flag'])
     # plt.savefig('/home/bmr135/spectro_comp/C3_RAVE_GES_'+param[1]+'.png')
 
 if __name__ == "__main__":
@@ -128,6 +144,9 @@ if __name__ == "__main__":
     C6 = C6.dropna(subset=['Teff','logg','[Fe/H]'])
 
     ''' Combine datasets prior to comparisons '''
+    a = R3[R3['Teff_RAVE'] < 4400]
+    # print(a[['Teff_RAVE','logg']])
+    R3 = R3[R3['Teff_RAVE'] > 4000]
     a3, ac3 = truncate(A3,C3)
     a6, ac6 = truncate(A6,C6)
     g, gc = truncate(G,C3)
@@ -139,8 +158,12 @@ if __name__ == "__main__":
     gr, rg = truncate(G,R3)
     ar, ra = truncate(A6,R6)
     al, la = truncate(A6,L6)
+    print(len(ag),len(gr),len(ar))
+    sys.exit()
 
-    # print(R3.columns.values)
+    # print(rg[['Teff_RAVE','logg_RAVE','logg','radius']])
+    # print(gr[['TEFF','LOGG','logg','radius']])
+    # sys.exit()
 
     ''' Compare Teff, [Fe/H], logg of given datasets '''
 
@@ -183,34 +206,36 @@ if __name__ == "__main__":
     ''' APOGEE vs RAVE - C3 '''
     # if len(ar3) > 2:
     #     ransac_fit(ar3,ra3,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+    #     plt.show()
     #     ransac_fit(ar3,ra3,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
     #     ransac_fit(ar3,ra3,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
-    # plt.show()
 
     ''' APOGEE vs RAVE - C6 '''
     if len(ar) > 2:
-        ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
-        plt.show()
-        ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
-        plt.show()
+        # ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+        # plt.show()
+        # ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+        # plt.show()
         ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
-        plt.show()
+        # plt.show()
 
     ''' APOGEE vs Gaia-ESO - C3 '''
     if len(ag) > 2:
-        ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
-        plt.show()
-        ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
-        plt.show()
+        # ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+        # plt.show()
+        # ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+        # plt.show()
         ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
-        plt.show()
+        # plt.show()
 
     ''' RAVE vs Gaia-ESO - C3 '''
-    # if len(rg) > 2:
-    #     ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
-    #     ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
-    #     ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
-    # plt.show()
+    if len(rg) > 2:
+        # ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
+        # plt.show()
+        # ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
+        # plt.show()
+        ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
+        # plt.show()
 
     ''' APOGEE vs LAMOST - C6 '''
     # if len(al) > 2:
