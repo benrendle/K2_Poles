@@ -29,6 +29,7 @@ import time
 
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
+plt.rcParams["font.family"] = "serif"
 
 ''' Dropbox Path '''
 ext_DB = '/home/bmr135/' # Work
@@ -102,6 +103,8 @@ TRILEGAL_C3, TRILEGAL_C6 = dat.TRILEGAL()
 C3 = dat.C3_cat()
 C6 = dat.C6_cat()
 GAP3, GAP6 = dat.K2_GAP()
+GAP3 = GAP3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
+GAP6 = GAP6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 Yvonne_C3, Yvonne_C6, Yvonne_EC6, Yvonne_EC3 = dat.Yvonne()
 Savita_C3, Savita_C6, Savita_EC3, Savita_EC6 = dat.Savita()
 Benoit_C3, Benoit_C6, Everest_C3, Everest_C6 = dat.Benoit()
@@ -116,58 +119,63 @@ print( "All files in")
 GAP6 = dat.n_epics(GAP6,oc)
 
 ''' Preparing GAP for probability detections '''
-# GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
-# GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
-# GAP3['fomag'] = GAP3['mass'] * GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
-# GAP3['Lumog'] = GAP3['Rgaia']**2 * (GAP3['Teff']/const.solar_Teff)**4
-# GAP3_v2 = GAP3[GAP3['foma'] < 280]
-# GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
-# GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
-# GAP3_v2 = GAP3_v2.reset_index(drop=True)
-# GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
-# GAP3_v3 = GAP3[GAP3['fomag'] < 280]
-# GAP3_v3 = GAP3_v3[GAP3_v3['fomag'] > 10]
-# GAP3_v3 = GAP3_v3[GAP3_v3['imag'] > 0.0]
-# GAP3_v3 = GAP3_v3.reset_index(drop=True)
-# GAP3_v3 = prop.det_prob_GAP_gaia(GAP3_v3,'fomag',3090,135.1)
-# # GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
-# # GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob_gaia',index=False)
-#
-# GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
-# GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
-# GAP6['fomag'] = GAP6['mass'] * GAP6['Rgaia']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
-# GAP6['Lumog'] = GAP6['Rgaia']**2 * (GAP6['Teff']/const.solar_Teff)**4
-# GAP6_v2 = GAP6[GAP6['foma'] < 280]
-# GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
-# GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
-# GAP6_v2 = GAP6_v2.reset_index(drop=True)
-# GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
-# GAP6_v3 = GAP6[GAP6['fomag'] < 280]
-# GAP6_v3 = GAP6_v3[GAP6_v3['fomag'] > 10]
-# GAP6_v3 = GAP6_v3[GAP6_v3['imag'] > 0.0]
-# GAP6_v3 = GAP6_v3.reset_index(drop=True)
-# GAP6_v3 = prop.det_prob_GAP(GAP6_v3,'fomag',3090,135.1)
-# # GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
-# # GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob_gaia',index=False)
-# K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
-# K2_camp = K2_camp.reset_index(drop=True)
-# K2_camp_v2 = pd.concat([GAP3_v2,GAP6_v2],ignore_index=True)
-# K2_camp_v2 = K2_camp_v2.reset_index(drop=True)
-# K2_camp_v3 = pd.concat([GAP3_v3,GAP6_v3],ignore_index=True)
-# K2_camp_v3 = K2_camp_v3.reset_index(drop=True)
+GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
+GAP3['fomag'] = GAP3['mass'] * GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+GAP3['Lumog'] = GAP3['Rgaia']**2 * (GAP3['Teff']/const.solar_Teff)**4
+GAP3_v2 = GAP3[GAP3['foma'] < 280]
+GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
+GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
+GAP3_v2 = GAP3_v2.reset_index(drop=True)
+GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
+GAP3_v3 = GAP3[GAP3['fomag'] < 280]
+GAP3_v3 = GAP3_v3[GAP3_v3['fomag'] > 10]
+GAP3_v3 = GAP3_v3[GAP3_v3['imag'] > 0.0]
+GAP3_v3 = GAP3_v3.reset_index(drop=True)
+GAP3_v3 = prop.det_prob_GAP_gaia(GAP3_v3,'fomag',3090,135.1)
+# GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
+# GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob_gaia',index=False)
 
-# fig,ax = plt.subplots()
-# a = np.where(K2_camp_v2['prob_s'] >= 0.95)
-# b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
-# ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
-# ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'EPIC Rad.')
-# ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'Rad. from Gaia')
-# ax.set_xlabel(r'J - K',fontsize=15)
-# ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
-# ax.invert_yaxis()
-# ax.legend()
-# # plt.show()
-#
+GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
+GAP6['fomag'] = GAP6['mass'] * GAP6['Rgaia']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['Lumog'] = GAP6['Rgaia']**2 * (GAP6['Teff']/const.solar_Teff)**4
+GAP6_v2 = GAP6[GAP6['foma'] < 280]
+GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
+GAP6_v2 = GAP6_v2[GAP6_v2['imag'] > 0.0]
+GAP6_v2 = GAP6_v2.reset_index(drop=True)
+GAP6_v2 = prop.det_prob_GAP(GAP6_v2,'foma',3090,135.1)
+GAP6_v3 = GAP6[GAP6['fomag'] < 280]
+GAP6_v3 = GAP6_v3[GAP6_v3['fomag'] > 10]
+GAP6_v3 = GAP6_v3[GAP6_v3['imag'] > 0.0]
+GAP6_v3 = GAP6_v3.reset_index(drop=True)
+GAP6_v3 = prop.det_prob_GAP(GAP6_v3,'fomag',3090,135.1)
+# GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
+# GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob_gaia',index=False)
+K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
+K2_camp = K2_camp.reset_index(drop=True)
+K2_camp_v2 = pd.concat([GAP3_v2,GAP6_v2],ignore_index=True)
+K2_camp_v2 = K2_camp_v2.reset_index(drop=True)
+K2_camp_v3 = pd.concat([GAP3_v3,GAP6_v3],ignore_index=True)
+K2_camp_v3 = K2_camp_v3.reset_index(drop=True)
+K2_camp_v3[['EPIC','Rgaia','radius_val','Kabs','glogg']].to_csv(ext_DB+'K2_Poles/Mass_Distr_In/K2_det_prob_gaia',index=False)
+
+
+fig,ax = plt.subplots()
+a = np.where(K2_camp_v2['prob_s'] >= 0.95)
+b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
+ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
+ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
+ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
+ax.set_xlabel(r'J - K',fontsize=15)
+ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+ax.set_xlim(0.475,1.325)
+ax.invert_yaxis()
+ax.legend(loc=4)
+plt.show()
+fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
+sys.exit()
+
 # bins = [np.linspace(min(K2_camp['mass']),max(K2_camp['mass']),50), \
 #         np.linspace(min(K2_camp['Radius']),25,50), \
 #         np.linspace(min(K2_camp['Teff']),max(K2_camp['Teff']),50), \
@@ -384,6 +392,44 @@ camp6_0 = camp6_0.fillna(value='NaN',method=None)
 cols = ['EPIC','RA','Dec','Teff','[Fe/H]','slogg','logg','radius','radius_val']
 K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
 K2_camp = K2_camp.reset_index(drop=True)
+
+K2_camp_v2 = pd.concat([camp3_0,camp6_0],ignore_index=True)
+K2_camp_v3 = pd.merge(K2_camp_v3,K2_camp_v2[['EPIC']],how='inner',on=['EPIC'])
+
+fig,ax = plt.subplots()
+a = np.where(K2_camp_v2['prob_s'] >= 0.95)
+b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
+ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
+ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
+ax.set_xlabel(r'J - K',fontsize=15)
+ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+ax.set_xlim(0.475,1.325)
+ax.invert_yaxis()
+ax.legend()
+# plt.show()
+f = plt.figure()
+plt.hist(K2_camp_v3['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'R$_{Gaia}$',normed=True,linewidth=2)
+plt.hist(K2_camp_v2['radius'],bins=np.linspace(0,20,50),histtype='step',label=r'R$_{seismo}$',normed=True,linewidth=2)
+plt.xlim(3.5,18)
+plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
+plt.legend(prop={'size':10})
+plt.show()
+sys.exit()
+
+fig,ax = plt.subplots()
+a = np.where(K2_camp_v2['prob_s'] >= 0.95)
+b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
+ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
+ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
+ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
+ax.set_xlabel(r'J - K',fontsize=15)
+ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+ax.invert_yaxis()
+ax.legend()
+plt.show()
+fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
+sys.exit()
+
 # K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
 # camp3_0.to_csv('/home/bmr135/Desktop/C3_gaia',columns=cols,index=False)
 # camp6_0.to_csv('/home/bmr135/Desktop/C6_gaia',columns=cols,index=False)
@@ -696,13 +742,13 @@ sys.exit()
 ''' Save out combined data sets to be processed for use with PARAM '''
 # camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y")+'.csv',index=False)
 # camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',index=False)
-RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+# RC3.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # RC6.to_csv(ext_GA+'GA/K2Poles/matlab_in/RC6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP6_RAVE_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+# AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+# AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP6_RAVE_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 sys.exit()
 
 ''' Check length of data sets '''

@@ -81,10 +81,10 @@ def uncert(parameter, data):
                     df[sig].iloc[i] = max(U.iloc[i],L.iloc[i])
                 else:
                     df[sig].iloc[i] = (df[up].iloc[i]-df[lo].iloc[i])/2
+            df = df.drop_duplicates(subset=['#Id']).reset_index(drop=True)
             data[j] = df
 
     return data
-
 
 def sig_cut(data, param, cut, upper_lim):
     '''
@@ -98,6 +98,21 @@ def sig_cut(data, param, cut, upper_lim):
         df = df[df[param] < upper_lim]
         df = df[(df['sig_'+param]/df[param]) < cut]
         df.reset_index(drop=True)
+        data[i] = df
+    return data
+
+def gaiaCut(data,gaia):
+    '''
+    Make cut in the data due to gaia sample passing detection probability test.
+    data: data frame to which the cut is applied
+    gaia: gaia input file containing the inputs to be crossmatched against
+    '''
+    for i in range(len(data)):
+        df = data[i]
+        df = df.drop_duplicates(subset=['#Id']).reset_index(drop=True)
+        df = pd.merge(df,gaia,how='inner',on=['#Id'])
+        df = df.reset_index(drop=True)
+        df = df.drop_duplicates(subset=['#Id']).reset_index(drop=True)
         data[i] = df
     return data
 

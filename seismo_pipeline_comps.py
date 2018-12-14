@@ -18,6 +18,7 @@ import sys
 
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
+matplotlib.rcParams["font.family"] = "serif"
 
 ''' Import and organise data '''
 
@@ -30,11 +31,17 @@ Savita_C3, Savita_C6, Savita_EC3, Savita_EC6 = dat.Savita()
 Benoit_C3, Benoit_C6, Everest_C3, Everest_C6 = dat.Benoit()
 
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
+YC3 = YC3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 YC6 = pd.merge(Yvonne_C6,GAP6,how='inner',on=['EPIC'])
+YC6 = YC6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 SC3 = pd.merge(Savita_C3,GAP3,how='inner',on=['EPIC'])
+SC3 = SC3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 SC6 = pd.merge(Savita_C6,GAP6,how='inner',on=['EPIC'])
+SC6 = SC6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 BC3 = pd.merge(Benoit_C3,GAP3,how='inner',on=['EPIC'])
+BC3 = BC3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 BC6 = pd.merge(Benoit_C6,GAP6,how='inner',on=['EPIC'])
+BC6 = BC6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
 ''' Number of stars unique ot each pipeline '''
 # prop.individ(YC3,BC3,SC3)
@@ -50,11 +57,17 @@ BC6['slogg'] = np.log10(27400*(BC6['Bnumax']/3104)*np.sqrt(BC6['Teff']/5777))
 
 ''' Combining pipelines for overlaps '''
 YS_C3 = pd.merge(SC3,YC3,how='inner',on=['EPIC'])
+YS_C3 = YS_C3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 YS_C6 = pd.merge(SC6,YC6,how='inner',on=['EPIC'])
+YS_C6 = YS_C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 YB_C3 = pd.merge(BC3,YC3,how='inner',on=['EPIC'])
+YB_C3 = YB_C3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 YB_C6 = pd.merge(BC6,YC6,how='inner',on=['EPIC'])
+YB_C6 = YB_C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 BS_C3 = pd.merge(BC3,SC3,how='inner',on=['EPIC'])
+BS_C3 = BS_C3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 BS_C6 = pd.merge(BC6,SC6,how='inner',on=['EPIC'])
+BS_C6 = BS_C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
 
 ''' numax histrograms - C3 and then C6 '''
@@ -332,15 +345,14 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     gs = gridspec.GridSpec(1, 2, width_ratios=[4,1])
 
     ax1 = fig.add_subplot(gs[0])
-
     ax1.scatter(df[params[0]], df['Diff'], s=25, facecolors='none', edgecolors='b', label='__nolegend__',alpha=0.5)
-    ax1.set_ylabel(r'('+labels[0]+r' - '+labels[1]+r')/$\sigma_{comb.}$ ',fontsize=20,labelpad=10)
-    ax1.set_xlabel(labels[0]+r', '+seismo+r' [$\mu$Hz]',fontsize=20, labelpad=10)
+    ax1.set_ylabel(r'('+labels[0]+r' - '+labels[1]+r')/$\sigma_{comb.}$ ',fontsize=15,labelpad=10)
+    ax1.set_xlabel(labels[0]+r', '+seismo+r' [$\mu$Hz]',fontsize=15, labelpad=10)
     ax1.plot([0,(max(df[params[0]])+1)],[mu,mu],color='k',linewidth=2,label=r'$\mu$: %.5s'%(mu))
     # ax1.plot([0,(max(df[params[0]])+1)],[mu+std,mu+std],color='r',linewidth=2,alpha=0.25,label=r'$\sigma$: %.5s'%(std))
     # ax1.plot([0,(max(df[params[0]])+1)],[mu-std,mu-std],color='r',linewidth=2,alpha=0.25,label='__nolegend__')
     ax1.fill_between([0,(max(df[params[0]])+1)],(mu-std),(mu+std),facecolor='grey', alpha=0.25,label=r'$\sigma$: %.5s'%(std))
-    ax1.tick_params(labelsize=15)
+    ax1.tick_params(labelsize=10)
     ax1.set_xlim(0,(max(df[params[0]])+1))
     ax1.set_ylim([-5,5])
     # ax1.plot([0,(max(df[params[0]])+1)],[0,0], 'k--',label='__nolegend__')
@@ -357,15 +369,16 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     ax2.plot(ref,x,'k--',linewidth=2,label='N(0,1)')
     ax2.set_ylim([-5,5])
     ax2.set_xticks([])
-    ax2.set_xlabel('PDF',fontsize=20)
+    ax2.set_xlabel('PDF',fontsize=15)
     ax2.legend(prop={'size':10})
-    ax2.tick_params(labelsize=15)
+    ax2.tick_params(labelsize=10)
     plt.setp(ax2.get_yticklabels(), visible=False)
     fig.subplots_adjust(wspace=0.0)
     plt.tight_layout()
-    # plt.savefig('/home/bmr135/seismo_comp/C3_'+labels[0]+'_'+labels[1]+'_dnu.png')
+    # sys.exit()
+    plt.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/seismo_comp/C6_'+labels[0]+'_'+labels[1]+'_dnu.png')
     df = df[df[params[0]]>7.5]
-    df[['EPIC',params[0],uncerts[0],params[1],uncerts[1]]].to_csv('/home/bmr135/seismo_comp/C6_'+labels[0]+'_'+labels[1]+'_dnu.txt',index=False)
+    # df[['EPIC',params[0],uncerts[0],params[1],uncerts[1]]].to_csv('/home/bmr135/seismo_comp/C6_'+labels[0]+'_'+labels[1]+'_dnu.txt',index=False)
     # plt.show()
     # sys.exit()
 

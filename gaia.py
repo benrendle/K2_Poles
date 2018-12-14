@@ -12,8 +12,9 @@ import abj2016
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
 
-df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/CoRoGEE_x_gaiadr2.csv')
-df1 = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+# df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/CoRoGEE_x_gaiadr2.csv')
+df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv')
+df1 = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Normal/Nov_2018/AS_281118')
 df2 = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/K2_Gaia_x_gaiadr2.csv')
 G3 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/GAP3')
 G6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/GAP6')
@@ -21,6 +22,9 @@ G6 = pd.read_csv('/home/bmr135/Dropbox/K2Poles/GAP6')
 # C3s.rename(columns={'#Id':'EPIC'},inplace=True)
 # C6s = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Normal/C6_07092018')
 # C6s.rename(columns={'#Id':'EPIC'},inplace=True)
+
+df1 = pd.merge(df1,df[['EPIC','parallax','parallax_error']],how='inner',on=['EPIC'])
+df1 = df1.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
 ''' Convert parallax to distance using the Astraatmadja and Bailer-Jones 2016 method - results in kpc '''
 # df['dist_G'] = 0.0
@@ -32,7 +36,12 @@ df1['sig_dist_G'] = 0.0
 # for i in range(len(df)):
 #     df['dist_G'].iloc[i] = abj2016.distpdf(df['parallax'].iloc[i], df['parallax_error'].iloc[i]).modedist   # Initiates the distpdf object
 #     df['sig_dist_G'].iloc[i] = abj2016.distpdf(df['parallax'].iloc[i], df['parallax_error'].iloc[i]).diststd   # Initiates the distpdf object
+
 for i in range(len(df1)):
+    if df1['EPIC'].iloc[i] < 207000000:
+        df1['parallax'].iloc[i] = df1['parallax'].iloc[i] - 0.0018
+    else: df1['parallax'].iloc[i] = df1['parallax'].iloc[i] - 0.01594
+
     df1['dist_G'].iloc[i] = abj2016.distpdf(df1['parallax'].iloc[i], df1['parallax_error'].iloc[i]).modedist   # Initiates the distpdf object
     df1['sig_dist_G'].iloc[i] = abj2016.distpdf(df1['parallax'].iloc[i], df1['parallax_error'].iloc[i]).diststd   # Initiates the distpdf object
 # for i in range(len(df2)):
@@ -40,7 +49,7 @@ for i in range(len(df1)):
 #     df2['sig_dist_G'].iloc[i] = abj2016.distpdf(df2['parallax'].iloc[i], df2['parallax_error'].iloc[i]).diststd   # Initiates the distpdf object
 #
 # df.to_csv('/home/ben/K2_Poles/Mass_Distr_In/CoRoGEE_x_gaiadr2.csv',index=False)
-df1.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_x_gaiadr2.csv',index=False)
+# df1.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/AS_x_gaiadr2.csv',index=False)
 # df2.to_csv('/home/ben/K2_Poles/Mass_Distr_In/Gaia/K2_Gaia_x_gaiadr2.csv',index=False)
 sys.exit()
 

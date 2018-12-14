@@ -184,9 +184,8 @@ def K2_GAP():
     # g2.to_csv('input.sample.all', header=None, sep=r' ', index=False)
     # p = subprocess.Popen(['./bcall'])
     # p.wait()
-    # p = subprocess.Popen(["mv", "output.file.all", "/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv"])
+    # p = subprocess.Popen(["mv", "output.file.all", "/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/BCs_6.csv"])
     # p.wait()
-    #
     # BC = pd.read_table('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BCs.csv', sep=r'\s+', header=0)
     # BC = BC[['ID', 'BC_1', 'BC_2']]
     # BC = BC.rename(columns={'ID':'EPIC','BC_1':'BC_K','BC_2':'BC_G'})
@@ -197,14 +196,17 @@ def K2_GAP():
     # sys.exit()
     ''' Computation of radii from Gaia '''
     # GAP3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP3')
+    # GAP3 = GAP3.drop(columns=['Rgaia','radius_val','Kabs','glogg'])
     # GAP6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/GAP6')
+    # GAP6 = GAP6.drop(columns=['Rgaia','radius_val','Kabs','glogg'])
     # df = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/GAP_Gaia_BC_full.csv')
     # df['Kabs'] = df['Kmag'] - 5*np.log10((df['dist_ABJ']*1000)/10)
     # # print(df.columns.values)
     # T = (5777/df['Teff'])**4 # Temperature term
     # Mm = (4.75-df['BC_K']-df['Kabs']-df['A_K'])/2.5 # Magnitude term including bolometric correction and extinction
     # df['Rgaia'] = np.sqrt(T * 10**(Mm))
-    # # print(df['Rgaia'])
+    # df = df.dropna(subset=['Rgaia'])
+    # df = df.reset_index(drop=True)
     # GAP3 = pd.merge(GAP3,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
     # GAP3['glogg'] = np.log10((const.G * GAP3['mass']*const.solar_mass)/((GAP3['Rgaia']*const.solar_radius)**2))
     # GAP6 = pd.merge(GAP6,df[['EPIC','Rgaia','radius_val','Kabs']],on=['EPIC'])
