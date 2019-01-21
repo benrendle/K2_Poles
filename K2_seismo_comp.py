@@ -161,20 +161,22 @@ K2_camp_v3 = K2_camp_v3.reset_index(drop=True)
 K2_camp_v3[['EPIC','Rgaia','radius_val','Kabs','glogg']].to_csv(ext_DB+'K2_Poles/Mass_Distr_In/K2_det_prob_gaia',index=False)
 
 
-fig,ax = plt.subplots()
-a = np.where(K2_camp_v2['prob_s'] >= 0.95)
-b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
-ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
-ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
-ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
-ax.set_xlabel(r'J - K',fontsize=15)
-ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
-ax.set_xlim(0.475,1.325)
-ax.invert_yaxis()
-ax.legend(loc=4)
-plt.show()
-fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
-sys.exit()
+
+
+# fig,ax = plt.subplots()
+# a = np.where(K2_camp_v2['prob_s'] >= 0.95)
+# b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
+# ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
+# ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
+# ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
+# ax.set_xlabel(r'J - K',fontsize=15)
+# ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+# ax.set_xlim(0.475,1.325)
+# ax.invert_yaxis()
+# ax.legend(loc=4)
+# # plt.show()
+# fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
+# sys.exit()
 
 # bins = [np.linspace(min(K2_camp['mass']),max(K2_camp['mass']),50), \
 #         np.linspace(min(K2_camp['Radius']),25,50), \
@@ -187,6 +189,9 @@ sys.exit()
 # GAP3_v2.to_csv('/home/ben/Desktop/C3_GAP_Gaia',columns=cols,index=False)
 # GAP6_v2.to_csv('/home/ben/Desktop/C6_GAP_Gaia',columns=cols,index=False)
 # sys.exit()
+
+GAP3 = GAP3_v3
+GAP6 = GAP6_v3
 
 ''' Merge data with GAP target lists '''
 YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
@@ -206,6 +211,79 @@ AC3 = pd.merge(APO3,GAP3,how='inner',on=['EPIC'])
 AC6 = pd.merge(APO6,GAP6,how='inner',on=['EPIC'])
 # LC3 = pd.merge(LAMOST3,GAP3,how='inner',on=['EPIC'])
 # LC6 = pd.merge(LAMOST6,GAP6,how='inner',on=['EPIC'])
+
+
+''' Complete asteroseismic lists '''
+camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
+camp3_0 = camp3_0.drop_duplicates(subset=['EPIC'])
+camp3_0 = camp3_0.reset_index(drop=True)
+camp3_0 = camp3_0.fillna(value='NaN',method=None)
+
+camp6_0 = pd.concat([YC6,SC6,BC6],ignore_index=True)
+camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
+camp6_0 = camp6_0.reset_index(drop=True)
+camp6_0 = camp6_0.fillna(value='NaN',method=None)
+
+C3R = pd.merge(camp3_0[['EPIC']],GAP3_v2,how='inner',on=['EPIC'])
+C3Rg = pd.merge(camp3_0[['EPIC']],GAP3_v3,how='inner',on=['EPIC'])
+C6R = pd.merge(camp6_0[['EPIC']],GAP6_v2,how='inner',on=['EPIC'])
+C6Rg = pd.merge(camp6_0[['EPIC']],GAP6_v3,how='inner',on=['EPIC'])
+
+fig,((ax,ax1),(ax4,ax5),(ax2,ax3),(ax6,ax7)) = plt.subplots(4,2,figsize=(8,10))
+ax.hist(GAP3_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
+ax.hist(C3R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
+ax.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+ax.set_ylabel(r'C3',fontsize=15)
+ax.set_xlim(2.5,19.)
+ax.set_title(r'With R$_{\rm{EPIC}}$',fontsize=15)
+ax.legend()
+
+ax4.hist(GAP3_v2['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, EPIC')
+ax4.hist(C3R['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual')
+ax4.set_xlabel(r'H',fontsize=15)
+ax4.set_ylabel(r'C3',fontsize=15)
+ax4.set_xlim(7.,12.)
+
+
+ax2.hist(GAP6_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, EPIC')
+ax2.hist(C6R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual')
+ax2.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+ax2.set_ylabel(r'C6',fontsize=15)
+ax2.set_xlim(2.5,19.)
+ax2.set_ylabel(r'C6')
+
+ax6.hist(GAP6_v2['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
+ax6.hist(C6R['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
+ax6.set_xlabel(r'V$_{cut}$',fontsize=15)
+ax6.set_ylabel(r'C6',fontsize=15)
+ax6.set_xlim(9.,15.)
+
+
+ax1.hist(GAP3_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
+ax1.hist(C3Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
+ax1.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+ax1.set_xlim(2.5,19.)
+ax1.set_title(r'With R$_{\rm{Gaia}}$',fontsize=15)
+ax1.legend()
+
+ax5.hist(GAP3_v3['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, Gaia',color='r')
+ax5.hist(C3Rg['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual',color='k')
+ax5.set_xlabel(r'H',fontsize=15)
+ax5.set_xlim(7.,12.)
+
+ax3.hist(GAP6_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, Gaia',color='r')
+ax3.hist(C6Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual',color='k')
+ax3.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+ax3.set_xlim(2.5,19.)
+
+ax7.hist(GAP6_v3['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
+ax7.hist(C6Rg['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
+ax7.set_xlabel(r'V$_{cut}$',fontsize=15)
+ax7.set_xlim(9.,15.)
+plt.tight_layout()
+
+plt.show()
+sys.exit()
 
 ''' Data processing and parameter calculation '''
 seismo_list = [YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6]
@@ -413,8 +491,8 @@ plt.hist(K2_camp_v2['radius'],bins=np.linspace(0,20,50),histtype='step',label=r'
 plt.xlim(3.5,18)
 plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
 plt.legend(prop={'size':10})
-plt.show()
-sys.exit()
+# plt.show()
+# sys.exit()
 
 fig,ax = plt.subplots()
 a = np.where(K2_camp_v2['prob_s'] >= 0.95)
@@ -426,16 +504,21 @@ ax.set_xlabel(r'J - K',fontsize=15)
 ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
 ax.invert_yaxis()
 ax.legend()
-plt.show()
-fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
-sys.exit()
+# plt.show()
+# fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
+# sys.exit()
 
 # K2_camp.to_csv('/home/ben/Desktop/GAP_Gaia',columns=cols,index=False)
 # camp3_0.to_csv('/home/bmr135/Desktop/C3_gaia',columns=cols,index=False)
 # camp6_0.to_csv('/home/bmr135/Desktop/C6_gaia',columns=cols,index=False)
-print('GAP lenghts:',len(GAP3),len(GAP6))
-print('Full seismic:',len(camp3_0),len(camp6_0))
 
+# K2_v3 = pd.merge(K2_camp_v3,camp3_0[['EPIC']],how='inner',on=['EPIC'])
+# K2_v6 = pd.merge(K2_camp_v3,camp6_0[['EPIC']],how='inner',on=['EPIC'])
+#
+# print('Seismic cross with GAP',len(K2_v3),len(K2_v6))
+print('GAP lengths:',len(GAP3_v3),len(GAP6_v3))
+print('Full seismic:',len(camp3_0),len(camp6_0))
+# sys.exit()
 
 ''' Complete spectroscopic lists '''
 spec3_0 = pd.concat([AP3,RAVE3,GES],ignore_index=True)
@@ -629,6 +712,18 @@ camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 
 print('C3/C6 lengths:',len(camp3),len(camp6))
 
+Luca = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/SM_Gaia_BC_full.csv')
+a = Luca[Luca['#Id'] < 208000000]
+b = Luca[Luca['#Id'] > 208000000]
+print(len(a),len(b))
+Luca = Luca.rename(columns={'#Id':'EPIC'})
+
+
+a = pd.merge(Luca,camp3,how='inner',on=['EPIC'])
+b = pd.merge(Luca,camp6,how='inner',on=['EPIC'])
+print('C3/C6 Luca cross:',len(a),len(b))
+# sys.exit()
+
 ''' Data Flag for EPIC parametric values - which [Fe/H] to use? '''
 # spectro_EPICS_3 = camp3[camp3['stpropflag'] != 'rpm']
 # spectro_EPICS_6 = camp6[camp6['stpropflag'] != 'rpm']
@@ -714,17 +809,30 @@ AP6 = pd.merge(APO6,camp6[cols_to_use],how='inner',on=['EPIC'])
 AP6['slogg_spec'] = np.log10(const.solar_g * (AP6['NUMAX'].astype('float64')/3090.) * np.sqrt(AP6['TEFF'].astype('float64')/const.solar_Teff))
 print("APOGEE: ", len(AP3), len(AP6))
 
+''' Complete spectroscopic lists '''
+spec3 = pd.concat([AP3,RC3,GES],ignore_index=True)
+spec3 = spec3.drop_duplicates(subset=['EPIC'])
+spec3 = spec3.reset_index(drop=True)
+spec3 = spec3.fillna(value='NaN',method=None)
+
+spec6 = pd.concat([AP6,RC6,L6],ignore_index=True)
+spec6 = spec6.drop_duplicates(subset=['EPIC'])
+spec6 = spec6.reset_index(drop=True)
+spec6 = spec6.fillna(value='NaN',method=None)
+
+print('C3/C6 Spec. lengths:',len(spec3),len(spec6))
+
 ''' Spectroscopic Sample Overlaps '''
-# print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
-# print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
-# print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
-# print(len(pd.merge(RC3,L3,how='inner',on=['EPIC'])))
-# print(len(pd.merge(GES,L3,how='inner',on=['EPIC'])))
-# print(len(pd.merge((pd.merge(GES,RC3,how='inner',on=['EPIC'])),AP3,how='inner',on=['EPIC'])))
-#
-# print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
-# print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
-# print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
+print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
+print(len(pd.merge(AP3,RC3,how='inner',on=['EPIC'])))
+print(len(pd.merge(AP3,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge(RC3,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge(GES,L3,how='inner',on=['EPIC'])))
+print(len(pd.merge((pd.merge(GES,RC3,how='inner',on=['EPIC'])),AP3,how='inner',on=['EPIC'])))
+
+print(len(pd.merge(AP6,RC6,how='inner',on=['EPIC'])))
+print(len(pd.merge(L6,AP6,how='inner',on=['EPIC'])))
+print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
 
 ''' Merge of LAMOST and RAVE '''
 # cols_to_use = RC6.columns.difference(L6.columns)
@@ -738,7 +846,7 @@ AP6 = prop.alt_spec_params(AP6,0,'RAVE',['TEFF','LOGG','FE_H'],['TEFF_ERR','LOGG
 AP3 = prop.alt_spec_params(AP3,1,'GES',['TEFF','LOGG','FE_H'],['TEFF_ERR','LOGG_ERR','FE_H_ERR'])
 RC3 = prop.alt_spec_params(RC3,1,'GES',['Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'],['sig_Teff','sig_logg','sig_feh'])
 
-sys.exit()
+# sys.exit()
 ''' Save out combined data sets to be processed for use with PARAM '''
 # camp3.to_csv(ext_GA+'GA/K2Poles/matlab_in/C3_'+time.strftime("%d%m%Y")+'.csv',index=False)
 # camp6.to_csv(ext_GA+'GA/K2Poles/matlab_in/C6_'+time.strftime("%d%m%Y")+'.csv',index=False)
@@ -749,7 +857,7 @@ sys.exit()
 # L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP6_RAVE_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-sys.exit()
+# sys.exit()
 
 ''' Check length of data sets '''
 # print( len(BC3), len(YC3), len(SC3), len(BC6), len(YC6), len(SC6))
@@ -1198,60 +1306,60 @@ print( "Processing Complete")
 # TRILEGAL_C6 = TRILEGAL_C6[TRILEGAL_C6.Radius < 8.0]
 # camp6 = camp6[camp6.radius < 8.0]
 #
-plt.figure()
-plt.subplot(2,2,1)
-hist1, xb1, yb1, im1 = plt.hist2d(BC3['JK'],BC3['Hmag'],bins=49,cmap=colormaps.parula)#,normed=True)
-cbar = plt.colorbar()
-cbar.set_label(r'Number', rotation=270, fontsize=20, labelpad=25)
-cbar.ax.tick_params(labelsize=20)
-plt.ylabel(r'H',fontsize=20, labelpad=20)
-plt.ylim(max(BC3['Hmag']),min(BC3['Hmag']))
-plt.xlim(min(BC3['JK']),max(BC3['JK']))
-plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
-plt.title(r'Benoit C3',fontsize=20)
-plt.tick_params(labelsize=15)
-# plt.tight_layout()
-
-plt.subplot(2,2,2)
-hist2, xb2, yb2, im2 = plt.hist2d(camp3['JK'],camp3['Hmag'],bins=[xb1,yb1],cmap=colormaps.parula)#,normed=True)
-cbar = plt.colorbar()
-cbar.set_label(r'Number', rotation=270, fontsize=20, labelpad=25)
-cbar.ax.tick_params(labelsize=20)
-plt.ylabel(r'H',fontsize=20, labelpad=20)
-plt.ylim(max(yb1),min(yb1))
-plt.xlim(min(xb1),max(xb1))
-# plt.ylim(max(TRILEGAL_C6['Vmag']),min(TRILEGAL_C6['Vmag']))
-# plt.xlim(min(TRILEGAL_C6['JK']),max(TRILEGAL_C6['JK']))
-plt.xlabel(r'J-K',fontsize=20, labelpad=10)
-plt.title(r'C3 Multi det',fontsize=20)
-plt.tick_params(labelsize=15)
-# plt.tight_layout()
-
-hist = hist2-hist1
-# hist = np.zeros((49,49))
-# print(hist.item(0))
-# h = 49**2
-# hist = [[(1 - hist2[i][j]/hist1[i][j])*100 for j in np.arange(49)] for i in np.arange(49)]
-# print(np.divide(hist1,hist2))
-# np.savetxt('/home/bmr165/GA/K2Poles/hist.txt',hist)
 # plt.figure()
-plt.subplot(2,2,3)
-plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspect='auto')
-cbar = plt.colorbar()
-cbar.set_label(r'$N_{\rm{obs}} - N_{\rm{sim}}$', rotation=270, fontsize=20, labelpad=25)
-cbar.ax.tick_params(labelsize=20)
-plt.ylabel(r'H',fontsize=20, labelpad=20)
-plt.xlabel(r'J-K',fontsize=20, labelpad=10)
-plt.title(r'Multi det - Benoit (C3)',fontsize=20)
-plt.tick_params(labelsize=15)
-
-plt.tight_layout()
-
-# a = np.sum(hist2)
-# b = np.sum(hist1)
-# c = np.float(b/a)*100
-# print( a, b, c)
-
+# plt.subplot(2,2,1)
+# hist1, xb1, yb1, im1 = plt.hist2d(BC3['JK'],BC3['Hmag'],bins=49,cmap=colormaps.parula)#,normed=True)
+# cbar = plt.colorbar()
+# cbar.set_label(r'Number', rotation=270, fontsize=20, labelpad=25)
+# cbar.ax.tick_params(labelsize=20)
+# plt.ylabel(r'H',fontsize=20, labelpad=20)
+# plt.ylim(max(BC3['Hmag']),min(BC3['Hmag']))
+# plt.xlim(min(BC3['JK']),max(BC3['JK']))
+# plt.xlabel(r'$\nu_{\rm{max}}$',fontsize=20, labelpad=10)
+# plt.title(r'Benoit C3',fontsize=20)
+# plt.tick_params(labelsize=15)
+# # plt.tight_layout()
+#
+# plt.subplot(2,2,2)
+# hist2, xb2, yb2, im2 = plt.hist2d(camp3['JK'],camp3['Hmag'],bins=[xb1,yb1],cmap=colormaps.parula)#,normed=True)
+# cbar = plt.colorbar()
+# cbar.set_label(r'Number', rotation=270, fontsize=20, labelpad=25)
+# cbar.ax.tick_params(labelsize=20)
+# plt.ylabel(r'H',fontsize=20, labelpad=20)
+# plt.ylim(max(yb1),min(yb1))
+# plt.xlim(min(xb1),max(xb1))
+# # plt.ylim(max(TRILEGAL_C6['Vmag']),min(TRILEGAL_C6['Vmag']))
+# # plt.xlim(min(TRILEGAL_C6['JK']),max(TRILEGAL_C6['JK']))
+# plt.xlabel(r'J-K',fontsize=20, labelpad=10)
+# plt.title(r'C3 Multi det',fontsize=20)
+# plt.tick_params(labelsize=15)
+# # plt.tight_layout()
+#
+# hist = hist2-hist1
+# # hist = np.zeros((49,49))
+# # print(hist.item(0))
+# # h = 49**2
+# # hist = [[(1 - hist2[i][j]/hist1[i][j])*100 for j in np.arange(49)] for i in np.arange(49)]
+# # print(np.divide(hist1,hist2))
+# # np.savetxt('/home/bmr165/GA/K2Poles/hist.txt',hist)
+# # plt.figure()
+# plt.subplot(2,2,3)
+# plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspect='auto')
+# cbar = plt.colorbar()
+# cbar.set_label(r'$N_{\rm{obs}} - N_{\rm{sim}}$', rotation=270, fontsize=20, labelpad=25)
+# cbar.ax.tick_params(labelsize=20)
+# plt.ylabel(r'H',fontsize=20, labelpad=20)
+# plt.xlabel(r'J-K',fontsize=20, labelpad=10)
+# plt.title(r'Multi det - Benoit (C3)',fontsize=20)
+# plt.tick_params(labelsize=15)
+#
+# plt.tight_layout()
+#
+# # a = np.sum(hist2)
+# # b = np.sum(hist1)
+# # c = np.float(b/a)*100
+# # print( a, b, c)
+#
 # C3_over = pd.concat([C3_1,GAP3_1],ignore_index=True)
 # C3_over = C3_over.drop_duplicates(subset=['EPIC'],keep=False)
 # C3_over = C3_over.reset_index(drop=True)
@@ -1269,7 +1377,7 @@ plt.tight_layout()
 # plt.tight_layout()
 
 ''' Sky projection plot '''
-# plt.figure()
+plt.figure()
 # # plt.hist(C6_nospec['Grad']/1000,bins=75)
 # v9 = C6_nospec[C6_nospec['Vmag'] < 10]
 # v10 = C6_nospec[(C6_nospec['Vmag'] >= 10) & (C6_nospec['Vmag'] < 11)]
@@ -1284,8 +1392,10 @@ plt.tight_layout()
 # plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
 # plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
 # plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
-# plt.xlabel(r'RA')
-# plt.ylabel(r'DEC')
-# plt.legend()
+plt.scatter(TRILEGAL_C3['RA'],TRILEGAL_C3['Dec'],label=r'TRILEGAL C3',alpha=0.5)
+plt.scatter(camp3_0['RA'],camp3_0['Dec'],label=r'K2 C3',alpha=0.5)
+plt.xlabel(r'RA')
+plt.ylabel(r'DEC')
+plt.legend()
 
-# plt.show()
+plt.show()

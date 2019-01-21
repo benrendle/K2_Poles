@@ -45,6 +45,9 @@ def TRILEGAL():
     TRILEGAL_C6['Vcut'] = TRILEGAL_C6['Kmag'] + 2*(TRILEGAL_C6['JK']+0.14) + 0.382*np.exp(2*(TRILEGAL_C6['JK']-0.2))
     TRILEGAL_C6 = TRILEGAL_C6.dropna(axis=0)
 
+    # print(TRILEGAL_C3.columns.values)
+    # sys.exit()
+
     return TRILEGAL_C3, TRILEGAL_C6
 
 # def BESANCON():

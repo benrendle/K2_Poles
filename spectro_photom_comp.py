@@ -15,6 +15,7 @@ import os
 
 matplotlib.rcParams['xtick.direction'] = 'out'
 matplotlib.rcParams['ytick.direction'] = 'out'
+matplotlib.rcParams["font.family"] = "serif"
 
 def truncate(a,b):
     ''' Truncate datasets to find overlapping stars.
@@ -37,7 +38,7 @@ def truncate(a,b):
 
     return a,b
 
-def ransac_fit(df,df1,param,label,f):#,uncert):
+def ransac_fit(df,df1,param,label,f,ax,uncert):
     ''' Using RANSAC fitting algorithm to fit the trends observed between different
         spectroscopic pipelines.
 
@@ -48,20 +49,29 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
         - Uncertainty if applicable (string)
         - Axes labels (string)
         - f, factor to extend plot limits to in the x-axis (float)
+        - ax, subplot axes for plot to be associated with
     '''
     df['Diff'] = df[param[0]] - df1[param[1]]
     # df['sig'] = np.sqrt(df[uncert[0]]**2 + df1[uncert[1]]**2)
-    X = (df[param[0]])
+    X = (df1[param[1]])
     X = X.values.reshape(-1,1)
-    y = (df['Diff'])
-
+    # y = (df['Diff'])
+    y = (df[param[0]])
+    # print(df1.columns.values)
+    # sys.exit()
     ''' Fit line using all data '''
     lr = linear_model.LinearRegression()
     lr.fit(X, y)
 
     ''' Robustly fit linear model with RANSAC algorithm '''
+    # plt.figure()
+    ax.set_xlim(X.min()-f, X.max()+f)
+    # ax.set_xlabel(label[1])
+    # ax.set_ylabel(label[0])
+    # ax.scatter(X, y, color='yellowgreen', label='__nolegend__')
+    lw = 2
     a = np.zeros((1000,2))
-    b = np.zeros((1000,np.shape(df)[0])) # Size of inlier mask
+    b = np.zeros((1000,np.shape(df1)[0])) # Size of inlier mask
     for i in range(1000):
         ransac = linear_model.RANSACRegressor(min_samples=5)
         ransac.fit(X, y)
@@ -69,6 +79,7 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
         outlier_mask = np.logical_not(inlier_mask)
 
         ''' Predict data of estimated models '''
+        # z = np.arange(X.min()-f, X.max()+f, 0.01)
         line_X = np.arange(X.min()-f, X.max()+f, 0.01)#[:, np.newaxis]
         line_X = line_X.reshape(-1,1)
         line_y = lr.predict(line_X)
@@ -76,6 +87,10 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
         ''' Compare estimated coefficients '''
         a[i,0], a[i,1] = ransac.estimator_.coef_,ransac.estimator_.intercept_
         b[i,:] = inlier_mask
+        if i%10 == 0:
+            ax.plot(line_X, a[i,0]*line_X + a[i,1], color='k', linewidth=3, label='__nolegend__', alpha=0.01)
+            # plt.draw()
+            # plt.waitforbuttonpress(0.1)
 
     ''' Make inliers boolean and find optimal fit using the median of the data '''
     b = b.astype('bool')
@@ -98,23 +113,26 @@ def ransac_fit(df,df1,param,label,f):#,uncert):
     #     elif (df[param[0]].iloc[i] < d) & ((a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1]) < 0.):
     #         df1['corr'].iloc[i] = df1[param[1]].iloc[i] + (a[medIdx,0]*df[param[0]].iloc[i] + a[medIdx,1])
 
-    plt.figure()
+    # plt.figure()
     # plt.scatter(df[param[0]],df1['corr'])
-    plt.scatter(df[param[0]],df['corr']-df1[param[1]])
+    # plt.scatter(df[param[0]],df['corr']-df1[param[1]])
     ''' Plot the inliers, outliers and optimal fit to the data '''
-    plt.figure()
-    lw = 2
-    plt.plot(line_X, a[medIdx,0]*line_X + a[medIdx,1], color='k', linewidth=3, label=r'%.5s$*x$ + %.5s'%(a[medIdx,0],a[medIdx,1]), alpha=0.5)
-    plt.axhline(y=0., color='r', linestyle='-')
-    plt.axvline(x=d, color='r', linestyle='-')
-    # plt.errorbar(X, y, yerr=df['sig'], color='gold', marker='.', label='Outliers',fmt='o')
-    # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o')
-    plt.scatter(X, y, color='gold', label='Outliers')
-    plt.scatter(X[b[medIdx]], y[b[medIdx]], color='yellowgreen', label='Inliers')
-    plt.xlabel(label[0])
-    plt.ylabel(label[1])
-    plt.xlim(X.min()-f, X.max()+f)
-    plt.legend()
+    # plt.figure()
+    # lw = 2
+    ax.plot(line_X,line_X,color='r', linewidth=3,alpha=0.5,linestyle='--',label='__nolegend__')
+    ax.plot(line_X, a[medIdx,0]*line_X + a[medIdx,1], color='orange', linewidth=3, label=r'%.5s$*x$ + %.5s'%(a[medIdx,0],a[medIdx,1]))
+    # plt.axhline(y=0., color='r', linestyle='-')
+    # plt.axvline(x=d, color='r', linestyle='-')
+
+    ax.errorbar(X, y, xerr=df1[uncert[1]], yerr=df[uncert[0]], color='blue', marker='.', label='__nolegend__',fmt='o',alpha=0.25)
+
+    # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig_Teff'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o',alpha=0.5)
+    ax.scatter(X, y, color='blue', label='__nolegend__')
+    # plt.scatter(X[b[medIdx]], y[b[medIdx]], color='yellowgreen', label='Inliers')
+    # plt.xlabel(label[0])
+    # plt.ylabel(label[1])
+    # plt.xlim(X.min()-f, X.max()+f)
+    ax.legend(frameon=False)
     # plt.show()
     # df['outlier_flag'] = 1.
     # df['outlier_flag'][b[medIdx]] = 0.
@@ -145,6 +163,7 @@ if __name__ == "__main__":
 
     ''' Combine datasets prior to comparisons '''
     a = R3[R3['Teff_RAVE'] < 4400]
+    A3['FE_H_ERR'] = A3['FE_H_ERR']*20
     # print(a[['Teff_RAVE','logg']])
     R3 = R3[R3['Teff_RAVE'] > 4000]
     a3, ac3 = truncate(A3,C3)
@@ -158,8 +177,11 @@ if __name__ == "__main__":
     gr, rg = truncate(G,R3)
     ar, ra = truncate(A6,R6)
     al, la = truncate(A6,L6)
-    print(len(ag),len(gr),len(ar))
-    sys.exit()
+    # print(len(ag),len(gr),len(ar))
+    # print(A3['FE_H_ERR'])
+    # print(G.columns.values)
+    # print(R3.columns.values)
+    # sys.exit()
 
     # print(rg[['Teff_RAVE','logg_RAVE','logg','radius']])
     # print(gr[['TEFF','LOGG','logg','radius']])
@@ -167,75 +189,96 @@ if __name__ == "__main__":
 
     ''' Compare Teff, [Fe/H], logg of given datasets '''
 
-    ''' APOGEE vs EPIC - C3 '''
-    # ransac_fit(a3,ac3,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)#,['TEFF_ERR','sig_Teff'])
-    # ransac_fit(a3,ac3,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)#,['LOGG_ERR','sig_logg'])
-    # ransac_fit(a3,ac3,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)#,['FE_H_ERR','sig_feh'])
-    # plt.show()
-
-    ''' APOGEE vs EPIC - C6 '''
-    # ransac_fit(a6,ac6,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)
-    # ransac_fit(a6,ac6,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)
-    # ransac_fit(a6,ac6,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)
-    # plt.show()
-
-    ''' Gaia-ESO vs EPIC - C3 '''
-    # ransac_fit(g,gc,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - Gaia-ESO, C3',r'$\Delta(T_{\rm{eff}})_{GES-EPIC}$'],10)
-    # ransac_fit(g,gc,['LOGG','logg'],[r'log$_{10}$(g) - Gaia-ESO, C3',r'$\Delta($log$_{10}$(g)$)_{GES-EPIC}$'],0.1)
-    # ransac_fit(g,gc,['FEH','[Fe/H]'],[r'[Fe/H] - Gaia-ESO, C3',r'$\Delta($[Fe/H]$)_{GES-EPIC}$'],0.1)
-    # plt.show()
-
-    ''' RAVE vs EPIC - C3 '''
-    # ransac_fit(r3,rc3,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
-    # ransac_fit(r3,rc3,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
-    # ransac_fit(r3,rc3,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
-    # plt.show()
-
-    ''' RAVE vs EPIC - C6 '''
-    # ransac_fit(r6,rc6,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C6',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
-    # ransac_fit(r6,rc6,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C6',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
-    # ransac_fit(r6,rc6,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C6',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
-    # plt.show()
-
-    ''' LAMOST vs EPIC - C6 '''
-    # ransac_fit(l6,lc6,['teff_L','Teff'],[r'$T_{\rm{eff}}$ - LAMOST, C6',r'$\Delta(T_{\rm{eff}})_{LAMOST-EPIC}$'],10)
-    # ransac_fit(l6,lc6,['logg_L','logg'],[r'log$_{10}$(g) - LAMOST, C6',r'$\Delta($log$_{10}$(g)$)_{LAMOST-EPIC}$'],0.1)
-    # ransac_fit(l6,lc6,['feh_L','[Fe/H]'],[r'[Fe/H] - LAMOST, C6',r'$\Delta($[Fe/H]$)_{LAMOST-EPIC}$'],0.1)
-    # plt.show()
-
-    ''' APOGEE vs RAVE - C3 '''
-    # if len(ar3) > 2:
-    #     ransac_fit(ar3,ra3,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
-    #     plt.show()
-    #     ransac_fit(ar3,ra3,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
-    #     ransac_fit(ar3,ra3,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
-
-    ''' APOGEE vs RAVE - C6 '''
-    if len(ar) > 2:
-        # ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
-        # plt.show()
-        # ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
-        # plt.show()
-        ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
-        # plt.show()
+    # ''' APOGEE vs EPIC - C3 '''
+    # # ransac_fit(a3,ac3,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)#,['TEFF_ERR','sig_Teff'])
+    # # ransac_fit(a3,ac3,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)#,['LOGG_ERR','sig_logg'])
+    # # ransac_fit(a3,ac3,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)#,['FE_H_ERR','sig_feh'])
+    # # plt.show()
+    #
+    # ''' APOGEE vs EPIC - C6 '''
+    # # ransac_fit(a6,ac6,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-EPIC}$'],10)
+    # # ransac_fit(a6,ac6,['LOGG','logg'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-EPIC}$'],0.1)
+    # # ransac_fit(a6,ac6,['FE_H','[Fe/H]'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-EPIC}$'],0.1)
+    # # plt.show()
+    #
+    # ''' Gaia-ESO vs EPIC - C3 '''
+    # # ransac_fit(g,gc,['TEFF','Teff'],[r'$T_{\rm{eff}}$ - Gaia-ESO, C3',r'$\Delta(T_{\rm{eff}})_{GES-EPIC}$'],10)
+    # # ransac_fit(g,gc,['LOGG','logg'],[r'log$_{10}$(g) - Gaia-ESO, C3',r'$\Delta($log$_{10}$(g)$)_{GES-EPIC}$'],0.1)
+    # # ransac_fit(g,gc,['FEH','[Fe/H]'],[r'[Fe/H] - Gaia-ESO, C3',r'$\Delta($[Fe/H]$)_{GES-EPIC}$'],0.1)
+    # # plt.show()
+    #
+    # ''' RAVE vs EPIC - C3 '''
+    # # ransac_fit(r3,rc3,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
+    # # ransac_fit(r3,rc3,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
+    # # ransac_fit(r3,rc3,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
+    # # plt.show()
+    #
+    # ''' RAVE vs EPIC - C6 '''
+    # # ransac_fit(r6,rc6,['Teff_RAVE','Teff'],[r'$T_{\rm{eff}}$ - RAVE, C6',r'$\Delta(T_{\rm{eff}})_{RAVE-EPIC}$'],10)
+    # # ransac_fit(r6,rc6,['logg_RAVE','logg'],[r'log$_{10}$(g) - RAVE, C6',r'$\Delta($log$_{10}$(g)$)_{RAVE-EPIC}$'],0.1)
+    # # ransac_fit(r6,rc6,['[Fe/H]_RAVE','[Fe/H]'],[r'[Fe/H] - RAVE, C6',r'$\Delta($[Fe/H]$)_{RAVE-EPIC}$'],0.1)
+    # # plt.show()
+    #
+    # ''' LAMOST vs EPIC - C6 '''
+    # # ransac_fit(l6,lc6,['teff_L','Teff'],[r'$T_{\rm{eff}}$ - LAMOST, C6',r'$\Delta(T_{\rm{eff}})_{LAMOST-EPIC}$'],10)
+    # # ransac_fit(l6,lc6,['logg_L','logg'],[r'log$_{10}$(g) - LAMOST, C6',r'$\Delta($log$_{10}$(g)$)_{LAMOST-EPIC}$'],0.1)
+    # # ransac_fit(l6,lc6,['feh_L','[Fe/H]'],[r'[Fe/H] - LAMOST, C6',r'$\Delta($[Fe/H]$)_{LAMOST-EPIC}$'],0.1)
+    # # plt.show()
+    #
+    # ''' APOGEE vs RAVE - C3 '''
+    # # if len(ar3) > 10:
+    # #     print('wooo')
+    # #     ransac_fit(ar3,ra3,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+    # #     ransac_fit(ar3,ra3,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+    # #     ransac_fit(ar3,ra3,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
+    # # plt.show()
+    #
+    # ''' APOGEE vs RAVE - C6 '''
+    # # if len(ar) > 10:
+    # #     ransac_fit(ar,ra,['TEFF','Teff_RAVE'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-RAVE}$'],10)
+    # #     plt.show()
+    # #     sys.exit()
+    # #     ransac_fit(ar,ra,['LOGG','logg_RAVE'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-RAVE}$'],0.1)
+    # #     # plt.show()
+    # #     ransac_fit(ar,ra,['FE_H','[Fe/H]_RAVE'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-RAVE}$'],0.1)
+    # #     plt.show()
 
     ''' APOGEE vs Gaia-ESO - C3 '''
-    if len(ag) > 2:
-        # ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+    fig, ((ax,ax1,ax2),(ax3,ax4,ax5)) = plt.subplots(2,3,sharex='col',figsize=(15,10))
+    ax.set_ylabel(r'$T_{\rm{eff}}$ - APOGEE, C3',fontsize=15)
+    ax1.set_ylabel(r'log$_{10}$(g) - APOGEE, C3',fontsize=15)
+    ax2.set_ylabel(r'[Fe/H] - APOGEE, C3',fontsize=15)
+    ax3.set_ylabel(r'$T_{\rm{eff}}$ - RAVE, C3',fontsize=15)
+    ax4.set_ylabel(r'log$_{10}$(g) - RAVE, C3',fontsize=15)
+    ax5.set_ylabel(r'[Fe/H] - RAVE, C3',fontsize=15)
+    ax3.set_xlabel(r'$T_{\rm{eff}}$ - GES, C3',fontsize=15)
+    ax4.set_xlabel(r'log$_{10}$(g) - GES, C3',fontsize=15)
+    ax5.set_xlabel(r'[Fe/H] - GES, C3',fontsize=15)
+
+    if len(ag) > 10:
+        ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],100,ax,['TEFF_ERR','sig_Teff'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
         # plt.show()
-        # ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+        ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'log$_{10}$(g) - GES, C3'],0.15,ax1,['LOGG_ERR','sig_logg'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
         # plt.show()
-        ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
+        ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],0.2,ax2,['FE_H_ERR','sig_feh'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
         # plt.show()
+        # sys.exit()
 
     ''' RAVE vs Gaia-ESO - C3 '''
-    if len(rg) > 2:
-        # ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
+    if len(rg) > 10:
+        ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],100,ax3,['sig_Teff','sig_Teff'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
         # plt.show()
-        # ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
+        ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'log$_{10}$(g) - GES, C3'],0.15,ax4,['sig_logg','sig_logg'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
         # plt.show()
-        ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
+        ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],0.3,ax5,['sig_feh','sig_feh'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
         # plt.show()
+
+    ax3.set_xlim(ga['TEFF'].min()-10, ga['TEFF'].max()+10)
+    ax4.set_xlim(ga['LOGG'].min()-0.05, ga['LOGG'].max()+0.05)
+    ax5.set_xlim(ga['FEH'].min()-0.05, ga['FEH'].max()+0.01)
+    ax5.set_ylim(-1.5,0.6)
+    plt.subplots_adjust(hspace=0.07,wspace=0.27)
+    fig.savefig('spec_comps.pdf',bbox_inches='tight')
 
     ''' APOGEE vs LAMOST - C6 '''
     # if len(al) > 2:
