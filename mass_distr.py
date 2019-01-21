@@ -627,8 +627,8 @@ if __name__ == '__main__':
     PHASE 2 - READ IN RESULTS FOR ANY PARAMETER CUTS AND PLOTTING
     '''
 
-    ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
-    # ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
+    # ext_load = '/home/bmr135/K2_Poles/Mass_Distr_In/'
+    ext_load = '/home/ben/K2_Poles/Mass_Distr_In/'
     ''' Read in processed results files '''
     C3_New = pd.read_csv(ext_load+'Normal/Nov_2018/C3_281118')
     C6_New = pd.read_csv(ext_load+'Normal/Nov_2018/C6_281118')
@@ -649,7 +649,8 @@ if __name__ == '__main__':
     TRI6 = pd.read_csv(ext_load+'Normal/Nov_2018/TRI6_281118')
     TRI = pd.concat([TRI3,TRI6],ignore_index=True)
 
-    C3_Sky = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/matched_GAP_SkyMapper.csv')
+    # C3_Sky = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/matched_GAP_SkyMapper.csv')
+    C3_Sky = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/Gaia/matched_GAP_SkyMapper.csv')
     C3_Sky = pd.merge(C3_Sky,C3_New[['#Id']],how='inner',on=['#Id'])
     # Gaia_IDs = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/Gaia/GAP_Gaia_Luca.csv')
     # Gaia_IDs = pd.merge(Gaia_IDs, K2_New[['#Id']], how='inner', on=['#Id'])
