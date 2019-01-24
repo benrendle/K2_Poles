@@ -53,42 +53,56 @@ def ransac_fit(df,df1,param,label,f,ax,uncert):
     '''
     df['Diff'] = df[param[0]] - df1[param[1]]
     # df['sig'] = np.sqrt(df[uncert[0]]**2 + df1[uncert[1]]**2)
-    X = (df1[param[1]])
-    X = X.values.reshape(-1,1)
+    x = (df1[param[1]])
+    # X = X.values.reshape(-1,1)
     # y = (df['Diff'])
-    y = (df[param[0]])
+    Y = (df[param[0]])
     # print(df1.columns.values)
     # sys.exit()
     ''' Fit line using all data '''
-    lr = linear_model.LinearRegression()
-    lr.fit(X, y)
+    # lr = linear_model.LinearRegression()
+    # lr.fit(X, y)
 
     ''' Robustly fit linear model with RANSAC algorithm '''
     # plt.figure()
-    ax.set_xlim(X.min()-f, X.max()+f)
+    ax.set_xlim(df1[param[1]].min()-f, df1[param[1]].max()+f)
     # ax.set_xlabel(label[1])
     # ax.set_ylabel(label[0])
     # ax.scatter(X, y, color='yellowgreen', label='__nolegend__')
     lw = 2
-    a = np.zeros((1000,2))
-    b = np.zeros((1000,np.shape(df1)[0])) # Size of inlier mask
-    for i in range(1000):
-        ransac = linear_model.RANSACRegressor(min_samples=5)
+    a = np.zeros((100,2))
+    b = np.zeros((100,np.shape(df1)[0])) # Size of inlier mask
+    df['pert'] = 0.
+    df1['pert'] = 0.
+    for i in range(100):
+        for j in range(len(df1)):
+            gauss1 = np.random.normal(df1[param[1]].iloc[j],df1[uncert[1]].iloc[j],50)
+            value = gauss1[np.random.randint(len(gauss1),size=1)][0]
+            df1['pert'].iloc[j] = value
+            gauss2 = np.random.normal(df[param[0]].iloc[j],df[uncert[0]].iloc[j],50)
+            value2 = gauss2[np.random.randint(len(gauss2),size=1)][0]
+            df['pert'].iloc[j] = value2
+
+        X = (df1['pert'])
+        X = X.values.reshape(-1,1)
+        y = (df['pert'])
+
+        ransac = linear_model.RANSACRegressor(min_samples=7)
         ransac.fit(X, y)
         inlier_mask = ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
 
         ''' Predict data of estimated models '''
         # z = np.arange(X.min()-f, X.max()+f, 0.01)
-        line_X = np.arange(X.min()-f, X.max()+f, 0.01)#[:, np.newaxis]
+        line_X = np.arange(x.min()-f, x.max()+f, 0.01)#[:, np.newaxis]
         line_X = line_X.reshape(-1,1)
-        line_y = lr.predict(line_X)
+        # line_y = lr.predict(line_X)
         line_y_ransac = ransac.predict(line_X)
         ''' Compare estimated coefficients '''
         a[i,0], a[i,1] = ransac.estimator_.coef_,ransac.estimator_.intercept_
         b[i,:] = inlier_mask
-        if i%10 == 0:
-            ax.plot(line_X, a[i,0]*line_X + a[i,1], color='k', linewidth=3, label='__nolegend__', alpha=0.01)
+        # if i%10 == 0:
+        ax.plot(line_X, a[i,0]*line_X + a[i,1], color='k', linewidth=3, label='__nolegend__', alpha=0.01)
             # plt.draw()
             # plt.waitforbuttonpress(0.1)
 
@@ -124,10 +138,10 @@ def ransac_fit(df,df1,param,label,f,ax,uncert):
     # plt.axhline(y=0., color='r', linestyle='-')
     # plt.axvline(x=d, color='r', linestyle='-')
 
-    ax.errorbar(X, y, xerr=df1[uncert[1]], yerr=df[uncert[0]], color='blue', marker='.', label='__nolegend__',fmt='o',alpha=0.25)
+    ax.errorbar(x, Y, xerr=df1[uncert[1]], yerr=df[uncert[0]], color='blue', marker='.', label='__nolegend__',fmt='o',alpha=0.25)
 
     # plt.errorbar(X[b[medIdx]], y[b[medIdx]], yerr=df['sig_Teff'][b[medIdx]], color='yellowgreen', marker='.', label='Inliers',fmt='o',alpha=0.5)
-    ax.scatter(X, y, color='blue', label='__nolegend__')
+    ax.scatter(x, Y, color='blue', label='__nolegend__')
     # plt.scatter(X[b[medIdx]], y[b[medIdx]], color='yellowgreen', label='Inliers')
     # plt.xlabel(label[0])
     # plt.ylabel(label[1])
@@ -256,27 +270,32 @@ if __name__ == "__main__":
     ax5.set_xlabel(r'[Fe/H] - GES, C3',fontsize=15)
 
     if len(ag) > 10:
-        ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],100,ax,['TEFF_ERR','sig_Teff'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+        ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax,['TEFF_ERR','sig_Teff'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
         # plt.show()
-        ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'log$_{10}$(g) - GES, C3'],0.15,ax1,['LOGG_ERR','sig_logg'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+        ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax1,['LOGG_ERR','sig_logg'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
         # plt.show()
-        ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],0.2,ax2,['FE_H_ERR','sig_feh'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
+        ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],1.,ax2,['FE_H_ERR','sig_feh'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
         # plt.show()
         # sys.exit()
 
     ''' RAVE vs Gaia-ESO - C3 '''
     if len(rg) > 10:
-        ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],100,ax3,['sig_Teff','sig_Teff'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
+        ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax3,['sig_Teff','sig_Teff'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
         # plt.show()
-        ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'log$_{10}$(g) - GES, C3'],0.15,ax4,['sig_logg','sig_logg'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
+        ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax4,['sig_logg','sig_logg'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
         # plt.show()
-        ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],0.3,ax5,['sig_feh','sig_feh'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
+        ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],1.,ax5,['sig_feh','sig_feh'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
         # plt.show()
 
-    ax3.set_xlim(ga['TEFF'].min()-10, ga['TEFF'].max()+10)
-    ax4.set_xlim(ga['LOGG'].min()-0.05, ga['LOGG'].max()+0.05)
-    ax5.set_xlim(ga['FEH'].min()-0.05, ga['FEH'].max()+0.01)
-    ax5.set_ylim(-1.5,0.6)
+    ax3.set_xlim(4400, 5200)
+    ax.set_ylim(4400, 5200)
+    ax3.set_ylim(4400, 5200)
+    ax4.set_xlim(2.1,3.4)
+    ax4.set_ylim(2.1,3.4)
+    ax1.set_ylim(2.1,3.4)
+    ax5.set_xlim(-1.2, 0.6)
+    ax5.set_ylim(-1.2, 0.6)
+    ax2.set_ylim(-1.2, 0.6)
     plt.subplots_adjust(hspace=0.07,wspace=0.27)
     fig.savefig('spec_comps.pdf',bbox_inches='tight')
 

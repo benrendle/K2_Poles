@@ -119,26 +119,45 @@ print( "All files in")
 GAP6 = dat.n_epics(GAP6,oc)
 
 ''' Preparing GAP for probability detections '''
-GAP3['foma'] = GAP3['mass'] * GAP3['Radius']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+''' Merge data with GAP target lists '''
+YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
+SC3 = pd.merge(Savita_C3,GAP3,how='inner',on=['EPIC'])
+BC3 = pd.merge(Benoit_C3,GAP3,how='inner',on=['EPIC'])
+
+''' Complete asteroseismic lists '''
+camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
+camp3_0 = camp3_0.drop_duplicates(subset=['EPIC'])
+camp3_0 = camp3_0.reset_index(drop=True)
+camp3_0 = camp3_0.fillna(value='NaN',method=None)
+
+
+GAP3 = pd.merge(GAP3,camp3_0[['EPIC','Bnumax','nmx','Snumax','BDnu','dnu','SDnu']],how='inner',on=['EPIC'])
+GAP3 = prop.single_seismo(GAP3,['Bnumax','nmx','Snumax'],'NUMAX')
+GAP3 = prop.single_seismo(GAP3,['BDnu','dnu','SDnu'],'DNU')
+GAP3['NUMAX']=pd.to_numeric(GAP3['NUMAX'])
+GAP3 = GAP3[GAP3['NUMAX'] < 280]
+GAP3['foma'] = GAP3['Radius']**-1.85 * (GAP3['Teff']/5777.0)**0.92 * 3090 # numax for C3 GAP (frequency of maximum amplitude) <- coefficients from Bill
 GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
-GAP3['fomag'] = GAP3['mass'] * GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**-0.5 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+GAP3['fomag'] = GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**0.92 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
 GAP3['Lumog'] = GAP3['Rgaia']**2 * (GAP3['Teff']/const.solar_Teff)**4
 GAP3_v2 = GAP3[GAP3['foma'] < 280]
 GAP3_v2 = GAP3_v2[GAP3_v2['foma'] > 10]
 GAP3_v2 = GAP3_v2[GAP3_v2['imag'] > 0.0]
 GAP3_v2 = GAP3_v2.reset_index(drop=True)
-GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'foma',3090,135.1)
+GAP3_v2 = prop.det_prob_GAP(GAP3_v2,'NUMAX',3090,135.1)
+
 GAP3_v3 = GAP3[GAP3['fomag'] < 280]
 GAP3_v3 = GAP3_v3[GAP3_v3['fomag'] > 10]
 GAP3_v3 = GAP3_v3[GAP3_v3['imag'] > 0.0]
 GAP3_v3 = GAP3_v3.reset_index(drop=True)
-GAP3_v3 = prop.det_prob_GAP_gaia(GAP3_v3,'fomag',3090,135.1)
-# GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
+GAP3_v3 = prop.det_prob_GAP_gaia(GAP3_v3,'NUMAX',3090,135.1)
+
+
 # GAP3_v2.to_csv(ext_GA+'GA/K2Poles/GAP3_det_prob_gaia',index=False)
 
-GAP6['foma'] = GAP6['mass'] * GAP6['Radius']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['foma'] = GAP6['Radius']**-1.85 * (GAP6['Teff']/5777.0)**0.92 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
-GAP6['fomag'] = GAP6['mass'] * GAP6['Rgaia']**-2 * (GAP6['Teff']/5777.0)**-0.5 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+GAP6['fomag'] = GAP6['Rgaia']**-1.85 * (GAP6['Teff']/5777.0)**0.92 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
 GAP6['Lumog'] = GAP6['Rgaia']**2 * (GAP6['Teff']/const.solar_Teff)**4
 GAP6_v2 = GAP6[GAP6['foma'] < 280]
 GAP6_v2 = GAP6_v2[GAP6_v2['foma'] > 10]
@@ -149,8 +168,13 @@ GAP6_v3 = GAP6[GAP6['fomag'] < 280]
 GAP6_v3 = GAP6_v3[GAP6_v3['fomag'] > 10]
 GAP6_v3 = GAP6_v3[GAP6_v3['imag'] > 0.0]
 GAP6_v3 = GAP6_v3.reset_index(drop=True)
-GAP6_v3 = prop.det_prob_GAP(GAP6_v3,'fomag',3090,135.1)
+GAP6_v3 = prop.det_prob_GAP_gaia(GAP6_v3,'fomag',3090,135.1)
+
+# GAP3_v2 = GAP3_v2[GAP3_v2['prob_s'] >= 0.95]
+# GAP3_v3 = GAP3_v3[GAP3_v3['prob_s_gaia'] >= 0.95]
 # GAP6_v2 = GAP6_v2[GAP6_v2['prob_s'] >= 0.95]
+# GAP6_v3 = GAP6_v3[GAP6_v3['prob_s_gaia'] >= 0.95]
+
 # GAP6_v2.to_csv(ext_GA+'GA/K2Poles/GAP6_det_prob_gaia',index=False)
 K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
 K2_camp = K2_camp.reset_index(drop=True)
@@ -190,100 +214,169 @@ K2_camp_v3[['EPIC','Rgaia','radius_val','Kabs','glogg']].to_csv(ext_DB+'K2_Poles
 # GAP6_v2.to_csv('/home/ben/Desktop/C6_GAP_Gaia',columns=cols,index=False)
 # sys.exit()
 
-GAP3 = GAP3_v3
-GAP6 = GAP6_v3
+# GAP3 = GAP3_v3
+# GAP6 = GAP6_v3
 
-''' Merge data with GAP target lists '''
-YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
-YC6 = pd.merge(Yvonne_C6,GAP6,how='inner',on=['EPIC'])
-SC3 = pd.merge(Savita_C3,GAP3,how='inner',on=['EPIC'])
-SC6 = pd.merge(Savita_C6,GAP6,how='inner',on=['EPIC'])
-BC3 = pd.merge(Benoit_C3,GAP3,how='inner',on=['EPIC'])
-BC6 = pd.merge(Benoit_C6,GAP6,how='inner',on=['EPIC'])
-EC6 = pd.merge(Everest_C6,GAP6,how='inner',on=['EPIC'])
-YEC3 = pd.merge(Yvonne_EC3,GAP3,how='inner',on=['EPIC'])
-YEC6 = pd.merge(Yvonne_EC6,GAP6,how='inner',on=['EPIC'])
-SEC3 = pd.merge(Savita_EC3,GAP3,how='inner',on=['EPIC'])
-SEC6 = pd.merge(Savita_EC6,GAP6,how='inner',on=['EPIC'])
-EC3 = pd.merge(Everest_C3,GAP3,how='inner',on=['EPIC'])
-GG3 = pd.merge(GES3,GAP3,how='inner',on=['EPIC'])
-AC3 = pd.merge(APO3,GAP3,how='inner',on=['EPIC'])
-AC6 = pd.merge(APO6,GAP6,how='inner',on=['EPIC'])
+# ''' Merge data with GAP target lists '''
+# YC3 = pd.merge(Yvonne_C3,GAP3,how='inner',on=['EPIC'])
+# YC6 = pd.merge(Yvonne_C6,GAP6,how='inner',on=['EPIC'])
+# SC3 = pd.merge(Savita_C3,GAP3,how='inner',on=['EPIC'])
+# SC6 = pd.merge(Savita_C6,GAP6,how='inner',on=['EPIC'])
+# BC3 = pd.merge(Benoit_C3,GAP3,how='inner',on=['EPIC'])
+# BC6 = pd.merge(Benoit_C6,GAP6,how='inner',on=['EPIC'])
+# EC6 = pd.merge(Everest_C6,GAP6,how='inner',on=['EPIC'])
+# YEC3 = pd.merge(Yvonne_EC3,GAP3,how='inner',on=['EPIC'])
+# YEC6 = pd.merge(Yvonne_EC6,GAP6,how='inner',on=['EPIC'])
+# SEC3 = pd.merge(Savita_EC3,GAP3,how='inner',on=['EPIC'])
+# SEC6 = pd.merge(Savita_EC6,GAP6,how='inner',on=['EPIC'])
+# EC3 = pd.merge(Everest_C3,GAP3,how='inner',on=['EPIC'])
+# GG3 = pd.merge(GES3,GAP3,how='inner',on=['EPIC'])
+# AC3 = pd.merge(APO3,GAP3,how='inner',on=['EPIC'])
+# AC6 = pd.merge(APO6,GAP6,how='inner',on=['EPIC'])
 # LC3 = pd.merge(LAMOST3,GAP3,how='inner',on=['EPIC'])
 # LC6 = pd.merge(LAMOST6,GAP6,how='inner',on=['EPIC'])
 
 
-''' Complete asteroseismic lists '''
-camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
-camp3_0 = camp3_0.drop_duplicates(subset=['EPIC'])
-camp3_0 = camp3_0.reset_index(drop=True)
-camp3_0 = camp3_0.fillna(value='NaN',method=None)
+# ''' Complete asteroseismic lists '''
+# camp3_0 = pd.concat([YC3,SC3,BC3],ignore_index=True)
+# camp3_0 = camp3_0.drop_duplicates(subset=['EPIC'])
+# camp3_0 = camp3_0.reset_index(drop=True)
+# camp3_0 = camp3_0.fillna(value='NaN',method=None)
+#
+# camp6_0 = pd.concat([YC6,SC6,BC6],ignore_index=True)
+# camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
+# camp6_0 = camp6_0.reset_index(drop=True)
+# camp6_0 = camp6_0.fillna(value='NaN',method=None)
+#
+# C3R = pd.merge(camp3_0[['EPIC']],GAP3_v2,how='inner',on=['EPIC'])
+# C3Rg = pd.merge(camp3_0[['EPIC']],GAP3_v3,how='inner',on=['EPIC'])
+# C6R = pd.merge(camp6_0[['EPIC']],GAP6_v2,how='inner',on=['EPIC'])
+# C6Rg = pd.merge(camp6_0[['EPIC']],GAP6_v3,how='inner',on=['EPIC'])
+#
+# print(len(GAP3_v3),len(C3Rg))
+# print(len(GAP3_v2),len(C3R))
+# print(len(GAP6_v3),len(C6Rg))
+# print(len(GAP6_v2),len(C6R))
+#
+# C3Rg = pd.merge(C3Rg,camp3_0[['EPIC','Bnumax','nmx','Snumax','BDnu','dnu','SDnu']],how='inner',on=['EPIC'])
+# C3Rg = prop.single_seismo(C3Rg,['Bnumax','nmx','Snumax'],'NUMAX')
+# C3Rg = prop.single_seismo(C3Rg,['BDnu','dnu','SDnu'],'DNU')
+# C3Rg = C3Rg[C3Rg['NUMAX'] < 280]
+# C3Rg['sRad'] = (C3Rg['NUMAX']/3090) * (C3Rg['DNU']/135.1)**-2  * (C3Rg['Teff']/5777)**0.5
+cthree = pd.merge(GAP3_v2,GAP3_v3[['EPIC','Rgaia']],how='inner',on=['EPIC'])
+# x = np.linspace(3,23,100)
+# plt.figure()
+# plt.plot(x,x,'r',alpha=0.5,linestyle='--')
+# plt.scatter(cthree['Radius'],cthree['Rgaia_y'])
+# plt.xlabel(r'R(EPIC)')
+# plt.ylabel(r'R(Gaia)')
+# plt.xlim(3,23)
+# plt.ylim(3,23)
 
-camp6_0 = pd.concat([YC6,SC6,BC6],ignore_index=True)
-camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
-camp6_0 = camp6_0.reset_index(drop=True)
-camp6_0 = camp6_0.fillna(value='NaN',method=None)
+# nx, (ax,ax1) = plt.subplots(1,2)
+# y = np.linspace(10,280,271)
+# ax.scatter(C3Rg['NUMAX'],C3Rg['fomag'])
+# ax.plot(y,y,'r',alpha=0.5,linestyle='--')
+# ax.set_xlabel(r'$\nu_{\rm{max},true}$')
+# ax.set_ylabel(r'$\nu_{\rm{max},scaling}$')
+# ax.set_xlim(10,280)
+# ax.set_ylim(10,280)
+# ax1.hist(GAP3_v3['fomag'],bins=np.linspace(10,280,50),alpha=0.5,label=r'GAP$_{Gaia}$, predicted')
+# ax1.hist(C3Rg['fomag'],bins=np.linspace(10,280,50),alpha=0.5,label=r'GAP$_{Gaia}$, actual')
+# ax1.set_xlabel(r'$\nu_{\rm{max},scaling}$, C3')
+# ax1.legend()
+# ax1.set_xlim(10,280)
 
-C3R = pd.merge(camp3_0[['EPIC']],GAP3_v2,how='inner',on=['EPIC'])
-C3Rg = pd.merge(camp3_0[['EPIC']],GAP3_v3,how='inner',on=['EPIC'])
-C6R = pd.merge(camp6_0[['EPIC']],GAP6_v2,how='inner',on=['EPIC'])
-C6Rg = pd.merge(camp6_0[['EPIC']],GAP6_v3,how='inner',on=['EPIC'])
+''' Detection Probability Plots '''
+prob, ax = plt.subplots(1)
+x = np.linspace(0,1,21)
+# print(len(C3R))
+a = len(GAP3_v2)
+b = len(GAP3_v3)
 
-fig,((ax,ax1),(ax4,ax5),(ax2,ax3),(ax6,ax7)) = plt.subplots(4,2,figsize=(8,10))
-ax.hist(GAP3_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
-ax.hist(C3R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
-ax.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
-ax.set_ylabel(r'C3',fontsize=15)
-ax.set_xlim(2.5,19.)
-ax.set_title(r'With R$_{\rm{EPIC}}$',fontsize=15)
-ax.legend()
-
-ax4.hist(GAP3_v2['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, EPIC')
-ax4.hist(C3R['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual')
-ax4.set_xlabel(r'H',fontsize=15)
-ax4.set_ylabel(r'C3',fontsize=15)
-ax4.set_xlim(7.,12.)
-
-
-ax2.hist(GAP6_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, EPIC')
-ax2.hist(C6R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual')
-ax2.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
-ax2.set_ylabel(r'C6',fontsize=15)
-ax2.set_xlim(2.5,19.)
-ax2.set_ylabel(r'C6')
-
-ax6.hist(GAP6_v2['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
-ax6.hist(C6R['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
-ax6.set_xlabel(r'V$_{cut}$',fontsize=15)
-ax6.set_ylabel(r'C6',fontsize=15)
-ax6.set_xlim(9.,15.)
-
-
-ax1.hist(GAP3_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
-ax1.hist(C3Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
-ax1.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
-ax1.set_xlim(2.5,19.)
-ax1.set_title(r'With R$_{\rm{Gaia}}$',fontsize=15)
-ax1.legend()
-
-ax5.hist(GAP3_v3['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, Gaia',color='r')
-ax5.hist(C3Rg['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual',color='k')
-ax5.set_xlabel(r'H',fontsize=15)
-ax5.set_xlim(7.,12.)
-
-ax3.hist(GAP6_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, Gaia',color='r')
-ax3.hist(C6Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual',color='k')
-ax3.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
-ax3.set_xlim(2.5,19.)
-
-ax7.hist(GAP6_v3['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
-ax7.hist(C6Rg['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
-ax7.set_xlabel(r'V$_{cut}$',fontsize=15)
-ax7.set_xlim(9.,15.)
-plt.tight_layout()
-
+for i in x:
+    GAP3v2 = GAP3_v2[GAP3_v2['prob_s'] >= i]
+    GAP3v3 = GAP3_v3[GAP3_v3['prob_s_gaia'] >= i]
+    # GAP6v2 = GAP6_v2[GAP6_v2['prob_s'] >= i]
+    # GAP6v3 = GAP6_v3[GAP6_v3['prob_s_gaia'] >= i]
+    C3R = pd.merge(camp3_0[['EPIC']],GAP3v2,how='inner',on=['EPIC'])
+    C3Rg = pd.merge(camp3_0[['EPIC']],GAP3v3,how='inner',on=['EPIC'])
+    # C6R = pd.merge(camp6_0[['EPIC']],GAP6v2,how='inner',on=['EPIC'])
+    # C6Rg = pd.merge(camp6_0[['EPIC']],GAP6v3,how='inner',on=['EPIC'])
+    ax.scatter(i,len(GAP3v3),color='b')
+    ax.scatter(i,len(C3Rg),color='b',marker='D')
+    ax.scatter(i,len(GAP3v2),color='orange')
+    ax.scatter(i,len(C3R),color='orange',marker='D')
+    # ax.scatter(i,len(GAP6v3),color='r')
+    # ax.scatter(i,len(C6Rg),color='r',marker='D')
+    # ax.scatter(i,len(GAP6v2),color='m')
+    # ax.scatter(i,len(C6R),color='m',marker='D')
+ax.axhline(y=a, color='orange', linestyle='--',alpha=0.5)
+ax.axhline(y=b, color='blue', linestyle='--',alpha=0.5)
+ax.set_xlabel(r'Detection Probability Threshold',fontsize=15)
+ax.set_ylabel(r'Number of stars',fontsize=15)
+# ax.legend(labels=[r'GAP$_{Gaia}$ C3',r'Actual$_{Gaia}$ C3' \
+#                 ,r'GAP$_{Gaia}$ C6',r'Actual$_{Gaia}$ C6'],ncol=2)#,r'GAP$_{EPIC}$ C6',r'Actual$_{EPIC}$ C6'],ncol=2)
+        # ,r'GAP$_{EPIC}$ C3',r'Actual$_{EPIC}$ C3'
 plt.show()
 sys.exit()
+#
+# fig,((ax,ax1),(ax4,ax5),(ax2,ax3),(ax6,ax7)) = plt.subplots(4,2,figsize=(8,10))
+# ax.hist(GAP3_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
+# ax.hist(C3R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
+# ax.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+# ax.set_ylabel(r'C3',fontsize=15)
+# ax.set_xlim(2.5,19.)
+# ax.set_title(r'With R$_{\rm{EPIC}}$',fontsize=15)
+# ax.legend()
+#
+# ax4.hist(GAP3_v2['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, EPIC')
+# ax4.hist(C3R['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual')
+# ax4.set_xlabel(r'H',fontsize=15)
+# ax4.set_ylabel(r'C3',fontsize=15)
+# ax4.set_xlim(7.,12.)
+#
+#
+# ax2.hist(GAP6_v2['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, EPIC')
+# ax2.hist(C6R['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual')
+# ax2.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+# ax2.set_ylabel(r'C6',fontsize=15)
+# ax2.set_xlim(2.5,19.)
+# ax2.set_ylabel(r'C6')
+#
+# ax6.hist(GAP6_v2['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted')
+# ax6.hist(C6R['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual')
+# ax6.set_xlabel(r'V$_{cut}$',fontsize=15)
+# ax6.set_ylabel(r'C6',fontsize=15)
+# ax6.set_xlim(9.,15.)
+#
+#
+# ax1.hist(GAP3_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
+# ax1.hist(C3Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
+# ax1.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+# ax1.set_xlim(2.5,19.)
+# ax1.set_title(r'With R$_{\rm{Gaia}}$',fontsize=15)
+# ax1.legend()
+#
+# ax5.hist(GAP3_v3['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, Gaia',color='r')
+# ax5.hist(C3Rg['Hmag'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C3, actual',color='k')
+# ax5.set_xlabel(r'H',fontsize=15)
+# ax5.set_xlim(7.,12.)
+#
+# ax3.hist(GAP6_v3['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, Gaia',color='r')
+# ax3.hist(C6Rg['Radius'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP C6, actual',color='k')
+# ax3.set_xlabel(r'R [R$_{\odot}$]',fontsize=15)
+# ax3.set_xlim(2.5,19.)
+#
+# ax7.hist(GAP6_v3['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, predicted',color='r')
+# ax7.hist(C6Rg['Vcut'],bins=np.linspace(0,20,50),alpha=0.5,label=r'GAP, actual',color='k')
+# ax7.set_xlabel(r'V$_{cut}$',fontsize=15)
+# ax7.set_xlim(9.,15.)
+# plt.tight_layout()
+
+# plt.show()
+# fig.savefig('det_bias.pdf',bbox_inches='tight')
+# sys.exit()
 
 ''' Data processing and parameter calculation '''
 seismo_list = [YC3,YC6,SC3,SC6,BC3,BC6,EC6,YEC6,EC3,YEC3,SEC3,SEC6]

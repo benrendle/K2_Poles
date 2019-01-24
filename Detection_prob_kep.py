@@ -42,25 +42,25 @@ def globalDetections(imag, Kp, lum, rad, teff, \
 
     dnu = dnu_solar*(rad**-1.42)*((teff/teff_solar)**0.71) # from (14) eqn 21
     beta = 1.0-np.exp(-(teffred-teff)/1550.0) # beta correction for hot solar-like stars from (6) eqn 9.
-    if isinstance(teff, float):  # for only 1 star
-        if (teff>=teffred):
-            beta = 0.0
-    else:
-        beta[teff>=teffred] = 0.0
+    # if isinstance(teff, float):  # for only 1 star
+    #     if (teff>=teffred):
+    #         beta = 0.0
+    # else:
+    #     beta[teff>=teffred] = 0.0
 
 
     # to remove the beta correction, set Beta=1
     if vary_beta == False:
         beta = 1.0 # added on 04.08.16 after 02.08.16 Bill+Tiago meeting
 
-    amp = 0.85*2.5*beta*(rad**2)*((teff/teff_solar)**0.5) # from (6) eqn 11
+    amp = 2.5*beta*(rad**2)*((teff/teff_solar)**0.5) # from (6) eqn 11
 
     env_width = 0.66 * numax**0.88 # From (5) table 2 values for delta nu_{env}. env_width is defined as +/- some value.
-    if isinstance(teff, float):  # for only 1 star
-        if (numax>=100):
-            env_width = numax/2
-    else:
-        env_width[numax>100]=numax[numax>100]/2 # from (6) p12
+    # if isinstance(teff, float):  # for only 1 star
+    #     if (numax>=100):
+    #         env_width = numax/2
+    # else:
+    #     env_width[numax>100]=numax[numax>100]/2 # from (6) p12
 
     total, per_cam, pix_limit, npix_aper = pixel_cost(imag)
 
@@ -70,7 +70,7 @@ def globalDetections(imag, Kp, lum, rad, teff, \
 
     noise = keplerNoise(Kp)
 
-    a_nomass = 0.85 * 3382*numax**-0.609 # multiply by 0.85 to convert to redder TESS bandpass.
+    a_nomass = 3382*numax**-0.609 # multiply by 0.85 to convert to redder TESS bandpass.
     b1 = 0.317 * numax**0.970
     b2 = 0.948 * numax**0.992
 
@@ -106,7 +106,7 @@ def globalDetections(imag, Kp, lum, rad, teff, \
 
     Pgrantotal = Pgran + Pgranalias
 
-    ptot = (0.5*2.94*amp**2*((2*env_width)/dnu)*eta**2) / (dilution**2)
+    ptot = (0.5*3.15*amp**2*((2*env_width)/dnu)*eta**2) / (dilution**2)
     Binstr = 2.0 * (noise)**2 * cadence*10**-6.0 # from (6) eqn 18
     bgtot = ((Binstr + Pgrantotal) * 2*env_width) # units are ppm**2
 
@@ -168,7 +168,6 @@ frac_aper = 0.76, e_pix_ro = 10, geom_area = 60.0, pix_scale = 21.1, sys_limit =
 def keplerNoise(Kp):
 
      c = 1.28 * 10**(0.4*(12.-Kp) + 7.)  # detections per cadence, from (4)
-    #  noise = np.sqrt(2) * 1e6/c * np.sqrt(c + 9.5 * 1e5*(14./Kp)**5) # from (4) eqn 17. in ppm <- K2 noise levels
      noise = 1e6/c * np.sqrt(c + 9.5 * 1e5*(14./Kp)**5) # from (4) eqn 17. in ppm
      return noise
 
