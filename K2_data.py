@@ -16,6 +16,7 @@ from numbers import Number
 import subprocess
 import matplotlib
 import matplotlib.pyplot as plt
+import random
 
 ''' Dropbox Path '''
 ext_DB = '/home/bmr135/' # Work
@@ -293,17 +294,21 @@ def RAVE():
     RAVE3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/RAVE/RAVE-K2C3_TGP_final.csv')
     RAVE3.rename(columns={'EPIC_ID':'EPIC'},inplace=True)
     RAVE3['ALPHA'] = (RAVE3['[Mg/H]']-RAVE3['[Fe/H]_RAVE'] + RAVE3['[Si/H]']-RAVE3['[Fe/H]_RAVE'])/2
-    RAVE3['sig_FEH'] = (abs(RAVE3['sup.3'])-abs(RAVE3['inf.3']))/2
+    RAVE3['sig_FEH'] = abs(RAVE3['sup.3']-RAVE3['inf.3'])/2
     RAVE6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/RAVE/RAVE-K2C6_TGPfinal.csv')
     RAVE6.rename(columns={'EPIC ID':'EPIC'},inplace=True)
     RAVE6['ALPHA'] = ((RAVE6['[Mg/H]']-RAVE6['[Fe/H]_RAVE']) + (RAVE6['[Si/H]']-RAVE6['[Fe/H]_RAVE']))/2
-    RAVE6['sig_FEH'] = (abs(RAVE6['sup.3'])-abs(RAVE6['inf.3']))/2
+    RAVE6['sig_FEH'] = abs(RAVE6['sup.3']-RAVE6['inf.3'])/2
     for i in range(len(RAVE3)):
         if (RAVE3['ALPHA'].iloc[i] > 1.5) | (RAVE3['ALPHA'].iloc[i] < -2.5):
             RAVE3['ALPHA'].iloc[i] = -99.9
+        if abs(RAVE3['sig_FEH'].iloc[i]) > 0.5:
+            RAVE3['sig_FEH'].iloc[i] = 0.2
     for i in range(len(RAVE6)):
         if (RAVE6['ALPHA'].iloc[i] > 1.5) | (RAVE6['ALPHA'].iloc[i] < -2.5):
             RAVE6['ALPHA'].iloc[i] = -99.9
+        if abs(RAVE6['sig_FEH'].iloc[i]) > 0.5:
+            RAVE6['sig_FEH'].iloc[i] = 0.2
     RAVE3.to_csv(ext_GA+'GA/K2Poles/RAVE3.csv',index=False)
     RAVE6.to_csv(ext_GA+'GA/K2Poles/RAVE6.csv',index=False)
     return RAVE3, RAVE6
@@ -329,6 +334,13 @@ def Gaia_ESO():
         Gaia_ESO_C3.rename(columns={'OBJECT':'EPIC'},inplace=True)
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].map(lambda x: x.split('_')[-1])
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].convert_objects(convert_numeric=True)
+        Gaia_ESO_C3['sig_FEH'] = 0
+        Gaia_ESO_C3['sig_TEFF'] = 0
+        Gaia_ESO_C3['sig_LOGG'] = 0
+        for i in range(len(Gaia_ESO_C3)):
+            Gaia_ESO_C3['sig_LOGG'].iloc[i] = random.randint(5,25)/100
+            Gaia_ESO_C3['sig_TEFF'].iloc[i] = random.randint(90,125)
+            Gaia_ESO_C3['sig_FEH'].iloc[i] = random.randint(15,25)/100
         return Gaia_ESO_C3
 
 def GES_merge(K2,GES,name):

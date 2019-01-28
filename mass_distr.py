@@ -1324,11 +1324,11 @@ if __name__ == '__main__':
     ax2.text(0.4, 0.95, '11 R$_{\odot}$', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,fontsize=10)
     ax2.set_xlim(5300,4400)
     ax2.set_ylim(1.65,1.85)
-    hrd.savefig('clump_rads.pdf',bbox_inches='tight')
+    # hrd.savefig('clump_rads.pdf',bbox_inches='tight')
 
-    plt.show()
+    # plt.show()
 
-    sys.exit()
+    # sys.exit()
     APK2_alpha = APK2[APK2['alpha'] > 0.1]
     K2_alpha = AS[AS['alpha'] > 0.1]
 
@@ -1885,40 +1885,40 @@ if __name__ == '__main__':
 
     ''' En masse commenting '''
 #
-#     ''' Radius Distributions '''
-#     APK2_alpha = APK2[APK2['alpha'] > 0.1]
-#     K2_alpha = AS[AS['alpha'] > 0.1]
-#     # TRI3a = TRI[TRI['#Gc'] == 1]
-#     # TRI3b = TRI[TRI['#Gc'] == 2]
-#     # TRI3c = TRI[TRI['#Gc'] == 3]
-#     K2_para = Luca[Luca['parallax_error']/Luca['parallax'] < .1]
-#     f = plt.figure()
-#     plt.hist(APK2['rad'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
-#
-#     # plt.hist(Kep_Sim['radius'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
-#     # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
-#     # plt.hist(APK2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'APOKASC $\alpha$-rich',color='r',normed=True,linewidth=2)
-#     # mdf.histo(AS,'rad',np.linspace(4,20,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
-#
-#     # plt.hist(K2_para['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'K2 SM',normed=True,linewidth=2)
-#     # plt.hist(K2_para['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2$_{Gaia}$',normed=True,linewidth=2)
-#
-#     # plt.hist(AS['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
-#     # plt.hist(AS['rad'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
-#     # plt.hist(K2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'K2 $\alpha$-rich',normed=True,linewidth=2)
-#     # plt.hist(K2_alpha['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'$\alpha$-rich K2, Gaia',normed=True,linewidth=2)
-#     plt.hist(TRI3a['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thin',normed=True,linewidth=2)
-#     plt.hist(TRI3b['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thick',normed=True,linewidth=2)
-#     # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
-#     # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
-#     plt.yticks([])
-#     plt.xlim(3.5,18)
-#     plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
-#     plt.legend(prop={'size':10})
-#     # f.savefig('Radius_TRI.pdf', bbox_inches='tight')
-#     # # pdf.savefig(f)
-#     # plt.show()
-#     # sys.exit()
+    ''' Radius Distributions '''
+    APK2_alpha = APK2[APK2['alpha'] > 0.1]
+    K2_alpha = AS[AS['alpha'] > 0.1]
+    # TRI3a = TRI[TRI['#Gc'] == 1]
+    # TRI3b = TRI[TRI['#Gc'] == 2]
+    # TRI3c = TRI[TRI['#Gc'] == 3]
+    K2_para = Luca[Luca['parallax_error']/Luca['parallax'] < .1]
+    f = plt.figure()
+    plt.hist(APK2['rad'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
+
+    # plt.hist(Kep_Sim['radius'],bins=np.linspace(0,20,100),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
+    # mdf.histo(APK2_alpha,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'$\alpha$-rich Kepler')
+    # plt.hist(APK2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'APOKASC $\alpha$-rich',color='r',normed=True,linewidth=2)
+    # mdf.histo(AS,'rad',np.linspace(4,20,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
+
+    plt.hist(K2_para['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'K2 SM',normed=True,linewidth=2)
+    plt.hist(K2_para['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2$_{Gaia}$',normed=True,linewidth=2)
+
+    # plt.hist(AS['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
+    # plt.hist(AS['rad'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
+    # plt.hist(K2_alpha['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'K2 $\alpha$-rich',normed=True,linewidth=2)
+    # plt.hist(K2_alpha['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'$\alpha$-rich K2, Gaia',normed=True,linewidth=2)
+    # plt.hist(TRI3a['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thin',normed=True,linewidth=2)
+    # plt.hist(TRI3b['radius'],bins=np.linspace(0,20,100),histtype='step',label=r'TRI: Thick',normed=True,linewidth=2)
+    # mdf.histo(Luca,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2')
+    # mdf.histo(gold,'rad',np.linspace(0,20,100),r'Radius [R$_{\odot}$]',0,r'K2, Gold')
+    plt.yticks([])
+    plt.xlim(3.5,18)
+    plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
+    plt.legend(prop={'size':10})
+    # f.savefig('Radius_TRI.pdf', bbox_inches='tight')
+    # # pdf.savefig(f)
+    # plt.show()
+    # sys.exit()
 #     #
 #     # f, ax = plt.subplots()
 #     # AS = AS[AS['alpha'] > -90]
