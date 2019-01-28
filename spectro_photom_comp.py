@@ -5,6 +5,7 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import seaborn as sns
 import numpy as np
 import scipy.optimize as op
@@ -166,36 +167,33 @@ def odr_fit(df,df1,param,label,f1,ax,uncert):
     cpar.append(myoutput.beta[1])
     empar.append(myoutput.sd_beta[0])
     ecpar.append(myoutput.sd_beta[1])
-    print(np.sqrt(np.diag(myoutput.cov_beta * myoutput.res_var)),[empar,ecpar])
+    # print(np.sqrt(np.diag(myoutput.cov_beta * myoutput.res_var)),[empar,ecpar])
     Z = np.sqrt(np.diag(myoutput.cov_beta * myoutput.res_var))
     # myoutput.pprint()
-    # ax.set_xlim(df1[param[1]].min()-f, df1[param[1]].max()+f)
-    # ax.set_xlabel(label[1])
-    # ax.set_ylabel(label[0])
-    # ax.scatter(X, y, color='yellowgreen', label='__nolegend__')
     lw = 2
+    means = np.array(myoutput.beta)
+    cov = np.array(myoutput.cov_beta)
+    np.diag(cov)**0.5
+    print(means, cov)
+    x = np.linspace(df1[param[1]].min()-f1, df1[param[1]].max()+f1, 1000)
+    aa, bb = np.random.multivariate_normal(means, cov, size=len(x)).T # Take samples of a random distribution centred on the best fit,
+                                                                      # using the covariance matrix to vary the values.
+    tmp = [np.std(aa * i + bb) for i in x] # Take std dev of the distribution of possible models to provide confidence interval.
+    a = means[0]
+    b = means[1]
+    y = a * x + b
 
-    df['pert'] = 0.
-    df1['pert'] = 0.
-    # for i in range(100):
-    ''' Add perturbation to the data to vary the fits '''
-    # for j in range(len(df1)):
-    #     gauss1 = np.random.normal(df1[param[1]].iloc[j],df1[uncert[1]].iloc[j],50)
-    #     value = gauss1[np.random.randint(len(gauss1),size=1)][0]
-    #     df1['pert'].iloc[j] = value
-    #     gauss2 = np.random.normal(df[param[0]].iloc[j],df[uncert[0]].iloc[j],50)
-    #     value2 = gauss2[np.random.randint(len(gauss2),size=1)][0]
-    #     df['pert'].iloc[j] = value2
-    #
-    # X = (df1['pert'])
-    # X = X.values.reshape(-1,1)
-    # y = (df['pert'])
+    # fig = plt.figure()
+    # fig, ax = plt.subplots()
+    #ax.errorbar(x, y, yerr=yerr, fmt='ko', label='Data')
+    ax.plot(x, a * x + b, 'r-', label=r'%.5s$*x$ + %.5s'%(a,b))
+    ax.fill_between(x, a * x + b - tmp, a * x + b + tmp, alpha=0.25, label='Confidence interval',color='gray')
+    ax.legend(loc=2)
+    # plt.show()
+    # sys.exit()
 
     line_X = np.arange(min(df1[param[1]])-f1, max(df1[param[1]])+f1, 0.01)#[:, np.newaxis]
     ax.plot(line_X,line_X,color='r', linewidth=3,alpha=0.5,linestyle='--',label='__nolegend__')
-    ax.plot(line_X, mpar[0]*line_X + cpar[0], color='orange', linewidth=3, label=r'%.5s$*x$ + %.5s'%(mpar[0],cpar[0]))
-    ax.plot(line_X, (mpar[0]+Z[0])*line_X + (cpar[0]), color='grey', linewidth=3, label=r'$+\sigma$')
-    ax.plot(line_X, (mpar[0]-Z[0])*line_X + (cpar[0]), color='grey', linewidth=3, label=r'$-\sigma$')
     ax.errorbar(df1[param[1]], df[param[0]], xerr=df1[uncert[1]], yerr=df[uncert[0]], color='blue', marker='.', label='__nolegend__',fmt='o',alpha=0.25)
     ax.scatter(df1[param[1]], df[param[0]], color='blue', label='__nolegend__')
     ax.legend(frameon=False)
@@ -204,8 +202,8 @@ def odr_fit(df,df1,param,label,f1,ax,uncert):
 
 if __name__ == "__main__":
     ''' Read in Data '''
-    ext = '/media/bmr135/SAMSUNG/GA/K2Poles'
-    # ext = '/media/ben/SAMSUNG/GA/K2Poles'
+    # ext = '/media/bmr135/SAMSUNG/GA/K2Poles'
+    ext = '/media/ben/SAMSUNG/GA/K2Poles'
     A3 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C3.csv')
     A3 = A3.dropna(subset=['TEFF','LOGG','FE_H'])
     A6 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C6.csv')
@@ -354,10 +352,10 @@ if __name__ == "__main__":
     ax2.set_ylim(-1.2, 0.6)
     plt.subplots_adjust(hspace=0.07,wspace=0.27)
     fig.savefig('spec_comps.pdf',bbox_inches='tight')
+    plt.show()
 
     ''' APOGEE vs LAMOST - C6 '''
     # if len(al) > 2:
     #     ransac_fit(al,la,['TEFF','teff_L'],[r'$T_{\rm{eff}}$ - APOGEE, C6',r'$\Delta(T_{\rm{eff}})_{APO-LAMOST}$'],10)
     #     ransac_fit(al,la,['LOGG','logg_L'],[r'log$_{10}$(g) - APOGEE, C6',r'$\Delta($log$_{10}$(g)$)_{APO-LAMOST}$'],0.1)
     #     ransac_fit(al,la,['FE_H','feh_L'],[r'[Fe/H] - APOGEE, C6',r'$\Delta($[Fe/H]$)_{APO-LAMOST}$'],0.1)
-    plt.show()
