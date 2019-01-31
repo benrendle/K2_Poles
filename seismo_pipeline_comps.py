@@ -10,7 +10,7 @@ import matplotlib.mlab as mlab
 import matplotlib.gridspec as gridspec
 from astropy.io import fits
 from astropy.table import Table
-from scipy.stats import norm
+from scipy.stats import norm, ttest_ind, t
 import colormaps
 import K2_properties as prop
 import K2_data as dat
@@ -362,6 +362,8 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     ax2 = fig.add_subplot(gs[1], sharey=ax1)
     n,bins,patches = ax2.hist(df['Diff'], 50, normed=1, orientation='horizontal', \
              facecolor='b',alpha=0.5, label='__nolegend__')
+    mu = np.mean(df['Diff'])
+    std = np.std(df['Diff'])
     x = np.linspace(min(df['Diff']),max(df['Diff']),100)
     y = mlab.normpdf(x, mu, std)
     print(mu, std, np.mean(df[comp_err]))
@@ -373,9 +375,17 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     ax2.set_xlabel('PDF',fontsize=15)
     ax2.legend(prop={'size':10})
     ax2.tick_params(labelsize=10)
+    '''student-t '''
+    # mu1, var1 = t.stats(2*len(df)-2,moments='mv')
+    # tt = mlab.normpdf(x, mu1, np.sqrt(var1))
+    # ax2.plot(tt,x,'b--',linewidth=2)
+    nu, loc, scale = t.fit(df['Diff'],floc=mu,fscale=std)
+    ax2.plot(t.pdf(x, nu, loc=loc, scale=scale),x,'r-', lw=5, alpha=0.6, label='t pdf')
     plt.setp(ax2.get_yticklabels(), visible=False)
     fig.subplots_adjust(wspace=0.0)
     plt.tight_layout()
+    print(ttest_ind(df[params[0]],df[params[1]],equal_var=False))
+    print(t.fit(df['Diff'],floc=mu,fscale=std))
     # sys.exit()
     # fig.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/seismo_comp/C3_'+labels[0]+'_'+labels[1]+'_dnu.pdf',bbox_inches='tight')
     # df = df[df[params[0]]>7.5]
@@ -399,5 +409,5 @@ comp_seismic_plot(BS_C3,'comp_err_nmx',['Bnumax','Snumax'],['e_Bnumax','e_Snumax
 # comp_seismic_plot(YS_C6,'comp_err_Dnu',['dnu','SDnu'],['dnu_err','e_SDnu'],[r'BHM',r'A2Z'],r'$\Delta\nu$')
 # comp_seismic_plot(YB_C6,'comp_err_Dnu',['dnu','BDnu'],['dnu_err','e_BDnu'],[r'BHM',r'COR'],r'$\Delta\nu$')
 # comp_seismic_plot(BS_C6,'comp_err_Dnu',['BDnu','SDnu'],['e_BDnu','e_SDnu'],[r'COR',r'A2Z'],r'$\Delta\nu$')
-
+plt.show()
 sys.exit()

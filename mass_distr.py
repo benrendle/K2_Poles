@@ -1316,6 +1316,8 @@ if __name__ == '__main__':
     ip = InsetPosition(ax, [0.6,0.05,0.35,0.35])
     ax2.set_axes_locator(ip)
     ax2.invert_xaxis()
+    TRI3a = TRI3a[TRI3a['label'] == 4]
+    TRI3b = TRI3b[TRI3b['label'] == 4]
     ax2.scatter(TRI3b['Teff'],TRI3b['logL'],c=TRI3b['M_H'],cmap=colormaps.parula,label=None,vmin=-2.0, vmax=1.0,alpha=0.3,s=10)
     ax2.scatter(TRI3a['Teff'],TRI3a['logL'],c=TRI3a['M_H'],cmap=colormaps.parula,label=None,vmin=-2.0, vmax=1.0,alpha=0.3,s=10,edgecolor='k')
     ax2.plot(Te,np.log10(100*(Te/5777)**4),alpha=0.5,color='k',linestyle='--',label=r'10 R$_{\odot}$')
@@ -1324,11 +1326,11 @@ if __name__ == '__main__':
     ax2.text(0.4, 0.95, '11 R$_{\odot}$', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,fontsize=10)
     ax2.set_xlim(5300,4400)
     ax2.set_ylim(1.65,1.85)
-    # hrd.savefig('clump_rads.pdf',bbox_inches='tight')
+    hrd.savefig('clump_rads.pdf',bbox_inches='tight')
 
-    # plt.show()
+    plt.show()
 
-    # sys.exit()
+    sys.exit()
     APK2_alpha = APK2[APK2['alpha'] > 0.1]
     K2_alpha = AS[AS['alpha'] > 0.1]
 
@@ -1901,7 +1903,7 @@ if __name__ == '__main__':
     # mdf.histo(AS,'rad',np.linspace(4,20,80),r'Radius [R$_{\odot}$]',0,r'K2 Spec.')
 
     plt.hist(K2_para['rad'],bins=np.linspace(0,20,100),histtype='step',label=r'K2 SM',normed=True,linewidth=2)
-    plt.hist(K2_para['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2$_{Gaia}$',normed=True,linewidth=2)
+    plt.hist(K2_para['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2$_{Gaia}$',normed=True,linewidth=2,color='m')
 
     # plt.hist(AS['Rgaia'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
     # plt.hist(AS['rad'],bins=np.linspace(0,20,50),histtype='step',label=r'K2 Spec.',normed=True,linewidth=2)
@@ -1915,8 +1917,8 @@ if __name__ == '__main__':
     plt.xlim(3.5,18)
     plt.xlabel(r'Radius [R$_{\odot}$]',fontsize=15)
     plt.legend(prop={'size':10})
-    # f.savefig('Radius_TRI.pdf', bbox_inches='tight')
-    # # pdf.savefig(f)
+    # f.savefig('Radius_PARAM_Gaia.pdf', bbox_inches='tight')
+    # # # pdf.savefig(f)
     # plt.show()
     # sys.exit()
 #     #
