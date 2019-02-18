@@ -295,7 +295,7 @@ for j in range(len(b)):
     # print(len(pd.merge(GAP3[['EPIC']],camp3_0[['EPIC']],how='inner',on=['EPIC'])))
     # print(len(GAP6_v2),len(C6R))
     print(len(GAP6_v2[GAP6_v2['prob_s'] >= 0.95]), len(C6R[C6R['prob_s'] >= 0.95]))
-    sys.exit()
+    # sys.exit()
 
     C3Rg = pd.merge(C3Rg,camp3_0[['EPIC','Bnumax','nmx','Snumax','BDnu','dnu','SDnu']],how='inner',on=['EPIC'])
     C3Rg = prop.single_seismo(C3Rg,['Bnumax','nmx','Snumax'],'NUMAX')
@@ -387,32 +387,32 @@ for j in range(len(b)):
     # # plt.show()
     # b['per'].iloc[j] = np.median(a['per'])
 
-GAP3v3 = GAP3_v3[GAP3_v3['prob_s_gaia'] >= 0.95]
-C3Rg = pd.merge(camp3_0[['EPIC']],GAP3v3,how='inner',on=['EPIC'])
-plt.figure()
-plt.subplot(2,2,1)
-hist1, xb1, yb1, im1 = plt.hist2d(GAP3v3['Rgaia'],GAP3v3['Hmag'],bins=16,cmap=colormaps.parula)#,normed=True)
-cbar = plt.colorbar()
-
-plt.subplot(2,2,2)
-hist2, xb2, yb2, im2 = plt.hist2d(C3Rg['Rgaia'],C3Rg['Hmag'],bins=[xb1,yb1],cmap=colormaps.parula)#,normed=True)
-cbar = plt.colorbar()
-
-# hist = (1-hist2/hist1)*100
-hist = hist1-hist2
-
-plt.figure()
-plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspect='auto',alpha=0.75)
-cbar = plt.colorbar()
-cbar.set_label(r'Percentage Reduction', rotation=270, fontsize=20, labelpad=25)
-cbar.ax.tick_params(labelsize=20)
-plt.ylabel(r'H',fontsize=20, labelpad=20)
-plt.xlabel(r'Radius',fontsize=20, labelpad=10)
-plt.title(r'C3 - GAP vs seismo (Rgaia, p$>0.95$)',fontsize=20)
-plt.tick_params(labelsize=15)
-plt.tight_layout()
-
-# a = np.sum(hist2)
+# GAP3v3 = GAP3_v3[GAP3_v3['prob_s_gaia'] >= 0.95]
+# C3Rg = pd.merge(camp3_0[['EPIC']],GAP3v3,how='inner',on=['EPIC'])
+# plt.figure()
+# plt.subplot(2,2,1)
+# hist1, xb1, yb1, im1 = plt.hist2d(GAP3v3['Rgaia'],GAP3v3['Hmag'],bins=16,cmap=colormaps.parula)#,normed=True)
+# cbar = plt.colorbar()
+#
+# plt.subplot(2,2,2)
+# hist2, xb2, yb2, im2 = plt.hist2d(C3Rg['Rgaia'],C3Rg['Hmag'],bins=[xb1,yb1],cmap=colormaps.parula)#,normed=True)
+# cbar = plt.colorbar()
+#
+# # hist = (1-hist2/hist1)*100
+# hist = hist1-hist2
+#
+# plt.figure()
+# plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspect='auto',alpha=0.75)
+# cbar = plt.colorbar()
+# cbar.set_label(r'Percentage Reduction', rotation=270, fontsize=20, labelpad=25)
+# cbar.ax.tick_params(labelsize=20)
+# plt.ylabel(r'H',fontsize=20, labelpad=20)
+# plt.xlabel(r'Radius',fontsize=20, labelpad=10)
+# plt.title(r'C3 - GAP vs seismo (Rgaia, p$>0.95$)',fontsize=20)
+# plt.tick_params(labelsize=15)
+# plt.tight_layout()
+#
+# # a = np.sum(hist2)
 # b = np.sum(hist1)
 # c = (1-np.float(a/b))*100
 # print(c)
@@ -659,7 +659,7 @@ camp6_0 = camp6_0.drop_duplicates(subset=['EPIC'])
 camp6_0 = camp6_0.reset_index(drop=True)
 camp6_0 = camp6_0.fillna(value='NaN',method=None)
 print(len(camp3_0),len(camp6_0))
-sys.exit()
+
 cols = ['EPIC','RA','Dec','Teff','[Fe/H]','slogg','logg','radius','radius_val']
 K2_camp = pd.concat([GAP3,GAP6],ignore_index=True)
 K2_camp = K2_camp.reset_index(drop=True)
@@ -1008,12 +1008,13 @@ spec3 = spec3.drop_duplicates(subset=['EPIC'])
 spec3 = spec3.reset_index(drop=True)
 spec3 = spec3.fillna(value='NaN',method=None)
 
-spec6 = pd.concat([AP6,RC6,L6],ignore_index=True)
+spec6 = pd.concat([AP6,RC6],ignore_index=True)
 spec6 = spec6.drop_duplicates(subset=['EPIC'])
 spec6 = spec6.reset_index(drop=True)
 spec6 = spec6.fillna(value='NaN',method=None)
 
 print('C3/C6 Spec. lengths:',len(spec3),len(spec6))
+sys.exit()
 
 ''' Spectroscopic Sample Overlaps '''
 print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
@@ -1048,9 +1049,11 @@ print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
+L3[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST3.csv',index=False,na_rep='Inf')
+L6[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST6.csv',index=False,na_rep='Inf')
 # AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP6_RAVE_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-# sys.exit()
+sys.exit()
 
 ''' Check length of data sets '''
 # print( len(BC3), len(YC3), len(SC3), len(BC6), len(YC6), len(SC6))
