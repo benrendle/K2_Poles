@@ -30,8 +30,8 @@ def p_in(name,df1,field):
     '''
     EPIC = pd.DataFrame()
     EPIC['#Id'] = df1['#Id']
-    # df = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
-    df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    df = pd.read_csv('/media/bmr135/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
+    # df = pd.read_csv('/media/ben/SAMSUNG/GA/K2Poles/param_inputs/Poles/'+name+'.in',delimiter=r'\s+')
     df.rename(columns={'ID':'#Id'},inplace=True)
     df = pd.merge(df,EPIC,how='inner',on=['#Id'])
     df = df.reset_index(drop=True)

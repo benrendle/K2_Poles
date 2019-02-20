@@ -9,26 +9,29 @@ import matplotlib.gridspec as gridspec
 
 if __name__ == "__main__":
     ### Read in the APOKASC data ...
-    context_csv_file  ='/home/bmr135/GA/K2Poles/APOKASC4BEN.txt'
+    context_csv_file  ='/home/bmr135/K2_Poles/Mass_Distr_In/Normal/Nov_2018/APOKASC_281118'
     df = pd.read_csv(context_csv_file)
     df = df[df.mass > 0] # Kill stars with no mass
 
     ### Read in the new sample
-    sample_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C3_22022018_130200.csv'
+    sample_csv_file = '/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/SM_Gaia_BC_full.csv'
     sample = pd.read_csv(sample_csv_file)
-    sample6_csv_file = '/home/bmr135/GA/K2Poles/matlab_in/C6_22022018_130200.csv'
+    sample6_csv_file = '/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/AS_Gaia_BC_APO.csv'
     sample6 = pd.read_csv(sample6_csv_file)
+    sample6 = sample6[(sample6['alpha'] > 0.1) & (sample6.age < 7)]
+    sample6 = sample6.reset_index(drop=True)
 
     ### Set up the plot
     fig = plt.figure()
     gs = gridspec.GridSpec(2, 1, height_ratios=(2,4))
-    ax = fig.add_subplot(gs[0], axisbg='white')
-    bx = fig.add_subplot(gs[1], axisbg='white')
+    ax = fig.add_subplot(gs[0], facecolor='white')
+    bx = fig.add_subplot(gs[1], facecolor='white')
     matplotlib.rcParams.update({'font.size': 20})
 
     ### plot the Context stars
-    CS = ax.scatter(df.numax, df.Dnu, c=df.mass, cmap='copper', \
-                    label='APOKASC SAMPLE', vmax=1.5)
+    ax.scatter(df.numax, df.Dnu, label=r'APOKASC', color='gray', alpha=0.2)
+    CS = ax.scatter(sample6.nmx, sample6.dnu, c=sample6.mass, cmap='copper', \
+                    label='K2 YAR SAMPLE', vmax=1.5)
     ax.set_xlabel(r'$\mathrm{\nu_{max}}$', fontsize=20)
     ax.set_ylabel(r'$\mathrm{\Delta \nu}$', fontsize=20)
     cbar = fig.colorbar(CS, extend='both')
@@ -45,21 +48,20 @@ if __name__ == "__main__":
     ax.plot(numaxx, fit, 'r--')
 
     ### Plot the context stars O-C
-    bx.scatter(df.numax, df.Dnu - fitt, c=df.mass, cmap='copper', vmax=2)
+    bx.scatter(df.numax, df.Dnu - fitt, color='gray',alpha=0.2)#, c=df.mass, cmap='copper', vmax=2,alpha=0.25)
     bx.set_xlim([0,220])
     fig.tight_layout()
 
     ### Plot the sample stars in the O-C
-    oc = sample.DNU - alpha * sample.NUMAX**beta
-    bx.scatter(sample.NUMAX, oc, facecolors='none', edgecolors='m', \
-               label='Sample', alpha=0.3, s=40)
-    oc6 = sample6.DNU - alpha * sample6.NUMAX**beta
-    bx.scatter(sample6.NUMAX, oc6, facecolors='none', edgecolors='m', \
-               label='Sample', alpha=0.3, s=40)
+    oc = sample.Dnu - alpha * sample.numax**beta
+    oc6 = sample6.dnu - alpha * sample6.nmx**beta
+    bx.scatter(sample6.nmx, oc6, label='SM', alpha=0.73, s=40, c=sample6.mass, cmap='copper', vmax=2,)
+    # bx.scatter(sample6.nmx, oc6, edgecolors='m', \
+    #            label='AS', alpha=0.73, s=40)
     bx.set_ylim([-2,1.5])
     bx.set_xlabel(r'$\mathrm{\nu_{max}}$', fontsize=20)
     bx.set_ylabel(r'$\mathrm{\Delta \nu}$ - fit', fontsize=20)
 
-    fig.savefig('context_mass.png')
+    # fig.savefig('context_mass.png')
 
     plt.show()
