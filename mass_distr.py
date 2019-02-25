@@ -806,16 +806,16 @@ if __name__ == '__main__':
     AS = mdf.vert_dist(AS)
     AS['sig_Z'] = 1e-3 * abs(AS['dist_68U'] - AS['dist_68L'])/2
     AS['sig_Gal_Rad'] = np.sqrt((2*(AS['sig_Z']/AS['X'])**2) + (2*(AS['sig_Z']/AS['Y'])**2))
-    AS['APO']=0
-    for i in range(len(AS)):
-        for j in range(len(AP3)):
-            if AS['#Id'].iloc[i] == AP3['#Id'].iloc[j]:
-                AS['APO'].iloc[i] = 1
-    for i in range(len(AS)):
-        for j in range(len(AP6)):
-            if AS['#Id'].iloc[i] == AP6['#Id'].iloc[j]:
-                AS['APO'].iloc[i] = 1
-    AS = AS[AS['APO'] == 1]
+    # AS['APO']=0
+    # for i in range(len(AS)):
+    #     for j in range(len(AP3)):
+    #         if AS['#Id'].iloc[i] == AP3['#Id'].iloc[j]:
+    #             AS['APO'].iloc[i] = 1
+    # for i in range(len(AS)):
+    #     for j in range(len(AP6)):
+    #         if AS['#Id'].iloc[i] == AP6['#Id'].iloc[j]:
+    #             AS['APO'].iloc[i] = 1
+    # AS = AS[AS['APO'] == 1]
     # AS.to_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/AS_Gaia_BC_APO.csv',index=False)
     # print(AS.columns.values)
     # a = AS[AS['#Id'] < 208000000]
@@ -1349,10 +1349,11 @@ if __name__ == '__main__':
     # hrd.savefig('clump_rads.pdf',bbox_inches='tight')
     #
     # plt.show()
-    # sys.exit()
     APK2_alpha = APK2[APK2['alpha'] > 0.1]
+    # APK2_alpha = APK2_alpha[APK2_alpha['age'] < 7.]
     K2_alpha = AS[AS['alpha'] > 0.1]
-
+    # print(len(APK2_alpha)/len(APK2))
+    # sys.exit()
 
 
     # ax.hist(Kep_Sim['Kabs'],bins=np.linspace(-4.2,0.75,60),label=r'APOKASC',color='grey',alpha=0.2,normed=True)
@@ -2004,20 +2005,21 @@ if __name__ == '__main__':
 
     ''' Mass vs logg scatter '''
     Luca = Luca[Luca['sig_age']/Luca['age']<0.35]
-    L1 = Luca[abs(Luca['Z']) < 0.5]
-    L2 = Luca[(abs(Luca['Z']) >= 0.5) & (abs(Luca['Z']) < 1.0)]
-    L3 = Luca[(abs(Luca['Z']) >= 1.0) & (abs(Luca['Z']) < 1.5)]
-    # L4 = Luca[(abs(Luca['Z']) >= 1.5) & (abs(Luca['Z']) < 2.0)]
-    # L5 = Luca[(abs(Luca['Z']) >= 2.0) & (abs(Luca['Z']) < 2.5)]
-    L4 = Luca[abs(Luca['Z']) >= 1.5]
+    # L1 = Luca[abs(Luca['Z']) < 0.5]
+    # L2 = Luca[(abs(Luca['Z']) >= 0.5) & (abs(Luca['Z']) < 1.0)]
+    # L3 = Luca[(abs(Luca['Z']) >= 1.0) & (abs(Luca['Z']) < 1.5)]
+    # # L4 = Luca[(abs(Luca['Z']) >= 1.5) & (abs(Luca['Z']) < 2.0)]
+    # # L5 = Luca[(abs(Luca['Z']) >= 2.0) & (abs(Luca['Z']) < 2.5)]
+    # L4 = Luca[abs(Luca['Z']) >= 1.5]
 #
-    # AS = AS[AS['sig_age']/AS['age']<0.35]
-    # # APK2 = APK2[APK2['sig_age']/APK2['age']<0.35]
-    # L1 = AS[abs(AS['Z']) < 0.5]
-    # L2 = AS[(abs(AS['Z']) >= 0.5) & (abs(AS['Z']) < 1.0)]
-    # L3 = AS[(abs(AS['Z']) >= 1.0) & (abs(AS['Z']) < 1.5)]
-    # # L4 = AS[(abs(AS['Z']) >= 1.5) & (abs(AS['Z']) < 2.0)]
-    # L4 = AS[abs(AS['Z']) >= 1.5]
+    AS = AS[AS['sig_age']/AS['age']<0.35]
+    # AS = AS[(AS['age'] < 7) & (AS['alpha'] > 0.1)]
+    APK2 = APK2[APK2['sig_age']/APK2['age']<0.35]
+    L1 = AS[abs(AS['Z']) < 0.5]
+    L2 = AS[(abs(AS['Z']) >= 0.5) & (abs(AS['Z']) < 1.0)]
+    L3 = AS[(abs(AS['Z']) >= 1.0) & (abs(AS['Z']) < 1.5)]
+    # L4 = AS[(abs(AS['Z']) >= 1.5) & (abs(AS['Z']) < 2.0)]
+    L4 = AS[abs(AS['Z']) >= 1.5]
 #     # L5 = AS[(abs(AS['Z']) >= 2.0) & (abs(AS['Z']) < 2.5)]
 #     # L6 = AS[abs(AS['Z']) >= 2.5]
 #
@@ -2045,7 +2047,7 @@ if __name__ == '__main__':
     sns.despine(left=True)
     bins = np.linspace(0,20,40)
     sns.distplot(AK1['age'], color="grey", ax=ax,bins=bins,label=r'APOKASC; Z $< 0.5$ kpc')
-    sns.distplot(L1['age'], color="b", ax=ax, bins=bins,label=r'K2$_{\rm{HQ}}$; Z $< 0.5$ kpc')
+    sns.distplot(L1['age'], color="orange", ax=ax, bins=bins,label=r'K2 Spec.; Z $< 0.5$ kpc')
     # ax.hist(AK1['age'],bins=bins,histtype='step',label='__nolegend__',normed=True,linewidth=2,color='grey',alpha=0.1)
     # ax.hist(L1['age'],bins=bins,histtype='step',label='__nolegend__',normed=True,linewidth=2,color='b',alpha=0.1)
     ax.set_yticks([])
@@ -2055,24 +2057,27 @@ if __name__ == '__main__':
     ax.legend(loc=1)
 
     sns.distplot(AK2['age'], color="grey", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
-    sns.distplot(L2['age'], color="b", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
+    sns.distplot(L2['age'], color="orange", ax=ax1,bins=bins,label=r'$0.5 <$ Z $< 1.0$ kpc')
     ax1.set_yticks([])
     ax1.set_xlim(0,20)
     ax1.set_xlabel('')
     ax1.legend(loc=1)
 
     sns.distplot(AK3['age'], color="grey", ax=ax2,bins=bins,label=r'$1.0 <$ Z $< 1.5$ kpc')
-    sns.distplot(L3['age'], color="b", ax=ax2,bins=bins,label=r'$1.0 <$ Z $< 1.5$ kpc')
+    sns.distplot(L3['age'], color="orange", ax=ax2,bins=bins,label=r'$1.0 <$ Z $< 1.5$ kpc')
     ax2.set_yticks([])
     ax2.set_xlabel('')
     ax2.legend(loc=1)
 
-    sns.distplot(L4['age'], color="b", ax=ax3,bins=bins,label=r'Z $> 1.5$ kpc')
+    sns.distplot(L4['age'], color="orange", ax=ax3,bins=bins,label=r'Z $> 1.5$ kpc')
     # ax3.hist(L4['age'],bins=bins,histtype='step',label=r'__nolegend__',normed=True,linewidth=2,color='b',alpha=0.1)
     ax3.set_yticks([])
     ax3.set_xlabel('')
     ax3.legend(loc=1)
-
+    print(len(L3[(L3['age'] < 7) & (L3['alpha'] > 0.1) & (L3['age'] > 4)]),len(L3[(L3['age'] < 7)]),len(L3))
+    print(len(L4[(L4['age'] < 7) & (L4['alpha'] > 0.1) & (L4['age'] > 4)]),len(L4[(L4['age'] < 7)]),len(L4))
+    print(len(AS[(AS['age'] < 7) & (AS['alpha'] > 0.1) & (AS['age'] > 4)]),len(AS[(AS['age'] < 7)]),len(AS))
+    print(len(APK2[(APK2['age'] < 7) & (APK2['alpha'] > 0.1)]),len(APK2[(APK2['age'] < 7)]),len(APK2))
     # sns.distplot(L5['age'], color="b", ax=ax4,bins=bins,label=r'$2.0 <$ Z $< 2.5$ kpc')
     # ax4.set_yticks([])
     ax2.set_xlabel(r'Age [Gyr]')
@@ -2083,11 +2088,11 @@ if __name__ == '__main__':
     ax3.set_xlabel(r'Age [Gyr]')
     # ax5.legend()
     # plt.tight_layout()
-    # fig.savefig('Age_Z_SM_HQ.pdf', bbox_inches='tight')
+    # fig.savefig('Age_Z_Spec_HQ.pdf', bbox_inches='tight')
     # pdf.savefig(fig)
     # pdf.close()
     # plt.show()
-    # sys.exit()
+    sys.exit()
 #
 #
 #     # plt.figure()
@@ -2361,6 +2366,15 @@ if __name__ == '__main__':
     d1 = kde.KDE1D(AS['age'])
     x1 = np.r_[min(AS['age']):max(AS['age']):1024j]
     ax2.plot(x1,d1(x1),linewidth=2,label=r'Full',color='orange')
+    for i in range(len(AS)):
+        for j in range(len(AP3)):
+            if AS['#Id'].iloc[i] == AP3['#Id'].iloc[j]:
+                AS['APO'].iloc[i] = 1
+    for i in range(len(AS)):
+        for j in range(len(AP6)):
+            if AS['#Id'].iloc[i] == AP6['#Id'].iloc[j]:
+                AS['APO'].iloc[i] = 1
+    AS = AS[AS['APO'] == 1]
     ar = AS[AS['alpha']>0.1]
     ap = AS[AS['alpha']<=0.1]
     d1 = kde.KDE1D(ar['age'])
@@ -2398,7 +2412,7 @@ if __name__ == '__main__':
     ax1.set_xlabel(r'Age [Gyr]',fontsize=15)
     ax2.set_xlabel(r'Age [Gyr]',fontsize=15)
     plt.subplots_adjust(hspace=0.07, wspace=0.1,top=0.91,bottom=0.15)
-    f1.savefig('Age_KDE_comb.pdf', bbox_inches='tight')
+    # f1.savefig('Age_KDE_comb.pdf', bbox_inches='tight')
     plt.show()
     # pdf.savefig(f1)
     sys.exit()
@@ -2902,7 +2916,7 @@ if __name__ == '__main__':
     # AS = AS[AS['alpha'] < -10]
     print(len(AS[AS['alpha']>0.1]))
     K2_ar = AS[(AS['alpha'] > 0.1) & ((10**AS['logAge']/1e9) < 7)]
-    K2_ar = K2_ar[abs((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']) < 0.5]
+    # K2_ar = K2_ar[abs((K2_ar['mass']-K2_ar['m_seismo'])/K2_ar['mass']) < 0.5]
     K2_ar = K2_ar.reset_index(drop=True)
     f = plt.figure()
     # print(K2_New['feh'])
@@ -2930,7 +2944,7 @@ if __name__ == '__main__':
     # pdf.close()
 
 
-    K2_ar = K2_ar[(K2_ar['mass'] > 1.8) & (K2_ar['mass'] < 2.2)]
+    # K2_ar = K2_ar[(K2_ar['mass'] > 1.8) & (K2_ar['mass'] < 2.2)]
     fig, ax = plt.subplots()
     ax.scatter(AS.mass, AS.nmx)
     ax.scatter(K2_ar.mass,K2_ar.nmx)
@@ -2942,8 +2956,8 @@ if __name__ == '__main__':
     ax.scatter(K2_ar['Teff'],np.log10(K2_ar['gLumo']))
     ax.invert_xaxis()
     print(len(K2_ar)/len(AS),len(AS),len(K2_ar))
-    plt.show()
-
+    # plt.show()
+    sys.exit()
 
     # APK2['gal_rad2'] = APK2['dist']*np.cos(APK2['Glat']*np.pi/180)*np.tan(APK2['Glon']*np.pi/180)*1e-3
     APK2['gal_rad3'] = np.sqrt(8250**2 + APK2['dist']**2 - 2*8250*APK2['dist']*np.cos(APK2['Glon']*np.pi/180))*1e-3
