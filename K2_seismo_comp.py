@@ -220,16 +220,16 @@ for j in range(len(b)):
     # fig,ax = plt.subplots()
     # a = np.where(K2_camp_v2['prob_s'] >= 0.95)
     # b = np.where(K2_camp_v3['prob_s_gaia'] >= 0.95)
-    # ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.5,label=r'GAP')
-    # ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
-    # ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.5,label=r'R$_{\rm{Gaia}}$')
-    # ax.set_xlabel(r'J - K',fontsize=15)
-    # ax.set_ylabel(r'K$_{\rm{abs}}$',fontsize=15)
+    # ax.scatter(K2_camp['JK'],K2_camp['Kabs'],alpha=0.25,label=r'GAP')
+    # # ax.scatter(K2_camp_v2['JK'].iloc[a],K2_camp_v2['Kabs'].iloc[a],alpha=0.5,label=r'R$_{\rm{catalogue}}$')
+    # ax.scatter(K2_camp_v3['JK'].iloc[b],K2_camp_v3['Kabs'].iloc[b],alpha=0.25,label=r'R$_{\rm{Gaia}}$')
+    # ax.set_xlabel(r'J - K$_{\rm{s}}$',fontsize=15)
+    # ax.set_ylabel(r'M$_{\rm{K}_{\rm{s}}}$',fontsize=15)
     # ax.set_xlim(0.475,1.325)
     # ax.invert_yaxis()
     # ax.legend(loc=4)
-    # # plt.show()
-    # fig.savefig('Det_prob_cut_HRD.pdf', bbox_inches='tight')
+    # plt.show()
+    # fig.savefig('Det_prob_cut_HRDv2.pdf', bbox_inches='tight')
     # sys.exit()
 
     # bins = [np.linspace(min(K2_camp['mass']),max(K2_camp['mass']),50), \
@@ -587,7 +587,8 @@ GES = GES.drop_duplicates(subset=['EPIC'])
 GES = GES.fillna(value='NaN',method=None)
 GES = GES.reset_index(drop=True)
 # GES.to_csv(ext_GA+'GA/K2Poles/Gaia_ESO/GES_full.csv',index=False,na_rep='Inf')
-print( "Gaia-ESO saved out")
+print( "Gaia-ESO saved out",len(GES))
+# sys.exit()
 
 ''' Merging of APOGEE data with single asteroseismic dets '''
 YA3,SA3,BA3,EA3 = dat.APO_merge(seismo3_list,APO3,seismo3_name)
@@ -902,19 +903,21 @@ camp6 = prop.single_seismo(camp6,['e_Bnumax','nmx_err','e_Snumax'],'NUMAX_err')
 camp6 = prop.single_seismo(camp6,['BDnu','dnu','SDnu'],'DNU')
 camp6 = prop.single_seismo(camp6,['e_BDnu','dnu_err','e_SDnu'],'DNU_err')
 # camp6 = prop.met_filter(camp6)
-
+camp3['Vcut'] = camp3['Kmag'] + 2*(camp3['JK']+0.14) + 0.382*np.exp(2*(camp3['JK']-0.2))
+print(min(camp3.Vcut),max(camp3.Vcut))
+print(min(camp6['Hmag']),max(camp6['Hmag']))
 print('C3/C6 lengths:',len(camp3),len(camp6))
 
-Luca = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/SM_Gaia_BC_full.csv')
-a = Luca[Luca['#Id'] < 208000000]
-b = Luca[Luca['#Id'] > 208000000]
-print(len(a),len(b))
-Luca = Luca.rename(columns={'#Id':'EPIC'})
-
-
-a = pd.merge(Luca,camp3,how='inner',on=['EPIC'])
-b = pd.merge(Luca,camp6,how='inner',on=['EPIC'])
-print('C3/C6 Luca cross:',len(a),len(b))
+# Luca = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/SM_Gaia_BC_full.csv')
+# a = Luca[Luca['#Id'] < 208000000]
+# b = Luca[Luca['#Id'] > 208000000]
+# print(len(a),len(b))
+# Luca = Luca.rename(columns={'#Id':'EPIC'})
+#
+#
+# a = pd.merge(Luca,camp3,how='inner',on=['EPIC'])
+# b = pd.merge(Luca,camp6,how='inner',on=['EPIC'])
+# print('C3/C6 Luca cross:',len(a),len(b))
 # sys.exit()
 
 ''' Data Flag for EPIC parametric values - which [Fe/H] to use? '''
@@ -968,10 +971,10 @@ print("Gaia-ESO: ", len(GES))
 # df = df[df.Vmag != 'NaN']
 # # df = df[df.values != 'NaN']
 # df = df.reset_index(drop=True)
-# # df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL',index=False)
+# df.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3_TL',index=False)
 # plt.figure()
-# # hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
-# # print(hist,bins)
+# hist, bins = np.histogram(df['Vmag'],bins=[9,10,11,12,13,14,15])
+# print(hist,bins)
 # plt.hist(df['Vmag'],bins=[9,10,11,12,13,14,15])
 # plt.xlabel(r'V',fontsize=15)
 # plt.show()
@@ -1014,7 +1017,7 @@ spec6 = spec6.reset_index(drop=True)
 spec6 = spec6.fillna(value='NaN',method=None)
 
 print('C3/C6 Spec. lengths:',len(spec3),len(spec6))
-sys.exit()
+
 
 ''' Spectroscopic Sample Overlaps '''
 print(len(pd.merge(AP3,GES,how='inner',on=['EPIC'])))
@@ -1049,11 +1052,11 @@ print(len(pd.merge(L6,RC6,how='inner',on=['EPIC'])))
 # GES.to_csv(ext_GA+'GA/K2Poles/matlab_in/GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L3.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST3_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # L6.to_csv(ext_GA+'GA/K2Poles/matlab_in/LAMOST6_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-L3[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST3.csv',index=False,na_rep='Inf')
-L6[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST6.csv',index=False,na_rep='Inf')
+# L3[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST3.csv',index=False,na_rep='Inf')
+# L6[['EPIC','RA','Dec']].to_csv('/home/bmr135/LAMOST6.csv',index=False,na_rep='Inf')
 # AP3.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP3_GES_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
 # AP6.to_csv(ext_GA+'GA/K2Poles/matlab_in/AP6_RAVE_'+time.strftime("%d%m%Y")+'.csv',index=False,na_rep='Inf')
-sys.exit()
+# sys.exit()
 
 ''' Check length of data sets '''
 # print( len(BC3), len(YC3), len(SC3), len(BC6), len(YC6), len(SC6))
@@ -1540,15 +1543,15 @@ hist = hist2-hist1
 # np.savetxt('/home/bmr165/GA/K2Poles/hist.txt',hist)
 # plt.figure()
 # plt.subplot(2,2,3)
-plt.figure()
-plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspect='auto')
-cbar = plt.colorbar()
-cbar.set_label(r'$N_{\rm{obs}} - N_{\rm{sim}}$', rotation=270, fontsize=20, labelpad=25)
-cbar.ax.tick_params(labelsize=20)
-plt.ylabel(r'H',fontsize=20, labelpad=20)
-plt.xlabel(r'J-K',fontsize=20, labelpad=10)
-plt.title(r'Multi det - Benoit (C3)',fontsize=20)
-plt.tick_params(labelsize=15)
+# plt.figure()
+# plt.imshow(hist.T,interpolation='none',cmap=colormaps.parula,extent=[min(xb1),max(xb1),max(yb1),min(yb1)],aspectratio='auto')
+# cbar = plt.colorbar()
+# cbar.set_label(r'$N_{\rm{obs}} - N_{\rm{sim}}$', rotation=270, fontsize=20, labelpad=25)
+# cbar.ax.tick_params(labelsize=20)
+# plt.ylabel(r'H',fontsize=20, labelpad=20)
+# plt.xlabel(r'J-K',fontsize=20, labelpad=10)
+# plt.title(r'Multi det - Benoit (C3)',fontsize=20)
+# plt.tick_params(labelsize=15)
 #
 # plt.tight_layout()
 #
@@ -1574,25 +1577,49 @@ plt.tick_params(labelsize=15)
 # plt.tight_layout()
 
 ''' Sky projection plot '''
+import json
+footprint_dictionary = json.load(open("/home/bmr135/K2_footprint.json"))
+# for i in range(84):
+#     if (i+1 == 5) | (i+1 == 6) | (i+1 == 7) | (i+1 == 8) | (i+1 == 17) | (i+1 == 18) | (i+1 == 19) | (i+1 == 20): pass
+#     else:
+#         mychannel = footprint_dictionary["c3"]["channels"][str(i+1)]
+#         print(mychannel)
+# sys.exit()
+
+
 plt.figure()
 # # plt.hist(C6_nospec['Grad']/1000,bins=75)
-# v9 = C6_nospec[C6_nospec['Vmag'] < 10]
-# v10 = C6_nospec[(C6_nospec['Vmag'] >= 10) & (C6_nospec['Vmag'] < 11)]
-# v11 = C6_nospec[(C6_nospec['Vmag'] >= 11) & (C6_nospec['Vmag'] < 12)]
-# v12 = C6_nospec[(C6_nospec['Vmag'] >= 12) & (C6_nospec['Vmag'] < 13)]
-# v13 = C6_nospec[(C6_nospec['Vmag'] >= 13) & (C6_nospec['Vmag'] < 14)]
-# v14 = C6_nospec[(C6_nospec['Vmag'] >= 14) & (C6_nospec['Vmag'] <= 15)]
-# # plt.scatter(C6_nospec['RA'],C6_nospec['Dec'])
-# plt.scatter(v9['RA'],v9['Dec'],label=r'V = 9-10')
-# plt.scatter(v10['RA'],v10['Dec'],label=r'V = 10-11',color='r')
-# plt.scatter(v11['RA'],v11['Dec'],label=r'V = 11-12',color='g')
-# plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
-# plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
-# plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
-plt.scatter(TRILEGAL_C3['RA'],TRILEGAL_C3['Dec'],label=r'TRILEGAL C3',alpha=0.5)
-plt.scatter(camp3_0['RA'],camp3_0['Dec'],label=r'K2 C3',alpha=0.5)
+C3_nospec = pd.read_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3/C3_TL')
+# C3_nospec = C3_nospec.dropna(subset=['Vmag'])
+# print(C3_nospec['Vmag'])
+v9 = C3_nospec[C3_nospec['Vmag'] < 10]
+v10 = C3_nospec[(C3_nospec['Vmag'] >= 10) & (C3_nospec['Vmag'] < 11)]
+v11 = C3_nospec[(C3_nospec['Vmag'] >= 11) & (C3_nospec['Vmag'] < 12)]
+v12 = C3_nospec[(C3_nospec['Vmag'] >= 12) & (C3_nospec['Vmag'] < 13)]
+v13 = C3_nospec[(C3_nospec['Vmag'] >= 13) & (C3_nospec['Vmag'] < 14)]
+v14 = C3_nospec[(C3_nospec['Vmag'] >= 14) & (C3_nospec['Vmag'] <= 15)]
+# plt.scatter(C6_nospec['RA'],C6_nospec['Dec'])
+for i in range(84):
+    if (i+1 == 5) | (i+1 == 6) | (i+1 == 7) | (i+1 == 8) | (i+1 == 17) | (i+1 == 18) | (i+1 == 19) | (i+1 == 20): pass
+    else:
+        mychannel = footprint_dictionary["c3"]["channels"][str(i+1)]
+        plt.plot(mychannel["corners_ra"] + mychannel["corners_ra"][:1],mychannel["corners_dec"] + mychannel["corners_dec"][:1],color='orange',label='__nolegend__')
+
+plt.scatter(v9['RA'],v9['Dec'],label=r'V = 9-10')
+plt.scatter(v10['RA'],v10['Dec'],label=r'V = 10-11',color='r')
+plt.scatter(v11['RA'],v11['Dec'],label=r'V = 11-12',color='g')
+plt.scatter(v12['RA'],v12['Dec'],label=r'V = 12-13',color='m')
+plt.scatter(v13['RA'],v13['Dec'],label=r'V = 13-14',color='c')
+plt.scatter(v14['RA'],v14['Dec'],label=r'V = 14-15',color='k')
+
+print(min(v9['BV']),max(v9['BV']))
+print(min(v14['BV']),max(v14['BV']))
+# sys.exit()
+# plt.scatter(TRILEGAL_C3['RA'],TRILEGAL_C3['Dec'],label=r'TRILEGAL C3',alpha=0.5)
+# plt.scatter(camp3_0['RA'],camp3_0['Dec'],label=r'K2 C3',alpha=0.5)
 plt.xlabel(r'RA')
 plt.ylabel(r'DEC')
 plt.legend()
-
-plt.show()
+C3_nospec = C3_nospec[['EPIC','Vmag']]
+C3_nospec.to_csv('/home/bmr135/Dropbox/GES-K2/Ages/C3/EPICS_Vmags',index=False)
+# plt.show()

@@ -277,7 +277,7 @@ def Savita():
 
 def Benoit():
     ''' Benoit Seismo C3/C6 K2P2/C6 Everest '''
-    Benoit_C3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/Benoit/K2_fin_C3_E.txt',skiprows=3, \
+    Benoit_C3 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/Benoit/K2_fin_C3_E_corrected.txt',skiprows=3, \
                             names=['EPIC','Bnumax','e_Bnumax','BDnu','e_BDnu','A','errA'],delim_whitespace=True)
 
     Benoit_C6 = pd.read_csv(ext_DB+'Dropbox/K2Poles/Data0405/Benoit/K2_fin_C06_01_E.txt',skiprows=3, \
@@ -328,19 +328,27 @@ def Gaia_ESO():
         #Gaia_ESO_C3 = pd.read_csv(ext_GA+'GA/K2Poles/Gaia_ESO/GES_EPICS_Seismic1_SpecParameters1.txt',delim_whitespace=True)
         '''Paula iters'''
         # Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/Laura_Magrini/epinarbo_ite2_new.txt')
-        Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/param_tables/params_abund.txt',delim_whitespace=True)
+        # Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/param_tables/params_abund.txt',delim_whitespace=True)
         # Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/Diane_Feuillet/epinarbo_ite2_new.txt')
         # Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/Alvin_Gavel/lumba_ite1_uves_new.txt')
-        Gaia_ESO_C3.rename(columns={'OBJECT':'EPIC'},inplace=True)
+        Gaia_ESO_C3 = pd.read_csv(ext_DB+'Dropbox/GES-K2/param_tables/Final_Spec_Params_w_seismo.bin')
+        alphas = pd.read_csv('/home/bmr135/Dropbox/GES-K2/param_tables/Alpha_Abundances.dat',delimiter=r'\s+')
+        # Gaia_ESO_C3.rename(columns={'OBJECT':'EPIC'},inplace=True)
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].map(lambda x: x.split('_')[-1])
         Gaia_ESO_C3['EPIC'] = Gaia_ESO_C3['EPIC'].convert_objects(convert_numeric=True)
-        Gaia_ESO_C3['sig_FEH'] = 0
-        Gaia_ESO_C3['sig_TEFF'] = 0
+        alphas['EPIC'] = alphas['EPIC'].map(lambda x: x.split('_')[-1])
+        alphas['EPIC'] = alphas['EPIC'].convert_objects(convert_numeric=True)
+        alphas['ALPHA'] = alphas['MG1'] #+ alphas['SI1'] + alphas['SI2'] + alphas['CA1'] + alphas['CA2'] + alphas['TI1'] + alphas['TI2'])/7.
+        Gaia_ESO_C3 = pd.merge(Gaia_ESO_C3,alphas[['EPIC','ALPHA']],how='inner',on=['EPIC'])
         Gaia_ESO_C3['sig_LOGG'] = 0
         for i in range(len(Gaia_ESO_C3)):
             Gaia_ESO_C3['sig_LOGG'].iloc[i] = random.randint(5,25)/100
-            Gaia_ESO_C3['sig_TEFF'].iloc[i] = random.randint(90,125)
-            Gaia_ESO_C3['sig_FEH'].iloc[i] = random.randint(15,25)/100
+            if Gaia_ESO_C3['E_TEFF'].iloc[i] < 70:
+                Gaia_ESO_C3['E_TEFF'].iloc[i] = Gaia_ESO_C3['E_TEFF'].iloc[i] + 50
+            if Gaia_ESO_C3['E_FEH'].iloc[i] < 0.1:
+                Gaia_ESO_C3['E_FEH'].iloc[i] = Gaia_ESO_C3['E_FEH'].iloc[i] + 0.1
+        # print(Gaia_ESO_C3)
+        # sys.exit()
         return Gaia_ESO_C3
 
 def GES_merge(K2,GES,name):

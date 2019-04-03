@@ -70,6 +70,18 @@ BS_C6 = pd.merge(BC6,SC6,how='inner',on=['EPIC'])
 BS_C6 = BS_C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 
 
+
+''' Combine again for compound uncertainty calculation '''
+C3 = pd.merge(YB_C3,BS_C3,how='inner',on=['EPIC'])
+C3 = C3.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
+C6 = pd.merge(YB_C6,BS_C6,how='inner',on=['EPIC'])
+C6 = C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
+
+comp_C3_nmx = np.mean(np.sqrt(C3.nmx_err**2 + C3.e_Snumax**2 + C3.e_Bnumax_x**2))
+comp_C3_dnu = np.mean(np.sqrt(C3.dnu_err**2 + C3.e_SDnu**2 + C3.e_BDnu_x**2))
+comp_C6_nmx = np.mean(np.sqrt(C6.nmx_err**2 + C6.e_Snumax**2 + C6.e_Bnumax_x**2))
+comp_C6_dnu = np.mean(np.sqrt(C6.dnu_err**2 + C6.e_SDnu**2 + C6.e_BDnu_x**2))
+
 ''' numax histrograms - C3 and then C6 '''
 # fig, ax = plt.subplots()
 # bins = np.linspace(10,280,100)
@@ -313,7 +325,7 @@ BS_C6 = BS_C6.drop_duplicates(subset=['EPIC']).reset_index(drop=True)
 # sys.exit()
 
 ''' Difference plots dnu --> Guy style '''
-def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
+def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo,compErr):
     '''
     Plot to compare different asteroseimic pipelines. Scatter plot of the
     difference between the the two pipelines in terms of the compound uncertainty
@@ -335,8 +347,8 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
         - Could be modified to save or show accordingly.
 
     '''
-    df[comp_err] = np.sqrt(df[uncerts[0]]**2+df[uncerts[1]]**2)
-    df['Diff'] = ((df[params[0]]-df[params[1]])/df[comp_err])
+    # df[comp_err] = np.sqrt(df[uncerts[0]]**2+df[uncerts[1]]**2)
+    df['Diff'] = ((df[params[0]]-df[params[1]])/compErr)
     df = df[abs(df['Diff']) < 5]
     df = df.reset_index(drop=True)
     mu = np.mean(df['Diff'])
@@ -366,7 +378,7 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     std = np.std(df['Diff'])
     x = np.linspace(min(df['Diff']),max(df['Diff']),100)
     y = mlab.normpdf(x, mu, std)
-    print(mu, std, np.mean(df[comp_err]))
+    print(mu, std, compErr)
     ref = mlab.normpdf(x, 0.0, 1.0)
     ax2.plot(y,x,'r--',linewidth=2, label='Fit')
     ax2.plot(ref,x,'k--',linewidth=2,label='N(0,1)')
@@ -387,27 +399,27 @@ def comp_seismic_plot(df,comp_err,params,uncerts,labels,seismo):
     print(ttest_ind(df[params[0]],df[params[1]],equal_var=False))
     print(t.fit(df['Diff'],floc=mu,fscale=std))
     # sys.exit()
-    # fig.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/seismo_comp/C3_'+labels[0]+'_'+labels[1]+'_dnu.pdf',bbox_inches='tight')
+    # fig.savefig('/home/bmr135/Dropbox/K2Poles/pop_trends/seismo_comp/C3_'+labels[0]+'_'+labels[1]+'_numax.pdf',bbox_inches='tight')
     # df = df[df[params[0]]>7.5]
     # df[['EPIC',params[0],uncerts[0],params[1],uncerts[1]]].to_csv('/home/bmr135/seismo_comp/C6_'+labels[0]+'_'+labels[1]+'_dnu.txt',index=False)
     # plt.show()
     # sys.exit()
 
 ''' C3 comparisons '''
-print(np.median(YS_C3['nmx_err']),np.median(YS_C3['e_Snumax']),np.median(YB_C3['e_Bnumax']))
-comp_seismic_plot(YS_C3,'comp_err_nmx',['nmx','Snumax'],['nmx_err','e_Snumax'],[r'BHM',r'A2Z'],r'$\nu_{\rm{max}}$')
-comp_seismic_plot(YB_C3,'comp_err_nmx',['nmx','Bnumax'],['nmx_err','e_Bnumax'],[r'BHM',r'COR'],r'$\nu_{\rm{max}}$')
-comp_seismic_plot(BS_C3,'comp_err_nmx',['Bnumax','Snumax'],['e_Bnumax','e_Snumax'],[r'COR',r'A2Z'],r'$\nu_{\rm{max}}$')
-# comp_seismic_plot(YS_C3,'comp_err_Dnu',['dnu','SDnu'],['dnu_err','e_SDnu'],[r'BHM',r'A2Z'],r'$\Delta\nu$')
-# comp_seismic_plot(YB_C3,'comp_err_Dnu',['dnu','BDnu'],['dnu_err','e_BDnu'],[r'BHM',r'COR'],r'$\Delta\nu$')
-# comp_seismic_plot(BS_C3,'comp_err_Dnu',['BDnu','SDnu'],['e_BDnu','e_SDnu'],[r'COR',r'A2Z'],r'$\Delta\nu$')
+# print(np.median(YS_C3['nmx_err']),np.median(YS_C3['e_Snumax']),np.median(YB_C3['e_Bnumax']))
+comp_seismic_plot(YS_C3,'comp_err_nmx',['nmx','Snumax'],['nmx_err','e_Snumax'],[r'BHM',r'A2Z'],r'$\nu_{\rm{max}}$',comp_C3_nmx)
+comp_seismic_plot(YB_C3,'comp_err_nmx',['nmx','Bnumax'],['nmx_err','e_Bnumax'],[r'BHM',r'COR'],r'$\nu_{\rm{max}}$',comp_C3_nmx)
+comp_seismic_plot(BS_C3,'comp_err_nmx',['Bnumax','Snumax'],['e_Bnumax','e_Snumax'],[r'COR',r'A2Z'],r'$\nu_{\rm{max}}$',comp_C3_nmx)
+# comp_seismic_plot(YS_C3,'comp_err_Dnu',['dnu','SDnu'],['dnu_err','e_SDnu'],[r'BHM',r'A2Z'],r'$\Delta\nu$',comp_C3_dnu)
+# comp_seismic_plot(YB_C3,'comp_err_Dnu',['dnu','BDnu'],['dnu_err','e_BDnu'],[r'BHM',r'COR'],r'$\Delta\nu$',comp_C3_dnu)
+# comp_seismic_plot(BS_C3,'comp_err_Dnu',['BDnu','SDnu'],['e_BDnu','e_SDnu'],[r'COR',r'A2Z'],r'$\Delta\nu$',comp_C3_dnu)
 
 ''' C6 comparisons '''
-# comp_seismic_plot(YS_C6,'comp_err_nmx',['nmx','Snumax'],['nmx_err','e_Snumax'],[r'BHM',r'A2Z'],r'$\nu_{\rm{max}}$')
-# comp_seismic_plot(YB_C6,'comp_err_nmx',['nmx','Bnumax'],['nmx_err','e_Bnumax'],[r'BHM',r'COR'],r'$\nu_{\rm{max}}$')
-# comp_seismic_plot(BS_C6,'comp_err_nmx',['Bnumax','Snumax'],['e_Bnumax','e_Snumax'],[r'COR',r'A2Z'],r'$\nu_{\rm{max}}$')
-# comp_seismic_plot(YS_C6,'comp_err_Dnu',['dnu','SDnu'],['dnu_err','e_SDnu'],[r'BHM',r'A2Z'],r'$\Delta\nu$')
-# comp_seismic_plot(YB_C6,'comp_err_Dnu',['dnu','BDnu'],['dnu_err','e_BDnu'],[r'BHM',r'COR'],r'$\Delta\nu$')
-# comp_seismic_plot(BS_C6,'comp_err_Dnu',['BDnu','SDnu'],['e_BDnu','e_SDnu'],[r'COR',r'A2Z'],r'$\Delta\nu$')
+# comp_seismic_plot(YS_C6,'comp_err_nmx',['nmx','Snumax'],['nmx_err','e_Snumax'],[r'BHM',r'A2Z'],r'$\nu_{\rm{max}}$',comp_C6_nmx)
+# comp_seismic_plot(YB_C6,'comp_err_nmx',['nmx','Bnumax'],['nmx_err','e_Bnumax'],[r'BHM',r'COR'],r'$\nu_{\rm{max}}$',comp_C6_nmx)
+# comp_seismic_plot(BS_C6,'comp_err_nmx',['Bnumax','Snumax'],['e_Bnumax','e_Snumax'],[r'COR',r'A2Z'],r'$\nu_{\rm{max}}$',comp_C6_nmx)
+# comp_seismic_plot(YS_C6,'comp_err_Dnu',['dnu','SDnu'],['dnu_err','e_SDnu'],[r'BHM',r'A2Z'],r'$\Delta\nu$',comp_C6_dnu)
+# comp_seismic_plot(YB_C6,'comp_err_Dnu',['dnu','BDnu'],['dnu_err','e_BDnu'],[r'BHM',r'COR'],r'$\Delta\nu$',comp_C6_dnu)
+# comp_seismic_plot(BS_C6,'comp_err_Dnu',['BDnu','SDnu'],['e_BDnu','e_SDnu'],[r'COR',r'A2Z'],r'$\Delta\nu$',comp_C6_dnu)
 plt.show()
 sys.exit()

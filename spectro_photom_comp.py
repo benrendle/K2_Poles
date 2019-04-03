@@ -202,14 +202,14 @@ def odr_fit(df,df1,param,label,f1,ax,uncert):
 
 if __name__ == "__main__":
     ''' Read in Data '''
-    # ext = '/media/bmr135/SAMSUNG/GA/K2Poles'
-    ext = '/media/ben/SAMSUNG/GA/K2Poles'
+    ext = '/media/bmr135/SAMSUNG/GA/K2Poles'
+    # ext = '/media/ben/SAMSUNG/GA/K2Poles'
     A3 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C3.csv')
     A3 = A3.dropna(subset=['TEFF','LOGG','FE_H'])
     A6 = pd.read_csv(ext+'/APO_LAMOST/APOGEE_full_C6.csv')
     A6 = A6.dropna(subset=['TEFF','LOGG','FE_H'])
     G = pd.read_csv(ext+'/Gaia_ESO/GES_full.csv')
-    G = G.dropna(subset=['TEFF','LOGG','FEH'])
+    G = G.dropna(subset=['TEFF','logg_s','FEH'])
     R3 = pd.read_csv(ext+'/RAVE_C3.csv')
     R3 = R3.dropna(subset=['Teff_RAVE','logg_RAVE','[Fe/H]_RAVE'])
     R3 = R3[R3['logg_RAVE'] > 0]
@@ -308,37 +308,37 @@ if __name__ == "__main__":
     ''' APOGEE vs Gaia-ESO - C3 '''
     fig, ((ax,ax1,ax2),(ax3,ax4,ax5)) = plt.subplots(2,3,sharex='col',figsize=(15,10))
     ax.set_ylabel(r'$T_{\rm{eff}}$ - APOGEE, C3',fontsize=15)
-    ax1.set_ylabel(r'log$_{10}$(g) - APOGEE, C3',fontsize=15)
+    ax1.set_ylabel(r'log(g) - APOGEE, C3',fontsize=15)
     ax2.set_ylabel(r'[Fe/H] - APOGEE, C3',fontsize=15)
     ax3.set_ylabel(r'$T_{\rm{eff}}$ - RAVE, C3',fontsize=15)
-    ax4.set_ylabel(r'log$_{10}$(g) - RAVE, C3',fontsize=15)
+    ax4.set_ylabel(r'log(g) - RAVE, C3',fontsize=15)
     ax5.set_ylabel(r'[Fe/H] - RAVE, C3',fontsize=15)
     ax3.set_xlabel(r'$T_{\rm{eff}}$ - GES, C3',fontsize=15)
-    ax4.set_xlabel(r'log$_{10}$(g) - GES, C3',fontsize=15)
+    ax4.set_xlabel(r'log(g) - GES, C3',fontsize=15)
     ax5.set_xlabel(r'[Fe/H] - GES, C3',fontsize=15)
 
     if len(ag) > 10:
         # ransac_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax,['TEFF_ERR','sig_Teff'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
-        odr_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax,['TEFF_ERR','sig_TEFF'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
+        odr_fit(ag,ga,['TEFF','TEFF'],[r'$T_{\rm{eff}}$ - APOGEE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax,['TEFF_ERR','E_TEFF'])#r'$\Delta(T_{\rm{eff}})_{APO-GES}$'],10)
         # plt.show()
         # ransac_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax1,['LOGG_ERR','sig_logg'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
-        odr_fit(ag,ga,['LOGG','LOGG'],[r'log$_{10}$(g) - APOGEE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax1,['LOGG_ERR','sig_LOGG'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
+        odr_fit(ag,ga,['LOGG','logg_s'],[r'log(g) - APOGEE, C3',r'log(g) - GES, C3'],0.45,ax1,['LOGG_ERR','sig_LOGG'])#r'$\Delta($log$_{10}$(g)$)_{APO-GES}$'],0.1)
         # plt.show()
         # ransac_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],1.,ax2,['FE_H_ERR','sig_feh'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
-        odr_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],1.,ax2,['FE_H_ERR','sig_FEH'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
+        odr_fit(ag,ga,['FE_H','FEH'],[r'[Fe/H] - APOGEE, C3',r'[Fe/H] - GES, C3'],1.,ax2,['FE_H_ERR','E_FEH'])#r'$\Delta($[Fe/H]$)_{APO-GES}$'],0.1)
         # plt.show()
         # sys.exit()
 
     ''' RAVE vs Gaia-ESO - C3 '''
     if len(rg) > 10:
         # ransac_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax3,['sig_Teff','sig_Teff'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
-        odr_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax3,['sig_Teff','sig_TEFF'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
+        odr_fit(rg,gr,['Teff_RAVE','TEFF'],[r'$T_{\rm{eff}}$ - RAVE, C3',r'$T_{\rm{eff}}$ - GES, C3'],500,ax3,['sig_Teff','E_TEFF'])#,r'$\Delta(T_{\rm{eff}})_{RAVE-GES}$'],10)
         # plt.show()
         # ransac_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax4,['sig_logg','sig_logg'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
-        odr_fit(rg,gr,['logg_RAVE','LOGG'],[r'log$_{10}$(g) - RAVE, C3',r'log$_{10}$(g) - GES, C3'],0.45,ax4,['sig_logg','sig_LOGG'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
+        odr_fit(rg,gr,['logg_RAVE','logg_s'],[r'log(g) - RAVE, C3',r'log(g) - GES, C3'],0.45,ax4,['sig_logg','sig_LOGG'])#,r'$\Delta($log$_{10}$(g)$)_{RAVE-GES}$'],0.1)
         # plt.show()
         # ransac_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],1.,ax5,['sig_feh','sig_feh'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
-        odr_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],1.,ax5,['sig_feh','sig_FEH'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
+        odr_fit(rg,gr,['[Fe/H]_RAVE','FEH'],[r'[Fe/H] - RAVE, C3',r'[Fe/H] - GES, C3'],1.,ax5,['sig_feh','E_FEH'])#,r'$\Delta($[Fe/H]$)_{RAVE-GES}$'],0.1)
         # plt.show()
 
     ax3.set_xlim(4400, 5200)
