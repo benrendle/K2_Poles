@@ -148,9 +148,11 @@ b['empar'] = 0
 b['ecpar'] = 0
 
 for j in range(len(b)):
+    GAP3['Teff'] -= 200
     GAP3['foma'] = GAP3['Radius']**(1/(1-2*b['beta'].iloc[j])) * (GAP3['Teff']/5777.0)**(-1/(2-4*b['beta'].iloc[j])) * 3090 # numax for C3 GAP (frequency of maximum amplitude) <- vary beta
     GAP3['Lumo'] = GAP3['Radius']**2 * (GAP3['Teff']/const.solar_Teff)**4
     # GAP3['fomag'] = GAP3['Rgaia']**-2 * (GAP3['Teff']/5777.0)**0.92 * 3090 # numax for C3 GAP (frequency of maximum amplitude)
+    # GAP3['Rgaia'] = GAP3['Rgaia'] * 1.15
     GAP3['fomag'] = GAP3['Rgaia']**(1/(1-2*b['beta'].iloc[j])) * (GAP3['Teff']/5777.0)**(-1/(2-4*b['beta'].iloc[j])) * 3090 # numax for C3 GAP (frequency of maximum amplitude)
     GAP3['fomag'] = 0.99949*GAP3['fomag'] + 1.016925 # From fitting
     # GAP3['lsep'] = 0.22*GAP3['fomag']**0.8
@@ -180,6 +182,7 @@ for j in range(len(b)):
     GAP6['foma'] = GAP6['Radius']**(1/(1-2*b['beta'].iloc[j])) * (GAP6['Teff']/5777.0)**(-1/(2-4*b['beta'].iloc[j])) * 3090 # numax for C6 GAP (frequency of maximum amplitude) -> vary beta
     GAP6['Lumo'] = GAP6['Radius']**2 * (GAP6['Teff']/const.solar_Teff)**4
     # GAP6['fomag'] = GAP6['Rgaia']**-1.85 * (GAP6['Teff']/5777.0)**0.92 * 3090 # numax for C6 GAP (frequency of maximum amplitude)
+    # GAP6['Rgaia'] = GAP6['Rgaia'] * 1.05
     GAP6['fomag'] = GAP6['Rgaia']**(1/(1-2*b['beta'].iloc[j])) * (GAP6['Teff']/5777.0)**(-1/(2-4*b['beta'].iloc[j])) * 3090 # numax for C6 GAP (frequency of maximum amplitude)
     GAP6['fomag'] = 0.99949*GAP6['fomag'] + 1.016925 # From fitting
     GAP6['lsep'] = 0.22*GAP6['fomag']**0.8
@@ -295,7 +298,7 @@ for j in range(len(b)):
     # print(len(pd.merge(GAP3[['EPIC']],camp3_0[['EPIC']],how='inner',on=['EPIC'])))
     # print(len(GAP6_v2),len(C6R))
     print(len(GAP6_v2[GAP6_v2['prob_s'] >= 0.95]), len(C6R[C6R['prob_s'] >= 0.95]))
-    # sys.exit()
+    sys.exit()
 
     C3Rg = pd.merge(C3Rg,camp3_0[['EPIC','Bnumax','nmx','Snumax','BDnu','dnu','SDnu']],how='inner',on=['EPIC'])
     C3Rg = prop.single_seismo(C3Rg,['Bnumax','nmx','Snumax'],'NUMAX')
@@ -907,6 +910,8 @@ camp3['Vcut'] = camp3['Kmag'] + 2*(camp3['JK']+0.14) + 0.382*np.exp(2*(camp3['JK
 print(min(camp3.Vcut),max(camp3.Vcut))
 print(min(camp6['Hmag']),max(camp6['Hmag']))
 print('C3/C6 lengths:',len(camp3),len(camp6))
+print(camp3.columns.values)
+print(camp3.slogg)
 
 # Luca = pd.read_csv('/home/bmr135/K2_Poles/Mass_Distr_In/Gaia/SM_Gaia_BC_full.csv')
 # a = Luca[Luca['#Id'] < 208000000]

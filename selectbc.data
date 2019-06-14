@@ -1,6 +1,6 @@
   1  = ialf (= [alpha/Fe] variation: select from choices listed below)
   5  = nfil (= number of filter bandpasses to be considered; maximum = 5)
-  1 3  =  photometric system and filter (select from menu below)
+  7 37  =  photometric system and filter (select from menu below)
  27 87  =  photometric system and filter (select from menu below)
  27 88  =  photometric system and filter (select from menu below)
  20 73  =  photometric system and filter (select from menu below)
